@@ -1,64 +1,59 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
-using System.Runtime.InteropServices;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Engine.Core;
+using Engine.Core.Managers.Interfaces;
+using OpenTK.Graphics.OpenGL4;
 
 namespace Engine.Graphics;
 
-public class Model<T> : IDisposable where T : struct
+public class Model<M> where M : struct
 {
-    private readonly int _vertexBuffer;
-    private readonly int _vertexArray;
-    private readonly int _vertexCount;
+    public Mesh<M> Mesh { get; set; }
+    public Shader Shader { get; set; }
+    public Transform Transform { get; set; }
 
-    public Model(T[] vertices, VertexLayout layout, BufferUsageHint usageHint, int vertexCount = -1)
+    public Model(Mesh<M> mesh, Shader shader)
     {
-        if (vertices == null || vertices.Length == 0)
-        {
-            throw new ArgumentException("Invalid vertex array.");
-        }
-
-        if (vertexCount < 0) vertexCount = vertices.Length;
-
-        var vertexSize = layout.GetVertexSize();
-        var expectedSize = vertexSize * vertexCount;
-        var dataSize = vertices.Length * Marshal.SizeOf<T>();
-        if (dataSize != expectedSize)
-        {
-            throw new ArgumentException($"Invalid vertex array size: expected {expectedSize} bytes, got {dataSize} bytes.");
-        }
-
-        _vertexCount = vertexCount;
-
-        GL.GenVertexArrays(1, out _vertexArray);
-        GL.BindVertexArray(_vertexArray);
-
-        GL.GenBuffers(1, out _vertexBuffer);
-        GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer);
-
-        GL.BufferData(BufferTarget.ArrayBuffer, dataSize, vertices, usageHint);
-
-        var idx = 0;
-        var offset = 0;
-        foreach (var attr in layout.Attributes)
-        {
-            GL.VertexAttribPointer(idx, attr.Size, attr.Type, attr.Normalized, vertexSize, offset);
-            GL.EnableVertexAttribArray(idx);
-
-            idx++;
-            offset += attr.Stride;
-        }
+        Mesh = mesh;
+        Shader = shader;
+        Transform = new();
     }
 
     public void Render()
     {
-        GL.BindVertexArray(_vertexArray);
-        GL.DrawArrays(PrimitiveType.Triangles, 0, _vertexCount);
-        //GL.BindVertexArray(0);
+        Shader.Use();
+
+        BindGeneralUniforms();
+
+        Shader.BindCustomUniforms();
+
+        Mesh.Render();
     }
 
-    public void Dispose()
+    private void BindGeneralUniforms()
     {
-        GL.DeleteBuffer(_vertexBuffer);
-        GL.DeleteVertexArray(_vertexArray);
+        var shaderHandle = Shader.Handle;
+
+        // Time
+        ITimeManager timeManager = ITimeManager.Instance!;
+
+        var uniformHandle = GL.GetUniformLocation(shaderHandle, "uTime");
+        if (uniformHandle != -1) GL.Uniform1(uniformHandle, (float)timeManager.TotalTime);
+
+        uniformHandle = GL.GetUniformLocation(shaderHandle, "uDeltaTime");
+        if (uniformHandle != -1) GL.Uniform1(uniformHandle, (float)timeManager.DeltaTime);
+
+        // Matrices
+
+
+
+        // uMatProj
+        // uMatView
+        // uMatModel
+        // uMatNormal
+        // uMatMVP
     }
 }

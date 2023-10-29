@@ -5,6 +5,7 @@ namespace Engine.Graphics;
 public class Shader : IDisposable
 {
     private readonly int _handle;
+    public int Handle => _handle;
 
     public Shader(string vertexPath, string fragmentPath)
     {
@@ -40,7 +41,7 @@ public class Shader : IDisposable
 
         if (success == 0)
         {
-            string infoLog = GL.GetProgramInfoLog(shader);
+            string infoLog = GL.GetShaderInfoLog(shader);
             throw new ShaderException(path, type, infoLog);
         }
 
@@ -50,6 +51,10 @@ public class Shader : IDisposable
     public void Use()
     {
         GL.UseProgram(_handle);
+    }
+
+    public virtual void BindCustomUniforms() 
+    {
     }
 
     public void Dispose()
