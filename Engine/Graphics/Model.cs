@@ -1,27 +1,33 @@
 ﻿using OpenTK.Graphics.OpenGL4;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+using OpenTK.Mathematics;
+using System.Runtime.InteropServices;
 
 namespace Engine.Graphics;
 
-public class Model : IDisposable
+public class Model<T> : IDisposable where T : struct
 {
     private readonly int _vertexBuffer;
     private readonly int _vertexArray;
     private readonly int _vertexCount;
 
-    public Model(float[] vertices)
+    public Model(T[] vertices, VertexLayout layout, BufferUsageHint usageHint, int vertexCount = -1)
     {
         if (vertices == null || vertices.Length == 0)
         {
-            throw new ArgumentException("Invalid vertices array.");
+            throw new ArgumentException("Invalid vertex array.");
         }
 
-        _vertexCount = vertices.Length / 6;
+        if (vertexCount < 0) vertexCount = vertices.Length;
+
+        var vertexSize = layout.GetVertexSize();
+        var expectedSize = vertexSize * vertexCount;
+        var dataSize = vertices.Length * Marshal.SizeOf<T>();
+        if (dataSize != expectedSize)
+        {
+            throw new ArgumentException($"Invalid vertex array size: expected {expectedSize} bytes, got {dataSize} bytes.");
+        }
+
+        _vertexCount = vertexCount;
 
         GL.GenVertexArrays(1, out _vertexArray);
         GL.BindVertexArray(_vertexArray);
@@ -29,17 +35,18 @@ public class Model : IDisposable
         GL.GenBuffers(1, out _vertexBuffer);
         GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer);
 
-        GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * vertices.Length, vertices, BufferUsageHint.StaticDraw);
+        GL.BufferData(BufferTarget.ArrayBuffer, dataSize, vertices, usageHint);
 
-        // Position attribute
-        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-        GL.EnableVertexAttribArray(0);
+        var idx = 0;
+        var offset = 0;
+        foreach (var attr in layout.Attributes)
+        {
+            GL.VertexAttribPointer(idx, attr.Size, attr.Type, attr.Normalized, vertexSize, offset);
+            GL.EnableVertexAttribArray(idx);
 
-        // Color attribute
-        GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
-        GL.EnableVertexAttribArray(1);
-
-        //GL.BindVertexArray(0);
+            idx++;
+            offset += attr.Stride;
+        }
     }
 
     public void Render()

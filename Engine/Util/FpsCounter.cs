@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TerrainGenerator.Engine.Util;
+namespace Engine.Util;
 
 internal class FpsCounter
 {

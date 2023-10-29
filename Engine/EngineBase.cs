@@ -1,9 +1,9 @@
 ﻿using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
-using TerrainGenerator.Engine.Util;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Mathematics;
+using Engine.Util;
 
 namespace Engine;
 
