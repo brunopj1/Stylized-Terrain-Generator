@@ -25,7 +25,22 @@ public class Transform
         Matrix4 translationMatrix = Matrix4.CreateTranslation(Position);
         Matrix4 rotationMatrix = Matrix4.CreateFromQuaternion(Rotation);
         Matrix4 scaleMatrix = Matrix4.CreateScale(Scale);
-
+        
         return scaleMatrix * rotationMatrix * translationMatrix;
+    }
+
+    public void Translate(Vector3 translation)
+    {
+        Position += translation;
+    }
+
+    public void Rotate(Quaternion rotation)
+    {
+        Rotation *= rotation;
+    }
+
+    public void ScaleBy(Vector3 scale)
+    {
+        Scale *= scale;
     }
 }

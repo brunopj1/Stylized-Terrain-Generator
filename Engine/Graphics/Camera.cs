@@ -10,23 +10,100 @@ namespace Engine.Graphics;
 // TODO should I validate the properties here?
 public class Camera
 {
-    public Vector3 Position { get; set; } = new(0.0f, 0.0f, 0.0f);
-    public Vector3 Front { get; set; } = new(0.0f, 0.0f, -1.0f);
-    public Vector3 Up { get; set; } = new(0.0f, 1.0f, 0.0f);
+    public Vector3 Position { get; set; } = Vector3.Zero;
 
-    public float Fov { get; set; } = 45.0f;
-    public float AspectRatio { get; set; } = 1.0f;
+    private float _pitch = 0; // Rotation around the X axis (radians)
+    private float _yaw = -MathHelper.PiOver2; // Rotation around the Y axis (radians)
 
-    public float Near { get; set; } = 0.1f;
-    public float Far { get; set; } = 100.0f;
+    public float Pitch
+    {
+        get => MathHelper.RadiansToDegrees(_pitch);
+        set
+        {
+            var angle = MathHelper.Clamp(value, -89f, 89f);
+            _pitch = MathHelper.DegreesToRadians(angle);
+            UpdateVectors();
+        }
+    }
+
+    public float Yaw
+    {
+        get => MathHelper.RadiansToDegrees(_yaw);
+        set
+        {
+            _yaw = MathHelper.DegreesToRadians(value);
+            UpdateVectors();
+        }
+    }
+
+    public Vector3 Front { get; private set; } = -Vector3.UnitZ;
+    public Vector3 Up { get; private set; } = Vector3.UnitY;
+    public Vector3 Right { get; private set; } = Vector3.UnitX;
+
+    private float _fov = MathHelper.PiOver2;
+
+    public float Fov
+    {
+        get => MathHelper.RadiansToDegrees(_fov);
+        set
+        {
+            var angle = MathHelper.Clamp(value, 1f, 90f);
+            _fov = MathHelper.DegreesToRadians(angle);
+        }
+    }
+
+    private float _near = 1f;
+    private float _far = 1000f;
+
+    public float Near
+    {
+        get => _near;
+        set
+        {
+            if (value <= 0f) throw new ArgumentOutOfRangeException(nameof(value), "Near plane must be greater than 0.");
+            if (value >= _far) throw new ArgumentOutOfRangeException(nameof(value), "Near plane must be less than far plane.");
+            _near = value;
+        }
+    }
+
+    public float Far
+    {
+        get => _far;
+        set
+        {
+            if (value <= 0f) throw new ArgumentOutOfRangeException(nameof(value), "Far plane must be greater than 0.");
+            if (value <= _near) throw new ArgumentOutOfRangeException(nameof(value), "Far plane must be greater than near plane.");
+            _far = value;
+        }
+    }
+
+    public float AspectRatio { private get; set; } = 1;
 
     public Matrix4 GetViewMatrix()
     {
         return Matrix4.LookAt(Position, Position + Front, Up);
     }
 
-    public Matrix4 GetProjectionMatrix(float aspectRatio)
+    public Matrix4 GetProjectionMatrix()
     {
-        return Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(Fov), aspectRatio, Near, Far);
+        return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, _near, _far);
+    }
+
+    public Matrix4 GetNormalMatrix()
+    {
+        return Matrix4.Transpose(Matrix4.Invert(GetViewMatrix()));
+    }
+
+    private void UpdateVectors()
+    {
+        Front = Vector3.Normalize(new Vector3
+        {
+            X = MathF.Cos(_pitch) * MathF.Cos(_yaw),
+            Y = MathF.Sin(_pitch),
+            Z = MathF.Cos(_pitch) * MathF.Sin(_yaw)
+        });
+
+        Right = Vector3.Normalize(Vector3.Cross(Front, Vector3.UnitY));
+        Up = Vector3.Normalize(Vector3.Cross(Right, Front));
     }
 }

@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Engine.Core;
-using Engine.Core.Managers.Interfaces;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 
 namespace Engine.Graphics;
 
@@ -22,38 +22,13 @@ public class Model<M> where M : struct
         Transform = new();
     }
 
-    public void Render()
+    public void Render(IEngineUniformAccessor uniformAccessor, Matrix4? parentModelMatrix = null)
     {
+        var modelMatrix = Transform.GetMatrix();
+        if (parentModelMatrix.HasValue) modelMatrix = parentModelMatrix.Value * modelMatrix;
+
         Shader.Use();
-
-        BindGeneralUniforms();
-
-        Shader.BindCustomUniforms();
-
+        Shader.BindUniforms(uniformAccessor, modelMatrix);
         Mesh.Render();
-    }
-
-    private void BindGeneralUniforms()
-    {
-        var shaderHandle = Shader.Handle;
-
-        // Time
-        ITimeManager timeManager = ITimeManager.Instance!;
-
-        var uniformHandle = GL.GetUniformLocation(shaderHandle, "uTime");
-        if (uniformHandle != -1) GL.Uniform1(uniformHandle, (float)timeManager.TotalTime);
-
-        uniformHandle = GL.GetUniformLocation(shaderHandle, "uDeltaTime");
-        if (uniformHandle != -1) GL.Uniform1(uniformHandle, (float)timeManager.DeltaTime);
-
-        // Matrices
-
-
-
-        // uMatProj
-        // uMatView
-        // uMatModel
-        // uMatNormal
-        // uMatMVP
     }
 }

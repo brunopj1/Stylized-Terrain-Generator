@@ -1,11 +1,13 @@
-﻿using Engine.Exceptions;
+﻿using Engine.Core;
+using Engine.Exceptions;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 
 namespace Engine.Graphics;
 public class Shader : IDisposable
 {
     private readonly int _handle;
-    public int Handle => _handle;
+    private readonly Dictionary<string, int> _uniformHandles = new();
 
     public Shader(string vertexPath, string fragmentPath)
     {
@@ -53,8 +55,53 @@ public class Shader : IDisposable
         GL.UseProgram(_handle);
     }
 
-    public virtual void BindCustomUniforms() 
+    public void BindUniforms(IEngineUniformAccessor uniformAccessor, Matrix4 modelMatrix)
     {
+        // Time
+        var uniformHandle = GetUniformHandle("uTotalTime");
+        if (uniformHandle != -1) GL.Uniform1(uniformHandle, (float)uniformAccessor.TotalTime);
+
+        uniformHandle = GetUniformHandle("uDeltaTime");
+        if (uniformHandle != -1) GL.Uniform1(uniformHandle, (float)uniformAccessor.DeltaTime);
+
+        uniformHandle = GetUniformHandle("uCurrentFrame");
+        if (uniformHandle != -1) GL.Uniform1(uniformHandle, uniformAccessor.CurrentFrame);
+
+        // Matrices
+        uniformHandle = GetUniformHandle("uModelMatrix");
+        if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref modelMatrix);
+
+        uniformHandle = GetUniformHandle("uViewMatrix");
+        var viewMatrix = uniformAccessor.ViewMatrix;
+        if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref viewMatrix);
+
+        uniformHandle = GetUniformHandle("uProjectionMatrix");
+        var projectionMatrix = uniformAccessor.ProjectionMatrix;
+        if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref projectionMatrix);
+
+        uniformHandle = GetUniformHandle("uNormalMatrix");
+        var normalMatrix = uniformAccessor.NormalMatrix;
+        if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref normalMatrix);
+
+        uniformHandle = GetUniformHandle("uMVPMatrix");
+        var mvpMatrix = modelMatrix * viewMatrix * projectionMatrix;
+        if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref mvpMatrix);
+
+        // Custom uniforms
+        BindCustomUniforms();
+    }
+
+    protected virtual void BindCustomUniforms() 
+    {
+    }
+
+    protected int GetUniformHandle(string name)
+    {
+        if (_uniformHandles.TryGetValue(name, out var handle)) return handle;
+
+        handle = GL.GetUniformLocation(_handle, name);
+        _uniformHandles[name] = handle;
+        return handle;
     }
 
     public void Dispose()

@@ -4,6 +4,8 @@ using OpenTK.Graphics.OpenGL4;
 using TerrainGenerator;
 using System.Runtime.InteropServices;
 using Engine.Core;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using OpenTK.Mathematics;
 
 namespace TriangleTest;
 
@@ -37,11 +39,18 @@ class TriangleTestEngine : EngineBase
         _model = new(mesh, shader);
     }
 
+    protected override void OnLoad()
+    {
+        base.OnLoad();
+
+        CursorState = CursorState.Grabbed;
+    }
+
     protected override void OnRenderFrame(FrameEventArgs e)
     {
         base.OnRenderFrame(e);
 
-        _model.Render();
+        _model.Render(UniformAccessor);
 
         SwapBuffers();
     }
