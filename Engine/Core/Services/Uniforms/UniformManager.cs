@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Engine.Core;
+namespace Engine.Core.Services.Uniforms;
 
-public class EngineUniformManager : IEngineUniformAccessor
+internal class UniformManager : IUniformAccessor
 {
     // Time
     public double TotalTime { get; set; }

@@ -1,4 +1,4 @@
-﻿using Engine.Core;
+﻿using Engine.Core.Services.Uniforms;
 using Engine.Exceptions;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -55,7 +55,7 @@ public class Shader : IDisposable
         GL.UseProgram(_handle);
     }
 
-    public void BindUniforms(IEngineUniformAccessor uniformAccessor, Matrix4 modelMatrix)
+    public void BindUniforms(IUniformAccessor uniformAccessor, Matrix4 modelMatrix)
     {
         // Time
         var uniformHandle = GetUniformHandle("uTotalTime");
@@ -83,9 +83,9 @@ public class Shader : IDisposable
         var normalMatrix = uniformAccessor.NormalMatrix;
         if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref normalMatrix);
 
-        uniformHandle = GetUniformHandle("uMVPMatrix");
-        var mvpMatrix = modelMatrix * viewMatrix * projectionMatrix;
-        if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref mvpMatrix);
+        uniformHandle = GetUniformHandle("uPVMMatrix");
+        var pvmMatrix = modelMatrix * viewMatrix * projectionMatrix;
+        if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref pvmMatrix);
 
         // Custom uniforms
         BindCustomUniforms();

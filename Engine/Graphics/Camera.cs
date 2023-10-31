@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Engine.Graphics;
 
-// TODO should I validate the properties here?
 public class Camera
 {
     public Vector3 Position { get; set; } = Vector3.Zero;
@@ -52,8 +51,8 @@ public class Camera
         }
     }
 
-    private float _near = 1f;
-    private float _far = 1000f;
+    private float _near = 0.1f;
+    private float _far = 100f;
 
     public float Near
     {
@@ -63,7 +62,7 @@ public class Camera
             if (value <= 0f) throw new ArgumentOutOfRangeException(nameof(value), "Near plane must be greater than 0.");
             if (value >= _far) throw new ArgumentOutOfRangeException(nameof(value), "Near plane must be less than far plane.");
             _near = value;
-        }
+    }
     }
 
     public float Far

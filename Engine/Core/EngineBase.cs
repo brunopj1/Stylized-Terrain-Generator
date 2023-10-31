@@ -6,6 +6,7 @@ using OpenTK.Mathematics;
 using Engine.Graphics;
 using System.Reflection.Metadata;
 using Engine.Exceptions;
+using Engine.Core.Services.Uniforms;
 
 namespace Engine.Core;
 
@@ -26,9 +27,13 @@ public class EngineBase : GameWindow
     protected new string Title { get; set; } = "My Game";
     protected Vector3 ClearColor { get; set; } = new(0.2f, 0.3f, 0.3f);
 
+    // TODO move this to an input manager
+    private Vector2 _previousMousePosition = Vector2i.Zero;
+    protected Vector2 MouseOffset { get; private set; } = Vector2i.Zero;
+
     // Rendering objects
-    private readonly EngineUniformManager _uniformManager = new();
-    protected IEngineUniformAccessor UniformAccessor => _uniformManager;
+    private readonly UniformManager _uniformManager = new();
+    protected IUniformAccessor UniformAccessor => _uniformManager;
 
     protected Camera _camera = new();
 
@@ -44,6 +49,10 @@ public class EngineBase : GameWindow
     protected override void OnLoad()
     {
         base.OnLoad();
+
+        GL.Enable(EnableCap.DepthTest);
+
+        _previousMousePosition = MousePosition;
     }
 
     protected override void OnResize(ResizeEventArgs e)
@@ -64,7 +73,8 @@ public class EngineBase : GameWindow
             base.Title = $"{Title} ({FrameRate} fps)";
         }
 
-        UpdateUniforms();
+        MouseOffset = MousePosition - _previousMousePosition;
+        _previousMousePosition = MousePosition;
 
         if (KeyboardState.IsKeyDown(Keys.Escape))
         {
@@ -76,8 +86,10 @@ public class EngineBase : GameWindow
     {
         base.OnRenderFrame(e);
 
-        GL.Clear(ClearBufferMask.ColorBufferBit);
+        GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         GL.ClearColor(ClearColor.X, ClearColor.Y, ClearColor.Z, 1.0f);
+
+        UpdateUniforms();
     }
 
     // Internal methods

@@ -1,6 +1,6 @@
 Task list:
 
 - [ ] Install the CodeMaid extension and establish project conventions
-- [ ] Load models / shaders outside the constructor
+- [ ] Add ImGui to the project
 - [ ] Option to recompile shaders
 - [ ] Better input handling

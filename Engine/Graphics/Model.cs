@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Engine.Core;
+using Engine.Core.Services.Uniforms;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -22,7 +22,7 @@ public class Model<M> where M : struct
         Transform = new();
     }
 
-    public void Render(IEngineUniformAccessor uniformAccessor, Matrix4? parentModelMatrix = null)
+    public void Render(IUniformAccessor uniformAccessor, Matrix4? parentModelMatrix = null)
     {
         var modelMatrix = Transform.GetMatrix();
         if (parentModelMatrix.HasValue) modelMatrix = parentModelMatrix.Value * modelMatrix;

@@ -10,9 +10,9 @@ public class Mesh<T> : IDisposable where T : struct
     private readonly int _vertexArray;
     private readonly int _vertexCount;
 
-    public Transform transform { get; set; } = new();
+    private readonly PrimitiveType _primitiveType;
 
-    public Mesh(T[] vertices, VertexLayout layout, BufferUsageHint usageHint, int vertexCount = -1)
+    public Mesh(T[] vertices, VertexLayout layout, PrimitiveType primitiveType = PrimitiveType.Triangles, BufferUsageHint usageHint = BufferUsageHint.StaticDraw, int vertexCount = -1)
     {
         if (vertices == null || vertices.Length == 0)
         {
@@ -30,6 +30,7 @@ public class Mesh<T> : IDisposable where T : struct
         }
 
         _vertexCount = vertexCount;
+        _primitiveType = primitiveType;
 
         GL.GenVertexArrays(1, out _vertexArray);
         GL.BindVertexArray(_vertexArray);
@@ -54,8 +55,7 @@ public class Mesh<T> : IDisposable where T : struct
     public void Render()
     {
         GL.BindVertexArray(_vertexArray);
-        GL.DrawArrays(PrimitiveType.Triangles, 0, _vertexCount);
-        //GL.BindVertexArray(0);
+        GL.DrawArrays(_primitiveType, 0, _vertexCount);
     }
 
     public void Dispose()

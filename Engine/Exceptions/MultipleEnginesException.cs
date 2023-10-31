@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Engine.Exceptions;
 
-class MultipleEnginesException : Exception
+internal class MultipleEnginesException : Exception
 {
     public MultipleEnginesException()
         : base("Only one instance of EngineBase can be created at a time.")
