@@ -1,17 +1,24 @@
-﻿using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-using OpenTK.Mathematics;
-using Engine.Graphics;
-using System.Reflection.Metadata;
+﻿using Engine.Core.Services.Uniforms;
 using Engine.Exceptions;
-using Engine.Core.Services.Uniforms;
+using Engine.Graphics;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
+using OpenTK.Windowing.Desktop;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Engine.Core;
 
 public class EngineBase : GameWindow
 {
+    public EngineBase()
+        : base(GameWindowSettings.Default, NativeWindowSettings.Default)
+    {
+        if (_wasAlreadyCreated) throw new MultipleEnginesException();
+        else _wasAlreadyCreated = true;
+    }
+
+    // Singleton
     private static bool _wasAlreadyCreated = false;
 
     // Clock
@@ -31,20 +38,12 @@ public class EngineBase : GameWindow
     private Vector2 _previousMousePosition = Vector2i.Zero;
     protected Vector2 MouseOffset { get; private set; } = Vector2i.Zero;
 
-    // Rendering objects
+    // Services
     private readonly UniformManager _uniformManager = new();
     protected IUniformAccessor UniformAccessor => _uniformManager;
 
+    // Rendering objects
     protected Camera _camera = new();
-
-    public EngineBase()
-        : base(GameWindowSettings.Default, NativeWindowSettings.Default)
-    {
-        if (_wasAlreadyCreated) throw new MultipleEnginesException();
-        else _wasAlreadyCreated = true;
-    }
-
-    // GameWindow methods
 
     protected override void OnLoad()
     {
@@ -92,7 +91,6 @@ public class EngineBase : GameWindow
         UpdateUniforms();
     }
 
-    // Internal methods
     private bool UpdateClock(double elapsedTime)
     {
         TotalTime += elapsedTime;

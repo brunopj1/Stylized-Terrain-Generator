@@ -4,11 +4,9 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
 namespace Engine.Graphics;
+
 public class Shader : IDisposable
 {
-    private readonly int _handle;
-    private readonly Dictionary<string, int> _uniformHandles = new();
-
     public Shader(string vertexPath, string fragmentPath)
     {
         var vertexShader = CompileShader(vertexPath, ShaderType.VertexShader);
@@ -26,33 +24,23 @@ public class Shader : IDisposable
             throw new ShaderException(infoLog);
         }
 
-
         GL.DetachShader(_handle, vertexShader);
         GL.DetachShader(_handle, fragmentShader);
         GL.DeleteShader(vertexShader);
         GL.DeleteShader(fragmentShader);
     }
 
-    private int CompileShader(string path, ShaderType type)
-    {
-        var shaderSource = File.ReadAllText(path);
-        var shader = GL.CreateShader(type);
-        GL.ShaderSource(shader, shaderSource);
-        GL.CompileShader(shader);
-        GL.GetShader(shader, ShaderParameter.CompileStatus, out int success);
-
-        if (success == 0)
-        {
-            string infoLog = GL.GetShaderInfoLog(shader);
-            throw new ShaderException(path, type, infoLog);
-        }
-
-        return shader;
-    }
+    private readonly int _handle;
+    private readonly Dictionary<string, int> _uniformHandles = new();
 
     public void Use()
     {
         GL.UseProgram(_handle);
+    }
+
+    public void Dispose()
+    {
+        GL.DeleteProgram(_handle);
     }
 
     public void BindUniforms(IUniformAccessor uniformAccessor, Matrix4 modelMatrix)
@@ -91,7 +79,7 @@ public class Shader : IDisposable
         BindCustomUniforms();
     }
 
-    protected virtual void BindCustomUniforms() 
+    protected virtual void BindCustomUniforms()
     {
     }
 
@@ -104,8 +92,20 @@ public class Shader : IDisposable
         return handle;
     }
 
-    public void Dispose()
+    private int CompileShader(string path, ShaderType type)
     {
-        GL.DeleteProgram(_handle);
+        var shaderSource = File.ReadAllText(path);
+        var shader = GL.CreateShader(type);
+        GL.ShaderSource(shader, shaderSource);
+        GL.CompileShader(shader);
+        GL.GetShader(shader, ShaderParameter.CompileStatus, out int success);
+
+        if (success == 0)
+        {
+            string infoLog = GL.GetShaderInfoLog(shader);
+            throw new ShaderException(path, type, infoLog);
+        }
+
+        return shader;
     }
 }

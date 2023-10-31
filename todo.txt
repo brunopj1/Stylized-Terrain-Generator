@@ -1,6 +1,7 @@
 Task list:
 
-- [ ] Install the CodeMaid extension and establish project conventions
+- [X] Install the CodeMaid extension
 - [ ] Add ImGui to the project
 - [ ] Option to recompile shaders
+- [ ] Texture class
 - [ ] Better input handling

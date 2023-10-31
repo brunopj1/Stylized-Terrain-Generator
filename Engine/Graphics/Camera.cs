@@ -1,9 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Engine.Graphics;
 
@@ -11,9 +6,7 @@ public class Camera
 {
     public Vector3 Position { get; set; } = Vector3.Zero;
 
-    private float _pitch = 0; // Rotation around the X axis (radians)
-    private float _yaw = -MathHelper.PiOver2; // Rotation around the Y axis (radians)
-
+    private float _pitch = 0;
     public float Pitch
     {
         get => MathHelper.RadiansToDegrees(_pitch);
@@ -25,6 +18,7 @@ public class Camera
         }
     }
 
+    private float _yaw = -MathHelper.PiOver2;
     public float Yaw
     {
         get => MathHelper.RadiansToDegrees(_yaw);
@@ -40,7 +34,6 @@ public class Camera
     public Vector3 Right { get; private set; } = Vector3.UnitX;
 
     private float _fov = MathHelper.PiOver2;
-
     public float Fov
     {
         get => MathHelper.RadiansToDegrees(_fov);
@@ -52,8 +45,6 @@ public class Camera
     }
 
     private float _near = 0.1f;
-    private float _far = 100f;
-
     public float Near
     {
         get => _near;
@@ -62,9 +53,10 @@ public class Camera
             if (value <= 0f) throw new ArgumentOutOfRangeException(nameof(value), "Near plane must be greater than 0.");
             if (value >= _far) throw new ArgumentOutOfRangeException(nameof(value), "Near plane must be less than far plane.");
             _near = value;
-    }
+        }
     }
 
+    private float _far = 100f;
     public float Far
     {
         get => _far;

@@ -1,17 +1,10 @@
 ﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using System.Runtime.InteropServices;
 
 namespace Engine.Graphics;
 
 public class Mesh<T> : IDisposable where T : struct
 {
-    private readonly int _vertexBuffer;
-    private readonly int _vertexArray;
-    private readonly int _vertexCount;
-
-    private readonly PrimitiveType _primitiveType;
-
     public Mesh(T[] vertices, VertexLayout layout, PrimitiveType primitiveType = PrimitiveType.Triangles, BufferUsageHint usageHint = BufferUsageHint.StaticDraw, int vertexCount = -1)
     {
         if (vertices == null || vertices.Length == 0)
@@ -51,6 +44,12 @@ public class Mesh<T> : IDisposable where T : struct
             offset += attr.Stride;
         }
     }
+
+    private readonly int _vertexBuffer;
+    private readonly int _vertexArray;
+    private readonly int _vertexCount;
+
+    private readonly PrimitiveType _primitiveType;
 
     public void Render()
     {

@@ -1,22 +1,21 @@
-﻿using OpenTK.Windowing.Common;
+﻿using Engine.Core;
 using Engine.Graphics;
 using OpenTK.Graphics.OpenGL4;
-using TerrainGenerator;
-using System.Runtime.InteropServices;
-using Engine.Core;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using TerrainGenerator;
 
 namespace TriangleTest;
 
-class TriangleTestEngine : EngineBase
+internal class TriangleTestEngine : EngineBase
 {
     private Model<TriangleVertex> _triangleModel;
     private Model<TriangleVertex> _axisModel;
 
     public TriangleTestEngine()
         : base()
-    { 
+    {
         Size = new(800, 600);
         Title = "Terrain Generator";
         ClearColor = new(0.2f, 0.3f, 0.3f);

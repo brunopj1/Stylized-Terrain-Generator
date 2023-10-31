@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Xml.Linq;
-
-namespace Engine.Graphics;
+﻿namespace Engine.Graphics;
 
 public class VertexLayout
 {
-    public VertexAttribute[] Attributes { get; private set; }
-
     public VertexLayout(VertexAttribute[] attributes)
     {
-        Attributes = attributes;
+        _attributes = attributes;
     }
+
+    private VertexAttribute[] _attributes;
+
+    public IEnumerable<VertexAttribute> Attributes => _attributes;
 
     public int GetVertexSize()
     {

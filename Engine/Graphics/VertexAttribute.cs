@@ -4,11 +4,6 @@ namespace Engine.Graphics;
 
 public struct VertexAttribute
 {
-    public VertexAttribPointerType Type { get; private set; }
-    public int Size { get; private set; }
-    public bool Normalized { get; private set; }
-    public int Stride { get; private set; }
-
     public VertexAttribute(VertexAttribPointerType type, int size, bool normalized)
     {
         Type = type;
@@ -32,4 +27,9 @@ public struct VertexAttribute
             _ => throw new NotSupportedException("Unsupported VertexAttribPointerType")
         };
     }
+
+    public VertexAttribPointerType Type { get; private set; }
+    public int Size { get; private set; }
+    public bool Normalized { get; private set; }
+    public int Stride { get; private set; }
 }
