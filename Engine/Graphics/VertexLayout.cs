@@ -7,13 +7,13 @@ public class VertexLayout
         _attributes = attributes;
     }
 
-    private VertexAttribute[] _attributes;
+    private readonly VertexAttribute[] _attributes;
 
     public IEnumerable<VertexAttribute> Attributes => _attributes;
 
     public int GetVertexSize()
     {
-        int stride = 0;
+        var stride = 0;
         foreach (var attr in Attributes)
         {
             stride += attr.Stride;

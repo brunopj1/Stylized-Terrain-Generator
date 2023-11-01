@@ -1,18 +1,17 @@
 ﻿using Engine.Core;
+using Engine.Core.Controllers;
 using Engine.Graphics;
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-using Test;
 
 namespace Test;
 
-internal class TestEngine : EngineBase
+internal class TestEngine : AEngineBase
 {
-    private Model<TriangleVertex> _triangleModel;
-    private Model<TriangleVertex> _axisModel;
+    private readonly Model<TriangleVertex> _triangleModel;
+    private readonly Model<TriangleVertex> _axisModel;
 
+    // TODO move this to the OnLoad method
     public TestEngine()
         : base()
     {
@@ -52,52 +51,30 @@ internal class TestEngine : EngineBase
         _triangleModel = new(triangleMesh, shader);
 
         // Camera
-        _camera.Position = new(10.0f, 10.0f, 10.0f);
+        Camera.Position = new(0.0f, 0.0f, 30.0f);
+
+        // Player Controller
+        PlayerController = new DefaultPlayerController(this);
     }
 
     protected override void OnLoad()
     {
         base.OnLoad();
 
-        CursorState = CursorState.Grabbed;
         VSync = VSyncMode.On;
     }
 
     protected override void OnUpdateFrame(FrameEventArgs args)
     {
         base.OnUpdateFrame(args);
-
-        if (!IsFocused) return;
-
-        const float moveSpeed = 10.0f;
-        const float cameraSensitivity = 0.1f;
-
-        var moveDir = Vector3.Zero;
-        if (KeyboardState.IsKeyDown(Keys.W)) moveDir += _camera.Front;
-        if (KeyboardState.IsKeyDown(Keys.S)) moveDir -= _camera.Front;
-        if (KeyboardState.IsKeyDown(Keys.A)) moveDir -= _camera.Right;
-        if (KeyboardState.IsKeyDown(Keys.D)) moveDir += _camera.Right;
-        if (KeyboardState.IsKeyDown(Keys.Space)) moveDir += Vector3.UnitY;
-        if (KeyboardState.IsKeyDown(Keys.LeftControl)) moveDir -= Vector3.UnitY;
-
-        if (moveDir != Vector3.Zero)
-        {
-            _camera.Position += moveDir.Normalized() * moveSpeed * (float)args.Time;
-        }
-
-        if (MouseState.Delta != Vector2.Zero)
-        {
-            _camera.Yaw += MouseState.Delta.X * cameraSensitivity;
-            _camera.Pitch -= MouseState.Delta.Y * cameraSensitivity;
-        }
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
     {
         base.OnRenderFrame(e);
 
-        _axisModel!.Render(UniformAccessor);
-        _triangleModel!.Render(UniformAccessor);
+        _axisModel!.Render(UniformManager);
+        _triangleModel!.Render(UniformManager);
 
         SwapBuffers();
     }

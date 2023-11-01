@@ -1,7 +1,6 @@
 Task list:
 
-- [X] Install the CodeMaid extension
 - [ ] Add ImGui to the project
 - [ ] Option to recompile shaders
 - [ ] Texture class
-- [ ] Better input handling
+- [ ] Event based input system

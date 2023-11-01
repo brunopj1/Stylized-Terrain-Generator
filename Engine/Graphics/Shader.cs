@@ -1,4 +1,4 @@
-﻿using Engine.Core.Services.Uniforms;
+﻿using Engine.Core.Services;
 using Engine.Exceptions;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -17,10 +17,10 @@ public class Shader : IDisposable
         GL.AttachShader(_handle, fragmentShader);
         GL.LinkProgram(_handle);
 
-        GL.GetProgram(_handle, GetProgramParameterName.LinkStatus, out int success);
+        GL.GetProgram(_handle, GetProgramParameterName.LinkStatus, out var success);
         if (success == 0)
         {
-            string infoLog = GL.GetProgramInfoLog(_handle);
+            var infoLog = GL.GetProgramInfoLog(_handle);
             throw new ShaderException(infoLog);
         }
 
@@ -41,34 +41,35 @@ public class Shader : IDisposable
     public void Dispose()
     {
         GL.DeleteProgram(_handle);
+        _uniformHandles.Clear();
     }
 
-    public void BindUniforms(IUniformAccessor uniformAccessor, Matrix4 modelMatrix)
+    public void BindUniforms(UniformManager uniformManager, Matrix4 modelMatrix)
     {
         // Time
         var uniformHandle = GetUniformHandle("uTotalTime");
-        if (uniformHandle != -1) GL.Uniform1(uniformHandle, (float)uniformAccessor.TotalTime);
+        if (uniformHandle != -1) GL.Uniform1(uniformHandle, (float)uniformManager.TotalTime);
 
         uniformHandle = GetUniformHandle("uDeltaTime");
-        if (uniformHandle != -1) GL.Uniform1(uniformHandle, (float)uniformAccessor.DeltaTime);
+        if (uniformHandle != -1) GL.Uniform1(uniformHandle, (float)uniformManager.DeltaTime);
 
         uniformHandle = GetUniformHandle("uCurrentFrame");
-        if (uniformHandle != -1) GL.Uniform1(uniformHandle, uniformAccessor.CurrentFrame);
+        if (uniformHandle != -1) GL.Uniform1(uniformHandle, uniformManager.CurrentFrame);
 
         // Matrices
         uniformHandle = GetUniformHandle("uModelMatrix");
         if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref modelMatrix);
 
         uniformHandle = GetUniformHandle("uViewMatrix");
-        var viewMatrix = uniformAccessor.ViewMatrix;
+        var viewMatrix = uniformManager.ViewMatrix;
         if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref viewMatrix);
 
         uniformHandle = GetUniformHandle("uProjectionMatrix");
-        var projectionMatrix = uniformAccessor.ProjectionMatrix;
+        var projectionMatrix = uniformManager.ProjectionMatrix;
         if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref projectionMatrix);
 
         uniformHandle = GetUniformHandle("uNormalMatrix");
-        var normalMatrix = uniformAccessor.NormalMatrix;
+        var normalMatrix = uniformManager.NormalMatrix;
         if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref normalMatrix);
 
         uniformHandle = GetUniformHandle("uPVMMatrix");
@@ -92,17 +93,17 @@ public class Shader : IDisposable
         return handle;
     }
 
-    private int CompileShader(string path, ShaderType type)
+    private static int CompileShader(string path, ShaderType type)
     {
         var shaderSource = File.ReadAllText(path);
         var shader = GL.CreateShader(type);
         GL.ShaderSource(shader, shaderSource);
         GL.CompileShader(shader);
-        GL.GetShader(shader, ShaderParameter.CompileStatus, out int success);
+        GL.GetShader(shader, ShaderParameter.CompileStatus, out var success);
 
         if (success == 0)
         {
-            string infoLog = GL.GetShaderInfoLog(shader);
+            var infoLog = GL.GetShaderInfoLog(shader);
             throw new ShaderException(path, type, infoLog);
         }
 
