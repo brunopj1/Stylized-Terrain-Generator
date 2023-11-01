@@ -5,28 +5,22 @@ public class EngineClock
     public float TotalTime { get; private set; } = 0;
     public float DeltaTime { get; private set; } = 0;
     public ulong CurrentFrame { get; private set; } = 0;
-    public int FrameRate { get; private set; } = 0;
+    public bool NewSecond { get; private set; } = false;
 
-    private int _framesThisSecond = 0;
     private double _elapsedTimeThisSecond = 1;
 
-    public bool Update(float elapsedTime)
+    public void Update(float elapsedTime)
     {
+        NewSecond = false;
         TotalTime += elapsedTime;
         DeltaTime = elapsedTime;
         CurrentFrame++;
 
         _elapsedTimeThisSecond += elapsedTime;
-        _framesThisSecond++;
-
         if (_elapsedTimeThisSecond >= 1)
         {
-            FrameRate = _framesThisSecond;
-            _framesThisSecond = 0;
+            NewSecond = true;
             _elapsedTimeThisSecond = 0;
-            return true;
         }
-
-        return false;
     }
 }

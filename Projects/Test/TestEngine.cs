@@ -1,6 +1,7 @@
 ﻿using Engine.Core;
 using Engine.Core.Controllers;
 using Engine.Graphics;
+using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 
@@ -15,7 +16,7 @@ internal class TestEngine : AEngineBase
     public TestEngine()
         : base()
     {
-        Size = new(800, 600);
+        Size = new(1600, 900);
         Title = "Terrain Generator";
         ClearColor = new(0.2f, 0.3f, 0.3f);
 
@@ -76,6 +77,8 @@ internal class TestEngine : AEngineBase
         _axisModel!.Render(UniformManager);
         _triangleModel!.Render(UniformManager);
 
-        SwapBuffers();
+        ImGui.ShowDemoWindow();
+
+        CompleteOnRenderFrame();
     }
 }

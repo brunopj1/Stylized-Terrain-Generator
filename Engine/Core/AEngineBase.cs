@@ -1,7 +1,9 @@
 ﻿using Engine.Core.Controllers;
+using Engine.Core.Internal;
 using Engine.Core.Services;
 using Engine.Exceptions;
 using Engine.Graphics;
+using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
@@ -22,6 +24,9 @@ public abstract class AEngineBase : GameWindow
     // Singleton
     private static bool s_wasAlreadyCreated = false;
 
+    // Internal
+    private ImGuiController _imGuiController;
+
     // Window
     public new string Title { get; set; } = "My Game";
     public Vector3 ClearColor { get; set; } = new(0.2f, 0.3f, 0.3f);
@@ -40,43 +45,73 @@ public abstract class AEngineBase : GameWindow
     {
         base.OnLoad();
 
+        _imGuiController = new ImGuiController(ClientSize.X, ClientSize.Y);
+
         GL.Enable(EnableCap.DepthTest);
     }
 
-    protected override void OnResize(ResizeEventArgs e)
+    protected override void OnResize(ResizeEventArgs args)
     {
-        base.OnResize(e);
+        base.OnResize(args);
 
-        GL.Viewport(0, 0, e.Width, e.Height);
-        Camera.AspectRatio = (float)e.Width / e.Height;
+        GL.Viewport(0, 0, args.Width, args.Height);
+
+        _imGuiController?.WindowResized(ClientSize.X, ClientSize.Y);
+
+        Camera.AspectRatio = (float)args.Width / args.Height;
     }
 
     protected override void OnUpdateFrame(FrameEventArgs args)
     {
         base.OnUpdateFrame(args);
 
-        var newSecond = EngineClock.Update((float)args.Time);
-        if (newSecond)
+        EngineClock.Update((float)args.Time);
+
+        if (EngineClock.NewSecond)
         {
-            base.Title = $"{Title} ({EngineClock.FrameRate} fps)";
+            base.Title = $"{Title} ({(int)ImGui.GetIO().Framerate} fps)";
         }
 
         if (KeyboardState.IsKeyDown(Keys.Escape))
         {
             Close();
+            return;
         }
 
         PlayerController?.Update((float)args.Time);
     }
 
-    protected override void OnRenderFrame(FrameEventArgs e)
+    protected override void OnRenderFrame(FrameEventArgs args)
     {
-        base.OnRenderFrame(e);
+        base.OnRenderFrame(args);
+
+        _imGuiController!.Update(this, (float)args.Time);
+
+        UpdateUniforms();
 
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         GL.ClearColor(ClearColor.X, ClearColor.Y, ClearColor.Z, 1.0f);
+    }
 
-        UpdateUniforms();
+    protected void CompleteOnRenderFrame()
+    {
+        _imGuiController!.Render();
+
+        SwapBuffers();
+    }
+
+    protected override void OnTextInput(TextInputEventArgs e)
+    {
+        base.OnTextInput(e);
+
+        _imGuiController!.PressChar((char)e.Unicode);
+    }
+
+    protected override void OnMouseWheel(MouseWheelEventArgs e)
+    {
+        base.OnMouseWheel(e);
+
+        _imGuiController!.MouseScroll(e.Offset);
     }
 
     private void UpdateUniforms()
