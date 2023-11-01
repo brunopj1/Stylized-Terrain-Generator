@@ -3,16 +3,16 @@ using OpenTK.Mathematics;
 
 namespace Engine.Graphics;
 
-public class Model<M> where M : struct
+public class Model
 {
-    public Model(Mesh<M> mesh, Shader shader)
+    internal Model(Mesh mesh, Shader shader)
     {
         Mesh = mesh;
         Shader = shader;
         Transform = new();
     }
 
-    public Mesh<M> Mesh { get; set; }
+    public Mesh Mesh { get; set; }
     public Shader Shader { get; set; }
     public Transform Transform { get; set; }
 

@@ -33,7 +33,7 @@ public class Camera
     public Vector3 Up { get; private set; } = Vector3.UnitY;
     public Vector3 Right { get; private set; } = Vector3.UnitX;
 
-    private float _fov = MathHelper.PiOver2;
+    private float _fov = MathHelper.PiOver3;
     public float Fov
     {
         get => MathHelper.RadiansToDegrees(_fov);

@@ -5,12 +5,27 @@ using OpenTK.Mathematics;
 
 namespace Engine.Graphics;
 
-public class Shader : IDisposable
+public class Shader
 {
-    public Shader(string vertexPath, string fragmentPath)
+    internal Shader(string vertexShaderPath, string fragmentShaderPath)
     {
-        var vertexShader = CompileShader(vertexPath, ShaderType.VertexShader);
-        var fragmentShader = CompileShader(fragmentPath, ShaderType.FragmentShader);
+        _vertexShaderPath = vertexShaderPath;
+        _fragmentShaderPath = fragmentShaderPath;
+    }
+
+    private readonly string _vertexShaderPath;
+    private readonly string _fragmentShaderPath;
+
+    private int _handle = -1;
+
+    private readonly Dictionary<string, int> _uniformHandles = new();
+
+    public void Compile()
+    {
+        if (_handle != -1) Dispose();
+
+        var vertexShader = CompileShader(_vertexShaderPath, ShaderType.VertexShader);
+        var fragmentShader = CompileShader(_fragmentShaderPath, ShaderType.FragmentShader);
 
         _handle = GL.CreateProgram();
         GL.AttachShader(_handle, vertexShader);
@@ -21,7 +36,7 @@ public class Shader : IDisposable
         if (success == 0)
         {
             var infoLog = GL.GetProgramInfoLog(_handle);
-            throw new ShaderException(infoLog);
+            throw new ShaderCompilationException(infoLog);
         }
 
         GL.DetachShader(_handle, vertexShader);
@@ -30,21 +45,19 @@ public class Shader : IDisposable
         GL.DeleteShader(fragmentShader);
     }
 
-    private readonly int _handle;
-    private readonly Dictionary<string, int> _uniformHandles = new();
+    internal void Dispose()
+    {
+        GL.DeleteProgram(_handle);
+        _uniformHandles.Clear();
+        _handle = -1;
+    }
 
     public void Use()
     {
         GL.UseProgram(_handle);
     }
 
-    public void Dispose()
-    {
-        GL.DeleteProgram(_handle);
-        _uniformHandles.Clear();
-    }
-
-    public void BindUniforms(UniformManager uniformManager, Matrix4 modelMatrix)
+    internal void BindUniforms(UniformManager uniformManager, Matrix4 modelMatrix)
     {
         // Time
         var uniformHandle = GetUniformHandle("uTotalTime");
@@ -104,7 +117,7 @@ public class Shader : IDisposable
         if (success == 0)
         {
             var infoLog = GL.GetShaderInfoLog(shader);
-            throw new ShaderException(path, type, infoLog);
+            throw new ShaderCompilationException(path, type, infoLog);
         }
 
         return shader;

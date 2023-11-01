@@ -2,14 +2,14 @@
 
 namespace Engine.Exceptions;
 
-internal class ShaderException : Exception
+internal class ShaderCompilationException : Exception
 {
-    public ShaderException(string path, ShaderType type, string info)
+    public ShaderCompilationException(string path, ShaderType type, string info)
         : base($"Failed to compile {type} located in \"{path}\".\n{info}")
     {
     }
 
-    public ShaderException(string info)
+    public ShaderCompilationException(string info)
         : base($"Failed to link shader program.\n{info}")
     {
     }

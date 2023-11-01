@@ -34,23 +34,25 @@ public class DefaultPlayerController : IPlayerController
         if (_engine.KeyboardState.IsKeyPressed(Keys.F1)) CursorEnabled = !CursorEnabled;
         if (CursorEnabled) return;
 
+        var camera = _engine.Renderer.Camera;
+
         var moveDir = Vector3.Zero;
-        if (_engine.KeyboardState.IsKeyDown(Keys.W)) moveDir += _engine.Camera.Front;
-        if (_engine.KeyboardState.IsKeyDown(Keys.S)) moveDir -= _engine.Camera.Front;
-        if (_engine.KeyboardState.IsKeyDown(Keys.A)) moveDir -= _engine.Camera.Right;
-        if (_engine.KeyboardState.IsKeyDown(Keys.D)) moveDir += _engine.Camera.Right;
+        if (_engine.KeyboardState.IsKeyDown(Keys.W)) moveDir += camera.Front;
+        if (_engine.KeyboardState.IsKeyDown(Keys.S)) moveDir -= camera.Front;
+        if (_engine.KeyboardState.IsKeyDown(Keys.A)) moveDir -= camera.Right;
+        if (_engine.KeyboardState.IsKeyDown(Keys.D)) moveDir += camera.Right;
         if (_engine.KeyboardState.IsKeyDown(Keys.Space)) moveDir += Vector3.UnitY;
         if (_engine.KeyboardState.IsKeyDown(Keys.LeftControl)) moveDir -= Vector3.UnitY;
 
         if (moveDir != Vector3.Zero)
         {
-            _engine.Camera.Position += moveDir.Normalized() * MovementSpeed * deltaTime;
+            camera.Position += moveDir.Normalized() * MovementSpeed * deltaTime;
         }
 
         if (_engine.MouseState.Delta != Vector2.Zero)
         {
-            _engine.Camera.Yaw += _engine.MouseState.Delta.X * MouseSensitivity;
-            _engine.Camera.Pitch -= _engine.MouseState.Delta.Y * MouseSensitivity;
+            camera.Yaw += _engine.MouseState.Delta.X * MouseSensitivity;
+            camera.Pitch -= _engine.MouseState.Delta.Y * MouseSensitivity;
         }
     }
 

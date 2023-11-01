@@ -2,7 +2,6 @@
 using Engine.Core.Internal;
 using Engine.Core.Services;
 using Engine.Exceptions;
-using Engine.Graphics;
 using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -19,13 +18,15 @@ public abstract class AEngineBase : GameWindow
     {
         if (s_wasAlreadyCreated) throw new MultipleEnginesException();
         else s_wasAlreadyCreated = true;
+
+        Renderer = new(UniformManager);
     }
 
     // Singleton
     private static bool s_wasAlreadyCreated = false;
 
     // Internal
-    private ImGuiController _imGuiController;
+    private ImGuiController? _imGuiController = null;
 
     // Window
     public new string Title { get; set; } = "My Game";
@@ -34,12 +35,10 @@ public abstract class AEngineBase : GameWindow
     // Services
     public EngineClock EngineClock { get; private set; } = new();
     public UniformManager UniformManager { get; private set; } = new();
+    public Renderer Renderer { get; private set; }
 
     // Player controller
     public IPlayerController? PlayerController { get; set; } = null;
-
-    // Rendering objects
-    public Camera Camera { get; set; } = new();
 
     protected override void OnLoad()
     {
@@ -47,18 +46,16 @@ public abstract class AEngineBase : GameWindow
 
         _imGuiController = new ImGuiController(ClientSize.X, ClientSize.Y);
 
+        Renderer.Load();
+
         GL.Enable(EnableCap.DepthTest);
     }
 
-    protected override void OnResize(ResizeEventArgs args)
+    protected override void OnUnload()
     {
-        base.OnResize(args);
+        base.OnUnload();
 
-        GL.Viewport(0, 0, args.Width, args.Height);
-
-        _imGuiController?.WindowResized(ClientSize.X, ClientSize.Y);
-
-        Camera.AspectRatio = (float)args.Width / args.Height;
+        Renderer.Unload();
     }
 
     protected override void OnUpdateFrame(FrameEventArgs args)
@@ -85,7 +82,7 @@ public abstract class AEngineBase : GameWindow
     {
         base.OnRenderFrame(args);
 
-        _imGuiController!.Update(this, (float)args.Time);
+        _imGuiController?.Update(this, (float)args.Time);
 
         UpdateUniforms();
 
@@ -95,23 +92,34 @@ public abstract class AEngineBase : GameWindow
 
     protected void CompleteOnRenderFrame()
     {
-        _imGuiController!.Render();
+        _imGuiController?.Render();
 
         SwapBuffers();
+    }
+
+    protected override void OnResize(ResizeEventArgs args)
+    {
+        base.OnResize(args);
+
+        GL.Viewport(0, 0, args.Width, args.Height);
+
+        _imGuiController?.WindowResized(ClientSize.X, ClientSize.Y);
+
+        Renderer.Camera.AspectRatio = (float)args.Width / args.Height;
     }
 
     protected override void OnTextInput(TextInputEventArgs e)
     {
         base.OnTextInput(e);
 
-        _imGuiController!.PressChar((char)e.Unicode);
+        _imGuiController?.PressChar((char)e.Unicode);
     }
 
     protected override void OnMouseWheel(MouseWheelEventArgs e)
     {
         base.OnMouseWheel(e);
 
-        _imGuiController!.MouseScroll(e.Offset);
+        _imGuiController?.MouseScroll(e.Offset);
     }
 
     private void UpdateUniforms()
@@ -122,8 +130,8 @@ public abstract class AEngineBase : GameWindow
         UniformManager.CurrentFrame = EngineClock.CurrentFrame;
 
         // Matrices
-        UniformManager.ViewMatrix = Camera.GetViewMatrix();
-        UniformManager.ProjectionMatrix = Camera.GetProjectionMatrix();
-        UniformManager.NormalMatrix = Camera.GetNormalMatrix();
+        UniformManager.ViewMatrix = Renderer.Camera.GetViewMatrix();
+        UniformManager.ProjectionMatrix = Renderer.Camera.GetProjectionMatrix();
+        UniformManager.NormalMatrix = Renderer.Camera.GetNormalMatrix();
     }
 }

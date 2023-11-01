@@ -9,7 +9,7 @@ using ErrorCode = OpenTK.Graphics.OpenGL4.ErrorCode;
 
 namespace Engine.Core.Internal;
 
-public class ImGuiController : IDisposable
+public sealed class ImGuiController : IDisposable
 {
     private bool _frameBegun;
 
@@ -32,10 +32,10 @@ public class ImGuiController : IDisposable
 
     private System.Numerics.Vector2 _scaleFactor = System.Numerics.Vector2.One;
 
-    private static bool KHRDebugAvailable = false;
+    private static bool s_kHRDebugAvailable = false;
 
-    private int GLVersion;
-    private bool CompatibilityProfile;
+    private readonly int _gLVersion;
+    private readonly bool _compatibilityProfile;
 
     /// <summary>
     /// Constructs a new ImGuiController.
@@ -48,11 +48,11 @@ public class ImGuiController : IDisposable
         var major = GL.GetInteger(GetPName.MajorVersion);
         var minor = GL.GetInteger(GetPName.MinorVersion);
 
-        GLVersion = major * 100 + minor * 10;
+        _gLVersion = major * 100 + minor * 10;
 
-        KHRDebugAvailable = major == 4 && minor >= 3 || IsExtensionSupported("KHR_debug");
+        s_kHRDebugAvailable = major == 4 && minor >= 3 || IsExtensionSupported("KHR_debug");
 
-        CompatibilityProfile = (GL.GetInteger((GetPName)All.ContextProfileMask) & (int)All.ContextCompatibilityProfileBit) != 0;
+        _compatibilityProfile = (GL.GetInteger((GetPName)All.ContextProfileMask) & (int)All.ContextCompatibilityProfileBit) != 0;
 
         var context = ImGui.CreateContext();
         ImGui.SetCurrentContext(context);
@@ -105,7 +105,7 @@ public class ImGuiController : IDisposable
 
         RecreateFontDeviceTexture();
 
-        var VertexSource = @"#version 330 core
+        var vertexSource = @"#version 330 core
 
 uniform mat4 projection_matrix;
 
@@ -122,7 +122,7 @@ void main()
     color = in_color;
     texCoord = in_texCoord;
 }";
-        var FragmentSource = @"#version 330 core
+        var fragmentSource = @"#version 330 core
 
 uniform sampler2D in_fontTexture;
 
@@ -136,7 +136,7 @@ void main()
     outputColor = color * texture(in_fontTexture, texCoord);
 }";
 
-        _shader = CreateProgram("ImGui", VertexSource, FragmentSource);
+        _shader = CreateProgram("ImGui", vertexSource, fragmentSource);
         _shaderProjectionMatrixLocation = GL.GetUniformLocation(_shader, "projection_matrix");
         _shaderFontTextureLocation = GL.GetUniformLocation(_shader, "in_fontTexture");
 
@@ -161,7 +161,7 @@ void main()
     public void RecreateFontDeviceTexture()
     {
         var io = ImGui.GetIO();
-        io.Fonts.GetTexDataAsRGBA32(out nint pixels, out var width, out var height, out var bytesPerPixel);
+        io.Fonts.GetTexDataAsRGBA32(out nint pixels, out var width, out var height, out _);
 
         var mips = (int)Math.Floor(Math.Log(Math.Max(width, height), 2));
 
@@ -239,22 +239,22 @@ void main()
         io.DeltaTime = deltaSeconds; // DeltaTime is in seconds.
     }
 
-    readonly List<char> PressedChars = new List<char>();
+    readonly List<char> _pressedChars = new();
 
     private void UpdateImGuiInput(GameWindow wnd)
     {
         var io = ImGui.GetIO();
 
-        var MouseState = wnd.MouseState;
-        var KeyboardState = wnd.KeyboardState;
+        var mouseState = wnd.MouseState;
+        var keyboardState = wnd.KeyboardState;
 
-        io.MouseDown[0] = MouseState[MouseButton.Left];
-        io.MouseDown[1] = MouseState[MouseButton.Right];
-        io.MouseDown[2] = MouseState[MouseButton.Middle];
-        io.MouseDown[3] = MouseState[MouseButton.Button4];
-        io.MouseDown[4] = MouseState[MouseButton.Button5];
+        io.MouseDown[0] = mouseState[MouseButton.Left];
+        io.MouseDown[1] = mouseState[MouseButton.Right];
+        io.MouseDown[2] = mouseState[MouseButton.Middle];
+        io.MouseDown[3] = mouseState[MouseButton.Button4];
+        io.MouseDown[4] = mouseState[MouseButton.Button5];
 
-        var screenPoint = new Vector2i((int)MouseState.X, (int)MouseState.Y);
+        var screenPoint = new Vector2i((int)mouseState.X, (int)mouseState.Y);
         var point = screenPoint;//wnd.PointToClient(screenPoint);
         io.MousePos = new System.Numerics.Vector2(point.X, point.Y);
 
@@ -264,26 +264,27 @@ void main()
             {
                 continue;
             }
-            io.KeysDown[(int)key] = KeyboardState.IsKeyDown(key);
+            io.KeysDown[(int)key] = keyboardState.IsKeyDown(key);
         }
 
-        foreach (var c in PressedChars)
+        foreach (var c in _pressedChars)
         {
             io.AddInputCharacter(c);
         }
-        PressedChars.Clear();
+        _pressedChars.Clear();
 
-        io.KeyCtrl = KeyboardState.IsKeyDown(Keys.LeftControl) || KeyboardState.IsKeyDown(Keys.RightControl);
-        io.KeyAlt = KeyboardState.IsKeyDown(Keys.LeftAlt) || KeyboardState.IsKeyDown(Keys.RightAlt);
-        io.KeyShift = KeyboardState.IsKeyDown(Keys.LeftShift) || KeyboardState.IsKeyDown(Keys.RightShift);
-        io.KeySuper = KeyboardState.IsKeyDown(Keys.LeftSuper) || KeyboardState.IsKeyDown(Keys.RightSuper);
+        io.KeyCtrl = keyboardState.IsKeyDown(Keys.LeftControl) || keyboardState.IsKeyDown(Keys.RightControl);
+        io.KeyAlt = keyboardState.IsKeyDown(Keys.LeftAlt) || keyboardState.IsKeyDown(Keys.RightAlt);
+        io.KeyShift = keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift);
+        io.KeySuper = keyboardState.IsKeyDown(Keys.LeftSuper) || keyboardState.IsKeyDown(Keys.RightSuper);
     }
 
     internal void PressChar(char keyChar)
     {
-        PressedChars.Add(keyChar);
+        _pressedChars.Add(keyChar);
     }
 
+#pragma warning disable CA1822 // Mark members as static
     internal void MouseScroll(Vector2 offset)
     {
         var io = ImGui.GetIO();
@@ -291,6 +292,7 @@ void main()
         io.MouseWheel = offset.Y;
         io.MouseWheelH = offset.X;
     }
+#pragma warning restore CA1822 // Mark members as static
 
     private static void SetKeyMappings()
     {
@@ -357,7 +359,7 @@ void main()
             }
         }
 
-        if (GLVersion <= 310 || CompatibilityProfile)
+        if (_gLVersion <= 310 || _compatibilityProfile)
         {
             GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
             GL.PolygonMode(MaterialFace.Back, PolygonMode.Fill);
@@ -383,7 +385,7 @@ void main()
                 GL.BufferData(BufferTarget.ArrayBuffer, newSize, nint.Zero, BufferUsageHint.DynamicDraw);
                 _vertexBufferSize = newSize;
 
-                Console.WriteLine($"Resized dear imgui vertex buffer to new size {_vertexBufferSize}");
+                //Console.WriteLine($"Resized dear imgui vertex buffer to new size {_vertexBufferSize}");
             }
 
             var indexSize = cmd_list.IdxBuffer.Size * sizeof(ushort);
@@ -393,7 +395,7 @@ void main()
                 GL.BufferData(BufferTarget.ElementArrayBuffer, newSize, nint.Zero, BufferUsageHint.DynamicDraw);
                 _indexBufferSize = newSize;
 
-                Console.WriteLine($"Resized dear imgui index buffer to new size {_indexBufferSize}");
+                //Console.WriteLine($"Resized dear imgui index buffer to new size {_indexBufferSize}");
             }
         }
 
@@ -486,7 +488,7 @@ void main()
         if (prevDepthTestEnabled) GL.Enable(EnableCap.DepthTest); else GL.Disable(EnableCap.DepthTest);
         if (prevCullFaceEnabled) GL.Enable(EnableCap.CullFace); else GL.Disable(EnableCap.CullFace);
         if (prevScissorTestEnabled) GL.Enable(EnableCap.ScissorTest); else GL.Disable(EnableCap.ScissorTest);
-        if (GLVersion <= 310 || CompatibilityProfile)
+        if (_gLVersion <= 310 || _compatibilityProfile)
         {
             GL.PolygonMode(MaterialFace.Front, (PolygonMode)prevPolygonMode[0]);
             GL.PolygonMode(MaterialFace.Back, (PolygonMode)prevPolygonMode[1]);
@@ -512,7 +514,7 @@ void main()
 
     public static void LabelObject(ObjectLabelIdentifier objLabelIdent, int glObject, string name)
     {
-        if (KHRDebugAvailable)
+        if (s_kHRDebugAvailable)
             GL.ObjectLabel(objLabelIdent, glObject, name.Length, name);
     }
 
