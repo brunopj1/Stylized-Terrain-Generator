@@ -4,16 +4,16 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using TerrainGenerator;
+using Test;
 
-namespace TriangleTest;
+namespace Test;
 
-internal class TriangleTestEngine : EngineBase
+internal class TestEngine : EngineBase
 {
     private Model<TriangleVertex> _triangleModel;
     private Model<TriangleVertex> _axisModel;
 
-    public TriangleTestEngine()
+    public TestEngine()
         : base()
     {
         Size = new(800, 600);
@@ -24,8 +24,8 @@ internal class TriangleTestEngine : EngineBase
         // TODO use relative pahts (maybe copy assets to bin folder?)
         var shader = new Shader
         (
-            @"C:\Projects\OpenGL-Stuff\Test\TriangleTest\Assets\Shaders\triangle.vert",
-            @"C:\Projects\OpenGL-Stuff\Test\TriangleTest\Assets\Shaders\triangle.frag"
+            @"C:\Projects\OpenGL-Stuff\Projects\Test\Assets\Shaders\triangle.vert",
+            @"C:\Projects\OpenGL-Stuff\Projects\Test\Assets\Shaders\triangle.frag"
         );
 
         // Axis
@@ -85,10 +85,10 @@ internal class TriangleTestEngine : EngineBase
             _camera.Position += moveDir.Normalized() * moveSpeed * (float)args.Time;
         }
 
-        if (MouseOffset != Vector2.Zero)
+        if (MouseState.Delta != Vector2.Zero)
         {
-            _camera.Yaw += MouseOffset.X * cameraSensitivity;
-            _camera.Pitch -= MouseOffset.Y * cameraSensitivity;
+            _camera.Yaw += MouseState.Delta.X * cameraSensitivity;
+            _camera.Pitch -= MouseState.Delta.Y * cameraSensitivity;
         }
     }
 

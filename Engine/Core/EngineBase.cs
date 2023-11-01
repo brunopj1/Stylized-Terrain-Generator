@@ -34,10 +34,6 @@ public class EngineBase : GameWindow
     protected new string Title { get; set; } = "My Game";
     protected Vector3 ClearColor { get; set; } = new(0.2f, 0.3f, 0.3f);
 
-    // TODO move this to an input manager
-    private Vector2 _previousMousePosition = Vector2i.Zero;
-    protected Vector2 MouseOffset { get; private set; } = Vector2i.Zero;
-
     // Services
     private readonly UniformManager _uniformManager = new();
     protected IUniformAccessor UniformAccessor => _uniformManager;
@@ -50,8 +46,6 @@ public class EngineBase : GameWindow
         base.OnLoad();
 
         GL.Enable(EnableCap.DepthTest);
-
-        _previousMousePosition = MousePosition;
     }
 
     protected override void OnResize(ResizeEventArgs e)
@@ -71,9 +65,6 @@ public class EngineBase : GameWindow
         {
             base.Title = $"{Title} ({FrameRate} fps)";
         }
-
-        MouseOffset = MousePosition - _previousMousePosition;
-        _previousMousePosition = MousePosition;
 
         if (KeyboardState.IsKeyDown(Keys.Escape))
         {
