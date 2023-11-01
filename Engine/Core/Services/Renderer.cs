@@ -14,6 +14,7 @@ public class Renderer
     private readonly UniformManager _uniformManager;
 
     public Camera Camera { get; set; } = new();
+
     private readonly List<Shader> _shaders = new();
     private readonly List<Mesh> _meshes = new();
     private readonly List<Model> _models = new();
@@ -87,6 +88,14 @@ public class Renderer
         foreach (var model in _models)
         {
             model.Render(_uniformManager);
+        }
+    }
+
+    public void RecompileShaders()
+    {
+        foreach (var shader in _shaders)
+        {
+            shader.Compile();
         }
     }
 }

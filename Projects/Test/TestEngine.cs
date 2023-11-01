@@ -12,6 +12,7 @@ internal class TestEngine : AEngineBase
         : base()
     {
         Size = new(1600, 900);
+        ClientLocation = new(50, 50);
         Title = "Terrain Generator";
         ClearColor = new(0.2f, 0.3f, 0.3f);
 

@@ -20,6 +20,7 @@ public abstract class AEngineBase : GameWindow
         else s_wasAlreadyCreated = true;
 
         Renderer = new(UniformManager);
+        _imGuiLayer = new(this);
     }
 
     // Singleton
@@ -32,10 +33,13 @@ public abstract class AEngineBase : GameWindow
     public new string Title { get; set; } = "My Game";
     public Vector3 ClearColor { get; set; } = new(0.2f, 0.3f, 0.3f);
 
-    // Services
+    // Public services
     public EngineClock EngineClock { get; private set; } = new();
     public UniformManager UniformManager { get; private set; } = new();
     public Renderer Renderer { get; private set; }
+
+    // Private services
+    private ImGuiLayer _imGuiLayer;
 
     // Player controller
     public IPlayerController? PlayerController { get; set; } = null;
@@ -88,6 +92,8 @@ public abstract class AEngineBase : GameWindow
 
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         GL.ClearColor(ClearColor.X, ClearColor.Y, ClearColor.Z, 1.0f);
+
+        _imGuiLayer.RenderMenuBar();
     }
 
     protected void CompleteOnRenderFrame()

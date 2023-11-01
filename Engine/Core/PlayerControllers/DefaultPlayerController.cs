@@ -26,6 +26,7 @@ public class DefaultPlayerController : IPlayerController
 
     public float MovementSpeed { get; set; } = 10.0f;
     public float MouseSensitivity { get; set; } = 0.1f;
+    public float RunMultiplier { get; set; } = 2.5f;
 
     public void Update(float deltaTime)
     {
@@ -46,7 +47,10 @@ public class DefaultPlayerController : IPlayerController
 
         if (moveDir != Vector3.Zero)
         {
-            camera.Position += moveDir.Normalized() * MovementSpeed * deltaTime;
+            var speed = MovementSpeed;
+            if (_engine.KeyboardState.IsKeyDown(Keys.LeftShift)) speed *= RunMultiplier;
+
+            camera.Position += moveDir.Normalized() * speed * deltaTime;
         }
 
         if (_engine.MouseState.Delta != Vector2.Zero)

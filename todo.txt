@@ -1,6 +1,6 @@
 Task list:
 
 - [X] Add ImGui to the project
-- [ ] Option to recompile shaders
+- [X] Option to recompile shaders
 - [ ] Texture class
 - [ ] Event based input system
