@@ -29,7 +29,7 @@ public abstract class AEngineBase : GameWindow
     // Internal
     private ImGuiController? _imGuiController = null;
 
-    // Window
+    // Settings
     public new string Title { get; set; } = "My Game";
     public Vector3 ClearColor { get; set; } = new(0.2f, 0.3f, 0.3f);
 
@@ -53,6 +53,9 @@ public abstract class AEngineBase : GameWindow
         Renderer.Load();
 
         GL.Enable(EnableCap.DepthTest);
+
+        GL.Enable(EnableCap.CullFace);
+        GL.CullFace(CullFaceMode.Back);
     }
 
     protected override void OnUnload()
