@@ -45,7 +45,7 @@ internal class TestEngine : AEngineBase
             new TriangleVertex{ Position = new( 0.0f, 0.0f, 0.0f), Color = new(0.0f, 0.0f, 1.0f) },
             new TriangleVertex{ Position = new( 0.0f, 0.0f, 1.0f), Color = new(0.0f, 0.0f, 1.0f) }
         };
-        var axisMesh = Renderer.CreateMesh(axisVertices, TriangleVertex.GetLayout(), primitiveType: PrimitiveType.Lines);
+        var axisMesh = Renderer.CreateMesh(axisVertices, TriangleVertex.GetLayout(), new() { PrimitiveType = PrimitiveType.Lines });
         Renderer.CreateModel(axisMesh, shader1);
 
         // Triangle
@@ -65,11 +65,10 @@ internal class TestEngine : AEngineBase
             new BoxVertex{ Position = new( -10f, -10f, 0.0f), TexCoord = new(0f, 0f) },
             new BoxVertex{ Position = new(  10f, -10f, 0.0f), TexCoord = new(1f, 0f) },
             new BoxVertex{ Position = new( -10f,  10f, 0.0f), TexCoord = new(0f, 1f) },
-            new BoxVertex{ Position = new(  10f, -10f, 0.0f), TexCoord = new(1f, 0f) },
-            new BoxVertex{ Position = new(  10f,  10f, 0.0f), TexCoord = new(1f, 1f) },
-            new BoxVertex{ Position = new( -10f,  10f, 0.0f), TexCoord = new(0f, 1f) }
+            new BoxVertex{ Position = new(  10f,  10f, 0.0f), TexCoord = new(1f, 1f) }
         };
-        var squareMesh = Renderer.CreateMesh(squareVertices, BoxVertex.GetLayout());
+        var squareIndices = new uint[] { 0, 1, 2, 1, 3, 2 };
+        var squareMesh = Renderer.CreateMesh(squareVertices, squareIndices, BoxVertex.GetLayout());
         var squareModel = Renderer.CreateModel(squareMesh, shader2);
         squareModel.Textures.Add(new(boxTexture, "texture0"));
         squareModel.Textures.Add(new(smileTexture, "texture1"));

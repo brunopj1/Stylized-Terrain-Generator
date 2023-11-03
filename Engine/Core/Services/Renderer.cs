@@ -1,5 +1,4 @@
 ﻿using Engine.Graphics;
-using OpenTK.Graphics.OpenGL4;
 
 namespace Engine.Core.Services;
 public class Renderer
@@ -49,9 +48,17 @@ public class Renderer
         _textures.Remove(texture);
     }
 
-    public Mesh CreateMesh<T>(T[] vertices, VertexLayout layout, int vertexCount = 0, PrimitiveType primitiveType = PrimitiveType.Triangles, BufferUsageHint usageHint = BufferUsageHint.StaticDraw) where T : struct
+    public Mesh CreateMesh<T>(T[] vertices, VertexLayout layout, MeshParameters? parameters = null) where T : struct
     {
-        var mesh = new Mesh<T>(vertices, vertexCount, layout, primitiveType, usageHint);
+        var mesh = new Mesh<T>(vertices, null, layout, parameters);
+        if (_isLoaded) mesh.Build();
+        _meshes.Add(mesh);
+        return mesh;
+    }
+
+    public Mesh CreateMesh<T>(T[] vertices, uint[] indices, VertexLayout layout, MeshParameters? parameters = null) where T : struct
+    {
+        var mesh = new Mesh<T>(vertices, indices, layout, parameters);
         if (_isLoaded) mesh.Build();
         _meshes.Add(mesh);
         return mesh;

@@ -3,6 +3,18 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace Engine.Graphics;
 
+public struct MeshParameters
+{
+    public MeshParameters()
+    {
+    }
+
+    public PrimitiveType PrimitiveType { get; set; } = PrimitiveType.Triangles;
+    public BufferUsageHint UsageHint { get; set; } = BufferUsageHint.StaticDraw;
+
+    public int OverrideVertexCount { get; set; } = 0;
+}
+
 public abstract class Mesh
 {
     internal abstract void Build();
@@ -12,14 +24,14 @@ public abstract class Mesh
 
 public class Mesh<T> : Mesh where T : struct
 {
-    internal Mesh(T[] vertices, int vertexCount, VertexLayout layout, PrimitiveType primitiveType, BufferUsageHint usageHint)
+    internal Mesh(T[] vertices, uint[]? indices, VertexLayout layout, MeshParameters? parameters)
     {
         _vertices = vertices;
-        _vertexCount = vertexCount > 0 ? vertexCount : vertices.Length;
+        _indices = indices;
         _layout = layout;
+        _parameters = parameters ?? new();
 
-        _primitiveType = primitiveType;
-        _usageHint = usageHint;
+        _vertexCount = _parameters.OverrideVertexCount > 0 ? _parameters.OverrideVertexCount : vertices.Length;
 
         if (vertices == null || vertices.Length == 0)
         {
@@ -36,14 +48,14 @@ public class Mesh<T> : Mesh where T : struct
     }
 
     private readonly T[] _vertices;
+    private readonly uint[] _indices;
     private readonly int _vertexCount;
     private readonly VertexLayout _layout;
-
-    private readonly PrimitiveType _primitiveType = PrimitiveType.Triangles;
-    private readonly BufferUsageHint _usageHint = BufferUsageHint.StaticDraw;
+    private readonly MeshParameters _parameters;
 
     private int _vertexBuffer = -1;
     private int _vertexArray = -1;
+    private int _elementBuffer = -1;
 
     internal override void Build()
     {
@@ -58,7 +70,7 @@ public class Mesh<T> : Mesh where T : struct
         GL.GenBuffers(1, out _vertexBuffer);
         GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer);
 
-        GL.BufferData(BufferTarget.ArrayBuffer, dataSize, _vertices, _usageHint);
+        GL.BufferData(BufferTarget.ArrayBuffer, dataSize, _vertices, _parameters.UsageHint);
 
         var idx = 0;
         var offset = 0;
@@ -69,6 +81,13 @@ public class Mesh<T> : Mesh where T : struct
 
             idx++;
             offset += attr.Stride;
+        }
+
+        if (_indices != null && _indices.Length > 0)
+        {
+            GL.GenBuffers(1, out _elementBuffer);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBuffer);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
         }
     }
 
@@ -82,7 +101,16 @@ public class Mesh<T> : Mesh where T : struct
 
     public override void Render()
     {
-        GL.BindVertexArray(_vertexArray);
-        GL.DrawArrays(_primitiveType, 0, _vertexCount);
+        if (_elementBuffer != -1)
+        {
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBuffer);
+            GL.BindVertexArray(_vertexArray);
+            GL.DrawElements(_parameters.PrimitiveType, _indices.Length, DrawElementsType.UnsignedInt, 0);
+        }
+        else
+        {
+            GL.BindVertexArray(_vertexArray);
+            GL.DrawArrays(_parameters.PrimitiveType, 0, _vertexCount);
+        }
     }
 }

@@ -21,18 +21,18 @@ public class Texture
     internal Texture(string path, TextureParameters? parameters)
     {
         _path = path;
-        _params = parameters ?? new TextureParameters();
+        _params = parameters ?? new();
     }
 
     private readonly string _path;
     private readonly TextureParameters _params;
 
-    private int _id = -1;
+    private int _handle = -1;
 
     internal void Load()
     {
-        _id = GL.GenTexture();
-        GL.BindTexture(TextureTarget.Texture2D, _id);
+        _handle = GL.GenTexture();
+        GL.BindTexture(TextureTarget.Texture2D, _handle);
 
         var image = ImageResult.FromStream(File.OpenRead(_path), ColorComponents.RedGreenBlueAlpha);
         GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, image.Data);
@@ -48,16 +48,16 @@ public class Texture
 
     internal void Dispose()
     {
-        GL.DeleteTexture(_id);
-        _id = -1;
+        GL.DeleteTexture(_handle);
+        _handle = -1;
     }
 
     public void Bind(int unit)
     {
-        if (_id != -1)
+        if (_handle != -1)
         {
             GL.ActiveTexture(TextureUnit.Texture0 + unit);
-            GL.BindTexture(TextureTarget.Texture2D, _id);
+            GL.BindTexture(TextureTarget.Texture2D, _handle);
         }
     }
 }
