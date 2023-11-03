@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using ImGuiNET;
-using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -163,7 +162,7 @@ void main()
         var io = ImGui.GetIO();
         io.Fonts.GetTexDataAsRGBA32(out nint pixels, out var width, out var height, out _);
 
-        var mips = (int)Math.Floor(Math.Log(Math.Max(width, height), 2));
+        var mips = (int)MathF.Floor(MathF.Log(MathF.Max(width, height), 2));
 
         var prevActiveTexture = GL.GetInteger(GetPName.ActiveTexture);
         GL.ActiveTexture(TextureUnit.Texture0);
@@ -380,7 +379,7 @@ void main()
             var vertexSize = cmd_list.VtxBuffer.Size * Unsafe.SizeOf<ImDrawVert>();
             if (vertexSize > _vertexBufferSize)
             {
-                var newSize = (int)Math.Max(_vertexBufferSize * 1.5f, vertexSize);
+                var newSize = (int)MathF.Max(_vertexBufferSize * 1.5f, vertexSize);
 
                 GL.BufferData(BufferTarget.ArrayBuffer, newSize, nint.Zero, BufferUsageHint.DynamicDraw);
                 _vertexBufferSize = newSize;
@@ -391,7 +390,7 @@ void main()
             var indexSize = cmd_list.IdxBuffer.Size * sizeof(ushort);
             if (indexSize > _indexBufferSize)
             {
-                var newSize = (int)Math.Max(_indexBufferSize * 1.5f, indexSize);
+                var newSize = (int)MathF.Max(_indexBufferSize * 1.5f, indexSize);
                 GL.BufferData(BufferTarget.ElementArrayBuffer, newSize, nint.Zero, BufferUsageHint.DynamicDraw);
                 _indexBufferSize = newSize;
 

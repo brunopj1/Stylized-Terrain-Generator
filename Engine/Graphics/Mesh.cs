@@ -1,5 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using OpenTK.Graphics.OpenGL4;
 
 namespace Engine.Graphics;
 

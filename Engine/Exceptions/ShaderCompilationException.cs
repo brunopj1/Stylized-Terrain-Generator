@@ -1,6 +1,4 @@
-﻿using OpenTK.Graphics.OpenGL4;
-
-namespace Engine.Exceptions;
+﻿namespace Engine.Exceptions;
 
 internal class ShaderCompilationException : Exception
 {

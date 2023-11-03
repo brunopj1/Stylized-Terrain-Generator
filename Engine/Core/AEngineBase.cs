@@ -3,7 +3,6 @@ using Engine.Core.Internal;
 using Engine.Core.Services;
 using Engine.Exceptions;
 using ImGuiNET;
-using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;

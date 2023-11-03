@@ -3,5 +3,7 @@ Task list:
 - [X] Add ImGui to the project
 - [X] Option to recompile shaders
 - [X] Texture class
-- [ ] View frustum culling
+- [X] View frustum culling
+- [ ] OBB frustum culling
+- [ ] Option to automatically generate Bounding Volume from vertices
 - [ ] Event based input system

@@ -1,6 +1,5 @@
 ﻿using Engine.Core.Services;
 using Engine.Exceptions;
-using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
 namespace Engine.Graphics;

@@ -1,6 +1,4 @@
-﻿using OpenTK.Graphics.OpenGL4;
-
-namespace Engine.Graphics;
+﻿namespace Engine.Graphics;
 
 public struct VertexAttribute
 {

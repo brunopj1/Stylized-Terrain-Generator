@@ -1,5 +1,6 @@
 ﻿using Engine.Core;
 using Engine.Core.Controllers;
+using Engine.Graphics;
 using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
@@ -38,41 +39,46 @@ internal class TestEngine : AEngineBase
         // Axis
         var axisVertices = new TriangleVertex[]
         {
-            new TriangleVertex{ Position = new( 0.0f, 0.0f, 0.0f), Color = new(1.0f, 0.0f, 0.0f) },
-            new TriangleVertex{ Position = new( 1.0f, 0.0f, 0.0f), Color = new(1.0f, 0.0f, 0.0f) },
-            new TriangleVertex{ Position = new( 0.0f, 0.0f, 0.0f), Color = new(0.0f, 1.0f, 0.0f) },
-            new TriangleVertex{ Position = new( 0.0f, 1.0f, 0.0f), Color = new(0.0f, 1.0f, 0.0f) },
-            new TriangleVertex{ Position = new( 0.0f, 0.0f, 0.0f), Color = new(0.0f, 0.0f, 1.0f) },
-            new TriangleVertex{ Position = new( 0.0f, 0.0f, 1.0f), Color = new(0.0f, 0.0f, 1.0f) }
+            new TriangleVertex{ Position = new( 0f, 0f, 0f), Color = new(1f, 0f, 0f) },
+            new TriangleVertex{ Position = new( 1f, 0f, 0f), Color = new(1f, 0f, 0f) },
+            new TriangleVertex{ Position = new( 0f, 0f, 0f), Color = new(0f, 1f, 0f) },
+            new TriangleVertex{ Position = new( 0f, 1f, 0f), Color = new(0f, 1f, 0f) },
+            new TriangleVertex{ Position = new( 0f, 0f, 0f), Color = new(0f, 0f, 1f) },
+            new TriangleVertex{ Position = new( 0f, 0f, 1f), Color = new(0f, 0f, 1f) }
         };
         var axisMesh = Renderer.CreateMesh(axisVertices, TriangleVertex.GetLayout(), new() { PrimitiveType = PrimitiveType.Lines });
-        Renderer.CreateModel(axisMesh, shader1);
+        var axisModel = Renderer.CreateModel(axisMesh, shader1);
+        axisModel.BoundingVolume = new BoundingSphere(new(0.5f, 0.5f, 0.5f), 0.5f);
 
         // Triangle
         var triangleVertices = new TriangleVertex[]
         {
-            new TriangleVertex{ Position = new( -10f, -10f, 0.0f), Color = new(1.0f, 0.0f, 0.0f) },
-            new TriangleVertex{ Position = new(  10f, -10f, 0.0f), Color = new(0.0f, 1.0f, 0.0f) },
-            new TriangleVertex{ Position = new(  0.0f,  10f, 0.0f), Color = new(0.0f, 0.0f, 1.0f) }
+            new TriangleVertex{ Position = new( -1f, -1f, 0f), Color = new(1f, 0f, 0f) },
+            new TriangleVertex{ Position = new(  1f, -1f, 0f), Color = new(0f, 1f, 0f) },
+            new TriangleVertex{ Position = new(  0f,  1f, 0f), Color = new(0f, 0f, 1f) }
         };
         var triangleMesh = Renderer.CreateMesh(triangleVertices, TriangleVertex.GetLayout());
         var triangleModel = Renderer.CreateModel(triangleMesh, shader1);
-        triangleModel.Transform.Translate(new(15, 0, 0));
+        triangleModel.Transform.Position = new(15, 0, 0);
+        triangleModel.Transform.Scale = new(10);
+        triangleModel.BoundingVolume = new AxisAlignedBoundingBox(new(-1, -1, 0), new(1, 1, 0));
 
         // Square
         var squareVertices = new BoxVertex[]
         {
-            new BoxVertex{ Position = new( -10f, -10f, 0.0f), TexCoord = new(0f, 0f) },
-            new BoxVertex{ Position = new(  10f, -10f, 0.0f), TexCoord = new(1f, 0f) },
-            new BoxVertex{ Position = new( -10f,  10f, 0.0f), TexCoord = new(0f, 1f) },
-            new BoxVertex{ Position = new(  10f,  10f, 0.0f), TexCoord = new(1f, 1f) }
+            new BoxVertex{ Position = new( -1f, -1f, 0f), TexCoord = new(0f, 0f) },
+            new BoxVertex{ Position = new(  1f, -1f, 0f), TexCoord = new(1f, 0f) },
+            new BoxVertex{ Position = new( -1f,  1f, 0f), TexCoord = new(0f, 1f) },
+            new BoxVertex{ Position = new(  1f,  1f, 0f), TexCoord = new(1f, 1f) }
         };
         var squareIndices = new uint[] { 0, 1, 2, 1, 3, 2 };
         var squareMesh = Renderer.CreateMesh(squareVertices, squareIndices, BoxVertex.GetLayout());
         var squareModel = Renderer.CreateModel(squareMesh, shader2);
         squareModel.Textures.Add(new(boxTexture, "texture0"));
         squareModel.Textures.Add(new(smileTexture, "texture1"));
-        squareModel.Transform.Translate(new(-15, 0, 0));
+        squareModel.Transform.Position = new(-15, 0, 0);
+        squareModel.Transform.Scale = new(10);
+        squareModel.BoundingVolume = new AxisAlignedBoundingBox(new(-1, -1, 0), new(1, 1, 0));
 
         // Camera
         Renderer.Camera.Position = new(0.0f, 0.0f, 30.0f);

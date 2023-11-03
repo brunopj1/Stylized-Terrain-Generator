@@ -115,7 +115,7 @@ public class Renderer
     {
         foreach (var model in _models)
         {
-            model.Render(_uniformManager);
+            model.Render(Camera, _uniformManager);
         }
     }
 

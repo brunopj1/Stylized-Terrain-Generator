@@ -15,12 +15,12 @@ public class Transform
     public Quaternion Rotation { get; set; }
     public Vector3 Scale { get; set; }
 
-    public void Translate(Vector3 translation)
+    public void TranslateBy(Vector3 translation)
     {
         Position += translation;
     }
 
-    public void Rotate(Quaternion rotation)
+    public void RotateBy(Quaternion rotation)
     {
         Rotation *= rotation;
     }
@@ -30,7 +30,7 @@ public class Transform
         Scale *= scale;
     }
 
-    public Matrix4 GetMatrix()
+    public Matrix4 GetModelMatrix()
     {
         var translationMatrix = Matrix4.CreateTranslation(Position);
         var rotationMatrix = Matrix4.CreateFromQuaternion(Rotation);
