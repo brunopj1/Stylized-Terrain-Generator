@@ -14,6 +14,7 @@ public class Model
 
     public Mesh Mesh { get; set; }
     public Shader Shader { get; set; }
+    public List<TextureUniform> Textures { get; set; } = new();
     public Transform Transform { get; set; }
 
     public void Render(UniformManager uniformManager, Matrix4? parentModelMatrix = null)
@@ -22,7 +23,7 @@ public class Model
         if (parentModelMatrix.HasValue) modelMatrix = parentModelMatrix.Value * modelMatrix;
 
         Shader.Use();
-        Shader.BindUniforms(uniformManager, modelMatrix);
+        Shader.BindUniforms(uniformManager, Textures, modelMatrix);
         Mesh.Render();
     }
 }

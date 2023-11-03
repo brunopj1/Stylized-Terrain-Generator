@@ -2,5 +2,6 @@ Task list:
 
 - [X] Add ImGui to the project
 - [X] Option to recompile shaders
-- [ ] Texture class
+- [X] Texture class
+- [ ] View frustum culling
 - [ ] Event based input system

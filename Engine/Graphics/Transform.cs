@@ -32,9 +32,9 @@ public class Transform
 
     public Matrix4 GetMatrix()
     {
-        Matrix4 translationMatrix = Matrix4.CreateTranslation(Position);
-        Matrix4 rotationMatrix = Matrix4.CreateFromQuaternion(Rotation);
-        Matrix4 scaleMatrix = Matrix4.CreateScale(Scale);
+        var translationMatrix = Matrix4.CreateTranslation(Position);
+        var rotationMatrix = Matrix4.CreateFromQuaternion(Rotation);
+        var scaleMatrix = Matrix4.CreateScale(Scale);
 
         return scaleMatrix * rotationMatrix * translationMatrix;
     }

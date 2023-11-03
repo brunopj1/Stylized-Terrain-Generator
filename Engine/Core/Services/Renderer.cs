@@ -15,7 +15,9 @@ public class Renderer
 
     public Camera Camera { get; set; } = new();
 
+    // TODO when destroying the graphics objects check if they are being used by a model
     private readonly List<Shader> _shaders = new();
+    private readonly List<Texture> _textures = new();
     private readonly List<Mesh> _meshes = new();
     private readonly List<Model> _models = new();
 
@@ -31,6 +33,20 @@ public class Renderer
     {
         shader.Dispose();
         _shaders.Remove(shader);
+    }
+
+    public Texture CreateTexture(string path, TextureParameters? parameters = null)
+    {
+        var texture = new Texture(path, parameters);
+        if (_isLoaded) texture.Load();
+        _textures.Add(texture);
+        return texture;
+    }
+
+    public void DestroyTexture(Texture texture)
+    {
+        texture.Dispose();
+        _textures.Remove(texture);
     }
 
     public Mesh CreateMesh<T>(T[] vertices, VertexLayout layout, int vertexCount = 0, PrimitiveType primitiveType = PrimitiveType.Triangles, BufferUsageHint usageHint = BufferUsageHint.StaticDraw) where T : struct
@@ -66,6 +82,11 @@ public class Renderer
             shader.Compile();
         }
 
+        foreach (var texture in _textures)
+        {
+            texture.Load();
+        }
+
         foreach (var mesh in _meshes)
         {
             mesh.Build();
@@ -83,7 +104,7 @@ public class Renderer
         _shaders.Clear();
     }
 
-    public void RenderAll()
+    public void RenderAllModels()
     {
         foreach (var model in _models)
         {
@@ -91,7 +112,7 @@ public class Renderer
         }
     }
 
-    public void RecompileShaders()
+    public void RecompileAllShaders()
     {
         foreach (var shader in _shaders)
         {

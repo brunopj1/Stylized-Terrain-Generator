@@ -20,7 +20,7 @@ internal class ImGuiLayer
         {
             if (ImGui.MenuItem("Toggle wireframe mode"))
             {
-                bool wireframeMode = GL.GetInteger(GetPName.PolygonMode) != (int)PolygonMode.Line;
+                var wireframeMode = GL.GetInteger(GetPName.PolygonMode) != (int)PolygonMode.Line;
                 if (wireframeMode)
                 {
                     GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
@@ -35,7 +35,7 @@ internal class ImGuiLayer
 
             if (ImGui.MenuItem("Recompile shaders"))
             {
-                _engine.Renderer.RecompileShaders();
+                _engine.Renderer.RecompileAllShaders();
             }
 
             ImGui.EndMenu();

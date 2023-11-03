@@ -8,6 +8,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using StbImageSharp;
 
 namespace Engine.Core;
 
@@ -39,7 +40,7 @@ public abstract class AEngineBase : GameWindow
     public Renderer Renderer { get; private set; }
 
     // Private services
-    private ImGuiLayer _imGuiLayer;
+    private readonly ImGuiLayer _imGuiLayer;
 
     // Player controller
     public IPlayerController? PlayerController { get; set; } = null;
@@ -49,6 +50,8 @@ public abstract class AEngineBase : GameWindow
         base.OnLoad();
 
         _imGuiController = new ImGuiController(ClientSize.X, ClientSize.Y);
+
+        StbImage.stbi_set_flip_vertically_on_load(1);
 
         Renderer.Load();
 

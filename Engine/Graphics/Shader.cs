@@ -57,7 +57,7 @@ public class Shader
         GL.UseProgram(_handle);
     }
 
-    internal void BindUniforms(UniformManager uniformManager, Matrix4 modelMatrix)
+    internal void BindUniforms(UniformManager uniformManager, List<TextureUniform> textureUniforms, Matrix4 modelMatrix)
     {
         // Time
         var uniformHandle = GetUniformHandle("uTotalTime");
@@ -88,6 +88,15 @@ public class Shader
         uniformHandle = GetUniformHandle("uPVMMatrix");
         var pvmMatrix = modelMatrix * viewMatrix * projectionMatrix;
         if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref pvmMatrix);
+
+        // Textures
+        for (var i = 0; i < textureUniforms.Count; i++)
+        {
+            var textureUniform = textureUniforms[i];
+            textureUniform.Texture.Bind(i);
+            uniformHandle = GetUniformHandle(textureUniform.Name);
+            if (uniformHandle != -1) GL.Uniform1(uniformHandle, i);
+        }
 
         // Custom uniforms
         BindCustomUniforms();
