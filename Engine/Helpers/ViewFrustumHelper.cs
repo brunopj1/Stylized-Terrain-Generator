@@ -1,6 +1,4 @@
-﻿using OpenTK.Mathematics;
-
-namespace Engine.Extensions;
+﻿namespace Engine.Extensions;
 
 public static class ViewFrustumHelper
 {

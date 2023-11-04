@@ -4,7 +4,7 @@ using OpenTK.Mathematics;
 
 namespace TerrainGenerator.Vertices;
 
-internal struct TriangleVertex
+internal struct TriangleVertex : IVertex
 {
     public Vector3 Position { set; get; }
     public Vector3 Color { set; get; }

@@ -48,7 +48,7 @@ public class Renderer
         _textures.Remove(texture);
     }
 
-    public Mesh CreateMesh<T>(T[] vertices, VertexLayout layout, MeshParameters? parameters = null) where T : struct
+    public Mesh CreateMesh<T>(T[] vertices, VertexLayout layout, MeshParameters? parameters = null) where T : struct, IVertex
     {
         var mesh = new Mesh<T>(vertices, null, layout, parameters);
         if (_isLoaded) mesh.Build();
@@ -56,7 +56,7 @@ public class Renderer
         return mesh;
     }
 
-    public Mesh CreateMesh<T>(T[] vertices, uint[] indices, VertexLayout layout, MeshParameters? parameters = null) where T : struct
+    public Mesh CreateMesh<T>(T[] vertices, uint[] indices, VertexLayout layout, MeshParameters? parameters = null) where T : struct, IVertex
     {
         var mesh = new Mesh<T>(vertices, indices, layout, parameters);
         if (_isLoaded) mesh.Build();

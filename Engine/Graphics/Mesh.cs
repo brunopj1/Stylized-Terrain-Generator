@@ -10,8 +10,6 @@ public struct MeshParameters
 
     public PrimitiveType PrimitiveType { get; set; } = PrimitiveType.Triangles;
     public BufferUsageHint UsageHint { get; set; } = BufferUsageHint.StaticDraw;
-
-    public int OverrideVertexCount { get; set; } = 0;
 }
 
 public abstract class Mesh
@@ -19,9 +17,11 @@ public abstract class Mesh
     internal abstract void Build();
     internal abstract void Dispose();
     public abstract void Render();
+
+    internal abstract BoundingVolume ComputeBoundingVolume();
 }
 
-public class Mesh<T> : Mesh where T : struct
+public class Mesh<T> : Mesh where T : struct, IVertex
 {
     internal Mesh(T[] vertices, uint[]? indices, VertexLayout layout, MeshParameters? parameters)
     {
@@ -30,15 +30,13 @@ public class Mesh<T> : Mesh where T : struct
         _layout = layout;
         _parameters = parameters ?? new();
 
-        _vertexCount = _parameters.OverrideVertexCount > 0 ? _parameters.OverrideVertexCount : vertices.Length;
-
         if (vertices == null || vertices.Length == 0)
         {
             throw new ArgumentException("Invalid vertex array.");
         }
 
         var vertexSize = layout.GetVertexSize();
-        var expectedSize = vertexSize * _vertexCount;
+        var expectedSize = vertexSize * _vertices.Length;
         var dataSize = vertices.Length * Marshal.SizeOf<T>();
         if (dataSize != expectedSize)
         {
@@ -47,8 +45,7 @@ public class Mesh<T> : Mesh where T : struct
     }
 
     private readonly T[] _vertices;
-    private readonly uint[] _indices;
-    private readonly int _vertexCount;
+    private readonly uint[]? _indices;
     private readonly VertexLayout _layout;
     private readonly MeshParameters _parameters;
 
@@ -61,7 +58,7 @@ public class Mesh<T> : Mesh where T : struct
         if (_vertexBuffer != -1 || _vertexArray != -1) return;
 
         var vertexSize = _layout.GetVertexSize();
-        var dataSize = vertexSize * _vertexCount;
+        var dataSize = vertexSize * _vertices.Length;
 
         GL.GenVertexArrays(1, out _vertexArray);
         GL.BindVertexArray(_vertexArray);
@@ -104,12 +101,26 @@ public class Mesh<T> : Mesh where T : struct
         {
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBuffer);
             GL.BindVertexArray(_vertexArray);
-            GL.DrawElements(_parameters.PrimitiveType, _indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(_parameters.PrimitiveType, _indices!.Length, DrawElementsType.UnsignedInt, 0);
         }
         else
         {
             GL.BindVertexArray(_vertexArray);
-            GL.DrawArrays(_parameters.PrimitiveType, 0, _vertexCount);
+            GL.DrawArrays(_parameters.PrimitiveType, 0, _vertices.Length);
         }
+    }
+
+    internal override BoundingVolume ComputeBoundingVolume()
+    {
+        var min = new Vector3(float.MaxValue);
+        var max = new Vector3(float.MinValue);
+
+        foreach (var vertex in _vertices)
+        {
+            min = Vector3.ComponentMin(min, vertex.Position);
+            max = Vector3.ComponentMax(max, vertex.Position);
+        }
+
+        return new AxisAlignedBoundingBox(min, max);
     }
 }

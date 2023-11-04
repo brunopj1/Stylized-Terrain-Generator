@@ -4,6 +4,6 @@ Task list:
 - [X] Option to recompile shaders
 - [X] Texture class
 - [X] View frustum culling
+- [X] Option to automatically generate Bounding Volume from vertices
 - [ ] OBB frustum culling
-- [ ] Option to automatically generate Bounding Volume from vertices
 - [ ] Event based input system

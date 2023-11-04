@@ -1,6 +1,4 @@
-﻿using OpenTK.Mathematics;
-
-namespace Engine.Core.Services;
+﻿namespace Engine.Core.Services;
 
 public class UniformManager
 {

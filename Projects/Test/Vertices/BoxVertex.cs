@@ -1,9 +1,9 @@
-﻿using System.Numerics;
-using Engine.Graphics;
+﻿using Engine.Graphics;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 
 namespace TerrainGenerator.Vertices;
-internal struct BoxVertex
+internal struct BoxVertex : IVertex
 {
     public Vector3 Position { set; get; }
     public Vector2 TexCoord { set; get; }

@@ -61,7 +61,6 @@ internal class TestEngine : AEngineBase
         var triangleModel = Renderer.CreateModel(triangleMesh, shader1);
         triangleModel.Transform.Position = new(15, 0, 0);
         triangleModel.Transform.Scale = new(10);
-        triangleModel.BoundingVolume = new AxisAlignedBoundingBox(new(-1, -1, 0), new(1, 1, 0));
 
         // Square
         var squareVertices = new BoxVertex[]
@@ -78,7 +77,6 @@ internal class TestEngine : AEngineBase
         squareModel.Textures.Add(new(smileTexture, "texture1"));
         squareModel.Transform.Position = new(-15, 0, 0);
         squareModel.Transform.Scale = new(10);
-        squareModel.BoundingVolume = new AxisAlignedBoundingBox(new(-1, -1, 0), new(1, 1, 0));
 
         // Camera
         Renderer.Camera.Position = new(0.0f, 0.0f, 30.0f);

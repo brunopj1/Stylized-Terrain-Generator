@@ -1,5 +1,4 @@
 ﻿using Engine.Extensions;
-using OpenTK.Mathematics;
 
 namespace Engine.Graphics;
 

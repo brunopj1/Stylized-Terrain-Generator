@@ -1,5 +1,4 @@
 ﻿using Engine.Core.Services;
-using OpenTK.Mathematics;
 
 namespace Engine.Graphics;
 
@@ -11,6 +10,7 @@ public class Model
         Shader = shader;
         Transform = new();
         BoundingVolume = boundingVolume;
+        if (boundingVolume == null) ComputeBoundingVolume();
     }
 
     public Mesh Mesh { get; set; }
@@ -24,11 +24,16 @@ public class Model
         var modelMatrix = Transform.GetModelMatrix();
         if (parentModelMatrix.HasValue) modelMatrix = parentModelMatrix.Value * modelMatrix;
 
-        Console.WriteLine($"Rendering: {camera.Intersect(BoundingVolume!, modelMatrix)}");
+        Console.WriteLine($"Visible? -> {camera.Intersect(BoundingVolume!, modelMatrix)}");
         if (BoundingVolume != null && !camera.Intersect(BoundingVolume, modelMatrix)) return;
 
         Shader.Use();
         Shader.BindUniforms(uniformManager, Textures, modelMatrix);
         Mesh.Render();
+    }
+
+    private void ComputeBoundingVolume()
+    {
+        BoundingVolume = Mesh.ComputeBoundingVolume();
     }
 }

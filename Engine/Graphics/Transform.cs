@@ -1,6 +1,4 @@
-﻿using OpenTK.Mathematics;
-
-namespace Engine.Graphics;
+﻿namespace Engine.Graphics;
 
 public class Transform
 {
