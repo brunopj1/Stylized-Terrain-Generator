@@ -6,11 +6,12 @@ uniform ivec2 uChunkOffset;
 layout (location = 0) in vec2 aPosition;
 
 out Data {
-	vec2 uv;
+    vec2 uvLocal;
+	vec2 uvWorld;
 } DataOut;
 
 void main()
 {
-    DataOut.uv = aPosition + uChunkOffset;
-    gl_Position = uPVMMatrix * vec4(aPosition.x, 0, aPosition.y, 1.0);
+    DataOut.uvLocal = aPosition;
+    DataOut.uvWorld = aPosition + uChunkOffset;
 }

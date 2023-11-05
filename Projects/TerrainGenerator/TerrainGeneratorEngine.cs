@@ -21,6 +21,8 @@ internal class TerrainGeneratorEngine : AEngineBase
 
         // Player Controller
         PlayerController = new DefaultPlayerController(this);
+        ((DefaultPlayerController)PlayerController).MovementSpeed = 40f;
+        ((DefaultPlayerController)PlayerController).RunMultiplier = 2.5f;
 
         // Axis
         var axisShader = Renderer.CreateShader
@@ -45,10 +47,12 @@ internal class TerrainGeneratorEngine : AEngineBase
         _axisModel.Transform.ScaleBy(new Vector3(30));
 
         // Terrain chunk
-        var terrainShader = Renderer.CreateShader
+        var terrainShader = Renderer.CreateShader // Full path for shader recompilation
         (
-            vertPath: "Assets/Shaders/terrain.vert",
-            fragPath: "Assets/Shaders/terrain.frag"
+            vertPath: "C:/Projects/OpenGL-Stuff/Projects/TerrainGenerator/Assets/Shaders/terrain.vert",
+            tescPath: "C:/Projects/OpenGL-Stuff/Projects/TerrainGenerator/Assets/Shaders/terrain.tesc",
+            tesePath: "C:/Projects/OpenGL-Stuff/Projects/TerrainGenerator/Assets/Shaders/terrain.tese",
+            fragPath: "C:/Projects/OpenGL-Stuff/Projects/TerrainGenerator/Assets/Shaders/terrain.frag"
         );
 
         var terrainVertices = new TerrainVertex[]
@@ -60,7 +64,7 @@ internal class TerrainGeneratorEngine : AEngineBase
         };
         var terrainIndices = new uint[] { 0, 1, 2, 2, 1, 3 };
 
-        var terrainMesh = Renderer.CreateMesh(terrainVertices, terrainIndices, TerrainVertex.GetLayout(), new MeshParameters { PrimitiveType = PrimitiveType.Triangles });
+        var terrainMesh = Renderer.CreateMesh(terrainVertices, terrainIndices, TerrainVertex.GetLayout(), new MeshParameters { PrimitiveType = PrimitiveType.Patches });
 
         // Terrain Manager
         _terrainManager = new(Renderer, terrainMesh, terrainShader);
@@ -78,6 +82,13 @@ internal class TerrainGeneratorEngine : AEngineBase
 
     private readonly TerrainManager _terrainManager;
     private readonly Model _axisModel;
+
+    protected override void OnLoad()
+    {
+        base.OnLoad();
+
+        GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
+    }
 
     protected override void OnUpdateFrame(FrameEventArgs args)
     {

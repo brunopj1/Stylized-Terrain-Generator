@@ -1,4 +1,5 @@
-﻿using Engine.Core.Controllers;
+﻿using System.Runtime.InteropServices;
+using Engine.Core.Controllers;
 using Engine.Core.Internal;
 using Engine.Core.Services;
 using Engine.Exceptions;
@@ -13,7 +14,7 @@ namespace Engine.Core;
 public abstract class AEngineBase : GameWindow
 {
     public AEngineBase()
-        : base(GameWindowSettings.Default, NativeWindowSettings.Default)
+        : base(new(), new() { APIVersion = new(4, 6), Flags = ContextFlags.Debug })
     {
         if (s_wasAlreadyCreated) throw new MultipleEnginesException();
         else s_wasAlreadyCreated = true;
@@ -43,9 +44,21 @@ public abstract class AEngineBase : GameWindow
     // Player controller
     public IPlayerController? PlayerController { get; set; } = null;
 
+    // Debug
+    private static void OnDebugMessage(DebugSource source, DebugType type, int id, DebugSeverity severity, int length, IntPtr pMessage, IntPtr pUserParam)
+    {
+        string message = Marshal.PtrToStringAnsi(pMessage, length);
+        Console.WriteLine($"[{severity} source={source} type={type} id={id}] {message}");
+        if (type == DebugType.DebugTypeError) throw new Exception(message);
+    }
+
+    // Methods
     protected override void OnLoad()
     {
         base.OnLoad();
+
+        GL.DebugMessageCallback(OnDebugMessage, IntPtr.Zero);
+        GL.Enable(EnableCap.DebugOutput);
 
         _imGuiController = new ImGuiController(ClientSize.X, ClientSize.Y);
 

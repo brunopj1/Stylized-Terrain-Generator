@@ -8,7 +8,8 @@ uniform float uChunkHeight;
 uniform ivec2 uChunkOffset;
 
 in Data {
-	vec2 uv;
+	vec2 uvLocal;
+	vec2 uvWorld;
 } DataIn[];
 
 out Data {
@@ -17,15 +18,18 @@ out Data {
 
 void main()
 {
-    vec3 pos = 
-        gl_TessCoord.x * gl_in[0].gl_Position.xyz +
-        gl_TessCoord.y * gl_in[1].gl_Position.xyz +
-        gl_TessCoord.z * gl_in[2].gl_Position.xyz;
-   
-    DataOut.uv = 
-        gl_TessCoord.x * DataIn[0].uv +
-        gl_TessCoord.y * DataIn[1].uv +
-        gl_TessCoord.z * DataIn[2].uv;
+    vec2 uvLocal = 
+		DataIn[0].uvLocal * gl_TessCoord.x +
+		DataIn[1].uvLocal * gl_TessCoord.y +
+		DataIn[2].uvLocal * gl_TessCoord.z;
 
-    gl_Position = vec4(pos, 1.0);
+    vec2 uvWorld = 
+	    DataIn[0].uvWorld * gl_TessCoord.x +
+	    DataIn[1].uvWorld * gl_TessCoord.y +
+	    DataIn[2].uvWorld * gl_TessCoord.z;
+
+    DataOut.uv = uvWorld;
+
+    float height = (sin(uvWorld.x + uvWorld.y) + 1) * uChunkHeight * 0.3;
+    gl_Position = uPVMMatrix * vec4(uvLocal.x, height, uvLocal.y, 1.0);
 }

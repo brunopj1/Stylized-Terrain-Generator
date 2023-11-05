@@ -1,14 +1,16 @@
 #version 440 core
 
-const float inner = 16.0;
-const float outer = 16.0;
+const float inner = 8.0;
+const float outer = 8.0;
 
 in Data {
-	vec2 uv;
+	vec2 uvLocal;
+	vec2 uvWorld;
 } DataIn[];
 
 out Data {
-	vec2 uv;
+	vec2 uvLocal;
+	vec2 uvWorld;
 } DataOut[];
 
 
@@ -25,7 +27,6 @@ void main()
         gl_TessLevelOuter[2] = outer;
     }
 
-    DataOut[gl_InvocationID].uv = DataIn[gl_InvocationID].uv;
-
-    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+    DataOut[gl_InvocationID].uvLocal = DataIn[gl_InvocationID].uvLocal;
+    DataOut[gl_InvocationID].uvWorld = DataIn[gl_InvocationID].uvWorld;
 }
