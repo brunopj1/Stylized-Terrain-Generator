@@ -16,8 +16,7 @@ out Data {
 
 layout(vertices = 3) out;
 
-void main()
-{
+void main() {
     if (gl_InvocationID == 0)
     {
         gl_TessLevelInner[0] = inner;

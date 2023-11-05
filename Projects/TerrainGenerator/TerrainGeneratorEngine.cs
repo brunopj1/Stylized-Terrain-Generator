@@ -24,35 +24,13 @@ internal class TerrainGeneratorEngine : AEngineBase
         ((DefaultPlayerController)PlayerController).MovementSpeed = 40f;
         ((DefaultPlayerController)PlayerController).RunMultiplier = 2.5f;
 
-        // Axis
-        var axisShader = Renderer.CreateShader
-        (
-            vertPath: "Assets/Shaders/axis.vert",
-            fragPath: "Assets/Shaders/axis.frag"
-        );
-
-        var axisVertices = new AxisVertex[]
-        {
-            new AxisVertex{ Position = new( 0f, 0f, 0f), Color = new(1f, 0f, 0f) },
-            new AxisVertex{ Position = new( 1f, 0f, 0f), Color = new(1f, 0f, 0f) },
-            new AxisVertex{ Position = new( 0f, 0f, 0f), Color = new(0f, 1f, 0f) },
-            new AxisVertex{ Position = new( 0f, 1f, 0f), Color = new(0f, 1f, 0f) },
-            new AxisVertex{ Position = new( 0f, 0f, 0f), Color = new(0f, 0f, 1f) },
-            new AxisVertex{ Position = new( 0f, 0f, 1f), Color = new(0f, 0f, 1f) }
-        };
-
-        var axisMesh = Renderer.CreateMesh(axisVertices, AxisVertex.GetLayout(), new() { PrimitiveType = PrimitiveType.Lines });
-
-        _axisModel = Renderer.CreateModel(axisMesh, axisShader);
-        _axisModel.Transform.ScaleBy(new Vector3(30));
-
         // Terrain chunk
-        var terrainShader = Renderer.CreateShader // Full path for shader recompilation
+        var terrainShader = Renderer.CreateShader
         (
-            vertPath: "C:/Projects/OpenGL-Stuff/Projects/TerrainGenerator/Assets/Shaders/terrain.vert",
-            tescPath: "C:/Projects/OpenGL-Stuff/Projects/TerrainGenerator/Assets/Shaders/terrain.tesc",
-            tesePath: "C:/Projects/OpenGL-Stuff/Projects/TerrainGenerator/Assets/Shaders/terrain.tese",
-            fragPath: "C:/Projects/OpenGL-Stuff/Projects/TerrainGenerator/Assets/Shaders/terrain.frag"
+            vertPath: "Assets/Shaders/terrain.vert",
+            tescPath: "Assets/Shaders/terrain.tesc",
+            tesePath: "Assets/Shaders/terrain.tese",
+            fragPath: "Assets/Shaders/terrain.frag"
         );
 
         var terrainVertices = new TerrainVertex[]
@@ -73,15 +51,12 @@ internal class TerrainGeneratorEngine : AEngineBase
         Renderer.Camera.Position = new
         (
             _terrainManager.ChunkLength * 0.5f,
-            _terrainManager.ChunkHeight + 10,
+            _terrainManager.ChunkHeight * 1.5f,
             _terrainManager.ChunkLength * 0.5f
         );
-        Renderer.Camera.Near = 1f;
-        Renderer.Camera.Far = 1000f;
     }
 
     private readonly TerrainManager _terrainManager;
-    private readonly Model _axisModel;
 
     protected override void OnLoad()
     {
@@ -101,8 +76,8 @@ internal class TerrainGeneratorEngine : AEngineBase
     {
         base.OnRenderFrameInternal(args);
 
-        _axisModel.Render(Renderer.Camera, UniformManager);
-
         _terrainManager.Render(UniformManager);
+
+        _terrainManager.RenderOverlay();
     }
 }

@@ -7,5 +7,6 @@ Task list:
 - [X] Option to automatically generate Bounding Volume from vertices
 - [ ] Add compute shaders
 - [ ] Light abstraction (in c# and in shaders))
+- [ ] PBR abstraction
 - [ ] OBB frustum culling
 - [ ] Event based input system

@@ -1,11 +1,14 @@
 #version 440 core
 
+#pragma include "Util/noise.glsl"
+
 layout(triangles, equal_spacing, ccw) in;
 
 uniform mat4 uPVMMatrix;
 uniform float uChunkLength;
 uniform float uChunkHeight;
 uniform ivec2 uChunkOffset;
+uniform float uTerrainFrequency;
 
 in Data {
 	vec2 uvLocal;
@@ -14,10 +17,28 @@ in Data {
 
 out Data {
 	vec2 uv;
+    float noise;
 } DataOut;
 
-void main()
-{
+float hash( in ivec2 p ) { // this hash is not production ready, please replace this by something better
+    int n = p.x*3 + p.y*113;
+	n = (n << 13) ^ n;
+    n = n * (n * n * 15731 + 789221) + 1376312589;
+    return -1.0+2.0*float( n & 0x0fffffff)/float(0x0fffffff);
+}
+
+float value_noise( in vec2 p ) {
+    ivec2 i = ivec2(floor( p ));
+    vec2 f = fract( p );
+    vec2 u = f*f*f*(f*(f*6.0-15.0)+10.0);
+
+    return mix(mix(hash(i + ivec2(0,0)),
+                   hash(i + ivec2(1,0)), u.x),
+               mix(hash(i + ivec2(0,1)), 
+                   hash(i + ivec2(1,1)), u.x), u.y);
+}
+
+void main() {
     vec2 uvLocal = 
 		DataIn[0].uvLocal * gl_TessCoord.x +
 		DataIn[1].uvLocal * gl_TessCoord.y +
@@ -28,8 +49,11 @@ void main()
 	    DataIn[1].uvWorld * gl_TessCoord.y +
 	    DataIn[2].uvWorld * gl_TessCoord.z;
 
-    DataOut.uv = uvWorld;
+    vec2 uv = uvWorld * uChunkLength * uTerrainFrequency;
+    float noise = (value_noise(uv) + 1.) * 0.5;
+    float height = noise * uChunkHeight;
 
-    float height = (sin(uvWorld.x + uvWorld.y) + 1) * uChunkHeight * 0.3;
     gl_Position = uPVMMatrix * vec4(uvLocal.x, height, uvLocal.y, 1.0);
+    DataOut.uv = uv;
+    DataOut.noise = noise;
 }

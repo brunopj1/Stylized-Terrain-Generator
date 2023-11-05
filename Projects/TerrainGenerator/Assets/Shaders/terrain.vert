@@ -10,8 +10,7 @@ out Data {
 	vec2 uvWorld;
 } DataOut;
 
-void main()
-{
+void main() {
     DataOut.uvLocal = aPosition;
     DataOut.uvWorld = aPosition + uChunkOffset;
 }

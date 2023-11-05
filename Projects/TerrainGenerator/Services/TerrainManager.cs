@@ -1,5 +1,6 @@
 ﻿using Engine.Core.Services;
 using Engine.Graphics;
+using ImGuiNET;
 
 namespace TerrainGenerator.Services;
 internal class TerrainManager : ICustomUniformManager
@@ -16,6 +17,7 @@ internal class TerrainManager : ICustomUniformManager
         _chunkOffset = new();
 
         UpdateChunkGrid();
+        UpdateCameraViewDistance();
     }
 
     private readonly Renderer _renderer;
@@ -26,7 +28,7 @@ internal class TerrainManager : ICustomUniformManager
     private Vector2i _gridOffset;
     private Vector2i _chunkOffset; // For usage in the shader
 
-    private uint _chunkRadius = 8;
+    private uint _chunkRadius = 15;
     public uint ChunkRadius
     {
         get => _chunkRadius;
@@ -34,10 +36,11 @@ internal class TerrainManager : ICustomUniformManager
         {
             _chunkRadius = value;
             UpdateChunkGrid();
+            UpdateCameraViewDistance();
         }
     }
 
-    private float _chunkLength = 50;
+    private float _chunkLength = 200;
     public float ChunkLength
     {
         get => _chunkLength;
@@ -45,15 +48,23 @@ internal class TerrainManager : ICustomUniformManager
         {
             _chunkLength = value;
             UpdateChunks();
+            UpdateCameraViewDistance();
         }
     }
 
-    private float _chunkHeight = 100;
+    private float _chunkHeight = 200;
     public float ChunkHeight
     {
         get => _chunkHeight;
-        set => _chunkHeight = value;
+        set
+        {
+            _chunkHeight = value;
+            UpdateChunks();
+        }
     }
+
+    // TODO move this to a different class
+    private float _terrainFrequency = 0.01f;
 
     public void Update()
     {
@@ -66,18 +77,6 @@ internal class TerrainManager : ICustomUniformManager
         {
             _gridOffset += new Vector2i(offsetX, offsetZ);
             _renderer.Camera.Position -= new Vector3(offsetX * _chunkLength, 0, offsetZ * _chunkLength);
-        }
-    }
-
-    public void Render(EngineUniformManager uniformManager)
-    {
-        for (var i = 0; i < _chunkGrid.GetLength(0); i++)
-        {
-            for (var j = 0; j < _chunkGrid.GetLength(1); j++)
-            {
-                _chunkOffset = _gridOffset + new Vector2i(i - (int)_chunkRadius, j - (int)_chunkRadius);
-                _chunkGrid[i, j].Render(_renderer.Camera, uniformManager);
-            }
         }
     }
 
@@ -97,7 +96,6 @@ internal class TerrainManager : ICustomUniformManager
             for (var j = 0; j < size; j++)
             {
                 _chunkGrid[i, j] = _renderer.CreateModel(_mesh, _shader, customUniformManager: this);
-                _chunkGrid[i, j].BoundingVolume = new AxisAlignedBoundingBox(Vector3.Zero, new Vector3(1, _chunkHeight, 1));
             }
         }
 
@@ -113,8 +111,46 @@ internal class TerrainManager : ICustomUniformManager
                 var chunk = _chunkGrid[i, j];
                 chunk.Transform.Position = new((i - _chunkRadius) * _chunkLength, 0, (j - _chunkRadius) * _chunkLength);
                 chunk.Transform.Scale = new(_chunkLength, 1, _chunkLength);
+                chunk.BoundingVolume = new AxisAlignedBoundingBox(Vector3.Zero, new Vector3(1, _chunkHeight, 1));
             }
         }
+    }
+
+    private void UpdateCameraViewDistance()
+    {
+        _renderer.Camera.Far = (_chunkRadius + 1) * 1.2f * _chunkLength;
+        _renderer.Camera.Near = _renderer.Camera.Far * 0.001f;
+    }
+
+    public void Render(EngineUniformManager uniformManager)
+    {
+        for (var i = 0; i < _chunkGrid.GetLength(0); i++)
+        {
+            for (var j = 0; j < _chunkGrid.GetLength(1); j++)
+            {
+                _chunkOffset = _gridOffset + new Vector2i(i - (int)_chunkRadius, j - (int)_chunkRadius);
+                _chunkGrid[i, j].Render(_renderer.Camera, uniformManager);
+            }
+        }
+    }
+
+    public void RenderOverlay()
+    {
+        ImGui.Begin("Terrain Grid Settings");
+
+        var tempF = _chunkLength;
+        if (ImGui.DragFloat("Chunk length", ref tempF, 1, 10, 500)) ChunkLength = tempF;
+
+        tempF = _chunkHeight;
+        if (ImGui.DragFloat("Chunk height", ref tempF, 1, 0, 1000)) ChunkHeight = tempF;
+
+        var tempI = (int)_chunkRadius;
+        if (ImGui.DragInt("Chunk radius", ref tempI, 1, 1, 50)) ChunkRadius = (uint)tempI;
+
+        tempF = _terrainFrequency;
+        if (ImGui.DragFloat("Terrain frequency", ref tempF, 0.0001f, 0.001f, 0.03f)) _terrainFrequency = tempF;
+
+        ImGui.End();
     }
 
     public void BindUniforms(Shader shader)
@@ -122,5 +158,6 @@ internal class TerrainManager : ICustomUniformManager
         shader.BindUniform("uChunkLength", _chunkLength);
         shader.BindUniform("uChunkHeight", _chunkHeight);
         shader.BindUniform("uChunkOffset", ref _chunkOffset);
+        shader.BindUniform("uTerrainFrequency", _terrainFrequency);
     }
 }
