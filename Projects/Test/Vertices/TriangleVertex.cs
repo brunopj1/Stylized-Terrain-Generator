@@ -1,6 +1,4 @@
 ﻿using Engine.Graphics;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 
 namespace TerrainGenerator.Vertices;
 
@@ -17,4 +15,6 @@ internal struct TriangleVertex : IVertex
             new VertexAttribute(VertexAttribPointerType.Float, 3, false)  // Color
         });
     }
+
+    public readonly Vector3 GetPosition() => Position;
 }

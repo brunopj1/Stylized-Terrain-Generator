@@ -4,7 +4,16 @@ namespace Engine.Graphics;
 
 public class Camera
 {
-    public Vector3 Position { get; set; } = Vector3.Zero;
+    private Vector3 _position = Vector3.Zero;
+    public Vector3 Position
+    {
+        get => _position;
+        set
+        {
+            _position = value;
+            UpdateViewFrustum();
+        }
+    }
 
     private float _pitch = 0;
     public float Pitch
@@ -88,7 +97,7 @@ public class Camera
 
     public Matrix4 GetViewMatrix()
     {
-        return Matrix4.LookAt(Position, Position + Front, Up);
+        return Matrix4.LookAt(_position, _position + Front, Up);
     }
 
     public Matrix4 GetProjectionMatrix()
@@ -125,11 +134,11 @@ public class Camera
         var halfHSide = halfVSide * _aspectRatio;
         var frontMultFar = _far * Front;
 
-        _viewFrustumPlanes[0] = ViewFrustumHelper.Plane(Position + _near * Front, Front);
-        _viewFrustumPlanes[1] = ViewFrustumHelper.Plane(Position + frontMultFar, -Front);
-        _viewFrustumPlanes[2] = ViewFrustumHelper.Plane(Position, Vector3.Cross(frontMultFar - Right * halfHSide, Up).Normalized());
-        _viewFrustumPlanes[3] = ViewFrustumHelper.Plane(Position, Vector3.Cross(Up, frontMultFar + Right * halfHSide).Normalized());
-        _viewFrustumPlanes[4] = ViewFrustumHelper.Plane(Position, Vector3.Cross(Right, frontMultFar - Up * halfVSide).Normalized());
-        _viewFrustumPlanes[5] = ViewFrustumHelper.Plane(Position, Vector3.Cross(frontMultFar + Up * halfVSide, Right).Normalized());
+        _viewFrustumPlanes[0] = ViewFrustumHelper.Plane(_position + _near * Front, Front);
+        _viewFrustumPlanes[1] = ViewFrustumHelper.Plane(_position + frontMultFar, -Front);
+        _viewFrustumPlanes[2] = ViewFrustumHelper.Plane(_position, Vector3.Cross(frontMultFar - Right * halfHSide, Up).Normalized());
+        _viewFrustumPlanes[3] = ViewFrustumHelper.Plane(_position, Vector3.Cross(Up, frontMultFar + Right * halfHSide).Normalized());
+        _viewFrustumPlanes[4] = ViewFrustumHelper.Plane(_position, Vector3.Cross(Right, frontMultFar - Up * halfVSide).Normalized());
+        _viewFrustumPlanes[5] = ViewFrustumHelper.Plane(_position, Vector3.Cross(frontMultFar + Up * halfVSide, Right).Normalized());
     }
 }

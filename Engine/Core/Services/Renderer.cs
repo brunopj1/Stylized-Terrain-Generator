@@ -3,14 +3,14 @@
 namespace Engine.Core.Services;
 public class Renderer
 {
-    public Renderer(UniformManager uniformManager)
+    public Renderer(EngineUniformManager uniformManager)
     {
         _uniformManager = uniformManager;
     }
 
     private bool _isLoaded = false;
 
-    private readonly UniformManager _uniformManager;
+    private readonly EngineUniformManager _uniformManager;
 
     public Camera Camera { get; set; } = new();
 
@@ -20,9 +20,9 @@ public class Renderer
     private readonly List<Mesh> _meshes = new();
     private readonly List<Model> _models = new();
 
-    public Shader CreateShader(string vertexShaderPath, string fragmentShaderPath)
+    public Shader CreateShader(string vertPath, string fragPath, string? tescPath = null, string? tesePath = null, string? geomPath = null)
     {
-        var shader = new Shader(vertexShaderPath, fragmentShaderPath);
+        var shader = new Shader(vertPath, tescPath, tesePath, geomPath, fragPath);
         if (_isLoaded) shader.Compile();
         _shaders.Add(shader);
         return shader;
@@ -70,9 +70,9 @@ public class Renderer
         _meshes.Remove(mesh);
     }
 
-    public Model CreateModel(Mesh mesh, Shader shader)
+    public Model CreateModel(Mesh mesh, Shader shader, BoundingVolume? boundingVolume = null, ICustomUniformManager? customUniformManager = null)
     {
-        var model = new Model(mesh, shader);
+        var model = new Model(mesh, shader, boundingVolume, customUniformManager);
         _models.Add(model);
         return model;
     }

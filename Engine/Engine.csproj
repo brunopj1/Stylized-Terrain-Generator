@@ -11,6 +11,9 @@
     <PackageReference Include="ImGui.NET" Version="1.89.9.3" />
     <PackageReference Include="OpenTK" Version="4.8.1" />
     <PackageReference Include="StbImageSharp" Version="2.27.13" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="OpenTK.Graphics.OpenGL4" />
     <Using Include="OpenTK.Mathematics" />
   </ItemGroup>

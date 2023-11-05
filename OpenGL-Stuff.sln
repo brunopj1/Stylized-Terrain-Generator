@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Other Files", "Other Files"
 		todo.txt = todo.txt
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TerrainGenerator", "Projects\TerrainGenerator\TerrainGenerator.csproj", "{B269E3D7-103B-434C-A513-890E0E6529EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,12 +34,17 @@ Global
 		{A0A0EE1A-6E20-4D70-A402-9336F32CA6CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0A0EE1A-6E20-4D70-A402-9336F32CA6CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0A0EE1A-6E20-4D70-A402-9336F32CA6CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B269E3D7-103B-434C-A513-890E0E6529EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B269E3D7-103B-434C-A513-890E0E6529EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B269E3D7-103B-434C-A513-890E0E6529EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B269E3D7-103B-434C-A513-890E0E6529EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C1B02CD4-B814-480C-8CF8-6EA0CB06C827} = {4E7A9577-74D9-417E-B33A-DD7D662265B2}
+		{B269E3D7-103B-434C-A513-890E0E6529EA} = {4E7A9577-74D9-417E-B33A-DD7D662265B2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F79DE717-D3FC-44D9-A652-4D3388566E89}

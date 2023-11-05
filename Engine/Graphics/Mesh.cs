@@ -105,6 +105,7 @@ public class Mesh<T> : Mesh where T : struct, IVertex
         }
         else
         {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer);
             GL.BindVertexArray(_vertexArray);
             GL.DrawArrays(_parameters.PrimitiveType, 0, _vertices.Length);
         }
@@ -117,8 +118,9 @@ public class Mesh<T> : Mesh where T : struct, IVertex
 
         foreach (var vertex in _vertices)
         {
-            min = Vector3.ComponentMin(min, vertex.Position);
-            max = Vector3.ComponentMax(max, vertex.Position);
+            var position = vertex.GetPosition();
+            min = Vector3.ComponentMin(min, position);
+            max = Vector3.ComponentMax(max, position);
         }
 
         return new AxisAlignedBoundingBox(min, max);

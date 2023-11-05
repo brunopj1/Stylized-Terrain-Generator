@@ -3,15 +3,14 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
-    <RootNamespace>TerrainGenerator</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\..\Engine\Engine.csproj" />
-    </ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\..\Engine\Engine.csproj" />
+  </ItemGroup>
+    
   <ItemGroup>
     <Using Include="OpenTK.Graphics.OpenGL4" />
     <Using Include="OpenTK.Mathematics" />

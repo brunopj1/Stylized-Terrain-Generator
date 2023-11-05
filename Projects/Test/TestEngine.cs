@@ -1,8 +1,6 @@
 ﻿using Engine.Core;
 using Engine.Core.Controllers;
 using Engine.Graphics;
-using ImGuiNET;
-using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using TerrainGenerator.Vertices;
 
@@ -15,26 +13,31 @@ internal class TestEngine : AEngineBase
     {
         Size = new(1600, 900);
         ClientLocation = new(50, 50);
-        Title = "Terrain Generator";
+        Title = "Test";
         ClearColor = new(0.2f, 0.3f, 0.3f);
 
+        // Camera
+        Renderer.Camera.Position = new(0.0f, 0.0f, 50.0f);
+
+        // Player Controller
+        PlayerController = new DefaultPlayerController(this);
+
         // Shaders
-        // TODO use relative pahts (maybe copy assets to bin folder?)
         var shader1 = Renderer.CreateShader
         (
-            @"C:\Projects\OpenGL-Stuff\Projects\Test\Assets\Shaders\triangle.vert",
-            @"C:\Projects\OpenGL-Stuff\Projects\Test\Assets\Shaders\triangle.frag"
+            @"Assets\Shaders\triangle.vert",
+            @"Assets\Shaders\triangle.frag"
         );
 
         var shader2 = Renderer.CreateShader
         (
-            @"C:\Projects\OpenGL-Stuff\Projects\Test\Assets\Shaders\box.vert",
-            @"C:\Projects\OpenGL-Stuff\Projects\Test\Assets\Shaders\box.frag"
+            @"Assets\Shaders\box.vert",
+            @"Assets\Shaders\box.frag"
         );
 
         // Textures
-        var boxTexture = Renderer.CreateTexture(@"C:\Projects\OpenGL-Stuff\Projects\Test\Assets\Textures\box.jpg");
-        var smileTexture = Renderer.CreateTexture(@"C:\Projects\OpenGL-Stuff\Projects\Test\Assets\Textures\smile.png");
+        var boxTexture = Renderer.CreateTexture(@"Assets\Textures\box.jpg");
+        var smileTexture = Renderer.CreateTexture(@"Assets\Textures\smile.png");
 
         // Axis
         var axisVertices = new TriangleVertex[]
@@ -59,6 +62,7 @@ internal class TestEngine : AEngineBase
         };
         var triangleMesh = Renderer.CreateMesh(triangleVertices, TriangleVertex.GetLayout());
         var triangleModel = Renderer.CreateModel(triangleMesh, shader1);
+        triangleModel.CumputeDefaultBoundingVolume();
         triangleModel.Transform.Position = new(15, 0, 0);
         triangleModel.Transform.Scale = new(10);
 
@@ -73,16 +77,11 @@ internal class TestEngine : AEngineBase
         var squareIndices = new uint[] { 0, 1, 2, 1, 3, 2 };
         var squareMesh = Renderer.CreateMesh(squareVertices, squareIndices, BoxVertex.GetLayout());
         var squareModel = Renderer.CreateModel(squareMesh, shader2);
+        squareModel.CumputeDefaultBoundingVolume();
         squareModel.Textures.Add(new(boxTexture, "texture0"));
         squareModel.Textures.Add(new(smileTexture, "texture1"));
         squareModel.Transform.Position = new(-15, 0, 0);
         squareModel.Transform.Scale = new(10);
-
-        // Camera
-        Renderer.Camera.Position = new(0.0f, 0.0f, 30.0f);
-
-        // Player Controller
-        PlayerController = new DefaultPlayerController(this);
     }
 
     protected override void OnLoad()
@@ -92,19 +91,10 @@ internal class TestEngine : AEngineBase
         VSync = VSyncMode.On;
     }
 
-    protected override void OnUpdateFrame(FrameEventArgs args)
+    protected override void OnRenderFrameInternal(FrameEventArgs e)
     {
-        base.OnUpdateFrame(args);
-    }
-
-    protected override void OnRenderFrame(FrameEventArgs e)
-    {
-        base.OnRenderFrame(e);
+        base.OnRenderFrameInternal(e);
 
         Renderer.RenderAllModels();
-
-        ImGui.ShowDemoWindow();
-
-        CompleteOnRenderFrame();
     }
 }

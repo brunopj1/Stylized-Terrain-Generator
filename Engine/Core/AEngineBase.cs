@@ -34,7 +34,7 @@ public abstract class AEngineBase : GameWindow
 
     // Public services
     public EngineClock EngineClock { get; private set; } = new();
-    public UniformManager UniformManager { get; private set; } = new();
+    public EngineUniformManager UniformManager { get; private set; } = new();
     public Renderer Renderer { get; private set; }
 
     // Private services
@@ -86,7 +86,7 @@ public abstract class AEngineBase : GameWindow
         PlayerController?.Update((float)args.Time);
     }
 
-    protected override void OnRenderFrame(FrameEventArgs args)
+    protected override sealed void OnRenderFrame(FrameEventArgs args)
     {
         base.OnRenderFrame(args);
 
@@ -98,13 +98,16 @@ public abstract class AEngineBase : GameWindow
         GL.ClearColor(ClearColor.X, ClearColor.Y, ClearColor.Z, 1.0f);
 
         _imGuiLayer.RenderMenuBar();
-    }
 
-    protected void CompleteOnRenderFrame()
-    {
+        OnRenderFrameInternal(args);
+
         _imGuiController?.Render();
 
         SwapBuffers();
+    }
+
+    protected virtual void OnRenderFrameInternal(FrameEventArgs args)
+    {
     }
 
     protected override void OnResize(ResizeEventArgs args)
