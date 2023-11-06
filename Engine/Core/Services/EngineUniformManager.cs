@@ -41,15 +41,15 @@ public class EngineUniformManager
         shader.BindUniform("uCurrentFrame", CurrentFrame);
 
         // Matrices
-        shader.BindUniform("uModelMatrix", ref modelMatrix);
+        shader.BindUniform("uModelMatrix", modelMatrix);
 
-        shader.BindUniform("uViewMatrix", ref _viewMatrix);
+        shader.BindUniform("uViewMatrix", _viewMatrix);
 
-        shader.BindUniform("uProjectionMatrix", ref _projectionMatrix);
+        shader.BindUniform("uProjectionMatrix", _projectionMatrix);
 
-        shader.BindUniform("uNormalMatrix", ref _normalMatrix);
+        shader.BindUniform("uNormalMatrix", _normalMatrix);
 
         var pvmMatrix = modelMatrix * _viewMatrix * _projectionMatrix;
-        shader.BindUniform("uPVMMatrix", ref pvmMatrix);
+        shader.BindUniform("uPVMMatrix", pvmMatrix);
     }
 }

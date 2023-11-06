@@ -96,55 +96,55 @@ public class Shader
         if (uniformHandle != -1) GL.Uniform1(uniformHandle, value);
     }
 
-    public void BindUniform(string name, ref Vector2i value)
+    public void BindUniform(string name, Vector2i value)
     {
         var uniformHandle = GetUniformHandle(name);
         if (uniformHandle != -1) GL.Uniform2(uniformHandle, ref value);
     }
 
-    public void BindUniform(string name, ref Vector3i value)
+    public void BindUniform(string name, Vector3i value)
     {
         var uniformHandle = GetUniformHandle(name);
         if (uniformHandle != -1) GL.Uniform3(uniformHandle, ref value);
     }
 
-    public void BindUniform(string name, ref Vector4i value)
+    public void BindUniform(string name, Vector4i value)
     {
         var uniformHandle = GetUniformHandle(name);
         if (uniformHandle != -1) GL.Uniform4(uniformHandle, ref value);
     }
 
-    public void BindUniform(string name, ref Vector2 value)
+    public void BindUniform(string name, Vector2 value)
     {
         var uniformHandle = GetUniformHandle(name);
         if (uniformHandle != -1) GL.Uniform2(uniformHandle, ref value);
     }
 
-    public void BindUniform(string name, ref Vector3 value)
+    public void BindUniform(string name, Vector3 value)
     {
         var uniformHandle = GetUniformHandle(name);
         if (uniformHandle != -1) GL.Uniform3(uniformHandle, ref value);
     }
 
-    public void BindUniform(string name, ref Vector4 value)
+    public void BindUniform(string name, Vector4 value)
     {
         var uniformHandle = GetUniformHandle(name);
         if (uniformHandle != -1) GL.Uniform4(uniformHandle, ref value);
     }
 
-    public void BindUniform(string name, ref Matrix2 value)
+    public void BindUniform(string name, Matrix2 value)
     {
         var uniformHandle = GetUniformHandle(name);
         if (uniformHandle != -1) GL.UniformMatrix2(uniformHandle, false, ref value);
     }
 
-    public void BindUniform(string name, ref Matrix3 value)
+    public void BindUniform(string name, Matrix3 value)
     {
         var uniformHandle = GetUniformHandle(name);
         if (uniformHandle != -1) GL.UniformMatrix3(uniformHandle, false, ref value);
     }
 
-    public void BindUniform(string name, ref Matrix4 value)
+    public void BindUniform(string name, Matrix4 value)
     {
         var uniformHandle = GetUniformHandle(name);
         if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref value);

@@ -1,7 +1,8 @@
 #version 440 core
 
-const float inner = 8.0;
-const float outer = 8.0;
+uniform uint uChunkRadius;
+uniform ivec2 uChunkOffsetLocal;
+uniform float uChunkTesselation;
 
 in Data {
 	vec2 uvLocal;
@@ -19,11 +20,11 @@ layout(vertices = 3) out;
 void main() {
     if (gl_InvocationID == 0)
     {
-        gl_TessLevelInner[0] = inner;
+        gl_TessLevelInner[0] = uChunkTesselation;
 
-        gl_TessLevelOuter[0] = outer;
-        gl_TessLevelOuter[1] = outer;
-        gl_TessLevelOuter[2] = outer;
+        gl_TessLevelOuter[0] = uChunkTesselation;
+        gl_TessLevelOuter[1] = uChunkTesselation;
+        gl_TessLevelOuter[2] = uChunkTesselation;
     }
 
     DataOut[gl_InvocationID].uvLocal = DataIn[gl_InvocationID].uvLocal;

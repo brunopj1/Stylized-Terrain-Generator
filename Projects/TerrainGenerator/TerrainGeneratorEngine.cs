@@ -5,9 +5,6 @@ using OpenTK.Windowing.Common;
 using TerrainGenerator.Services;
 using TerrainGenerator.Vertices;
 
-// TODO tesselation shader not working
-// TODO rendering quads not working
-
 namespace TerrainGenerator;
 internal class TerrainGeneratorEngine : AEngineBase
 {
