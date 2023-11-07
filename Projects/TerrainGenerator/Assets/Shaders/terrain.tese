@@ -5,6 +5,9 @@
 layout(triangles, equal_spacing, ccw) in;
 
 uniform mat4 uPVMMatrix;
+uniform mat4 uViewMatrix;
+uniform mat4 uModelMatrix;
+
 uniform float uChunkLength;
 uniform float uChunkHeight;
 uniform ivec2 uChunkOffset;
@@ -16,8 +19,7 @@ in Data {
 } DataIn[];
 
 out Data {
-	vec2 uv;
-    float noise;
+    vec3 viewPos;
 } DataOut;
 
 float hash( in ivec2 p ) { // this hash is not production ready, please replace this by something better
@@ -50,10 +52,12 @@ void main() {
 	    DataIn[2].uvWorld * gl_TessCoord.z;
 
     vec2 uv = uvWorld * uChunkLength * uTerrainFrequency;
+    
     float noise = (value_noise(uv) + 1.) * 0.5;
     float height = noise * uChunkHeight;
 
-    gl_Position = uPVMMatrix * vec4(uvLocal.x, height, uvLocal.y, 1.0);
-    DataOut.uv = uv;
-    DataOut.noise = noise;
+    vec4 pos = vec4(uvLocal.x, height, uvLocal.y, 1.0);
+    DataOut.viewPos = (uViewMatrix * uModelMatrix * pos).xyz;
+
+    gl_Position = uPVMMatrix * pos;
 }

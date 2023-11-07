@@ -17,9 +17,13 @@ internal class TerrainManager : ICustomUniformManager
         _tesselationLevels = new()
         {
             new TesselationLevel{ Distance = 4, Tesselation = 16 },
-            new TesselationLevel{ Distance = 4, Tesselation = 8 },
-            new TesselationLevel{ Distance = 4, Tesselation = 4 },
-            new TesselationLevel{ Distance = 64, Tesselation = 2 },
+            new TesselationLevel{ Distance = 2, Tesselation = 14 },
+            new TesselationLevel{ Distance = 2, Tesselation = 12 },
+            new TesselationLevel{ Distance = 2, Tesselation = 10 },
+            new TesselationLevel{ Distance = 2, Tesselation = 8 },
+            new TesselationLevel{ Distance = 2, Tesselation = 6 },
+            new TesselationLevel{ Distance = 2, Tesselation = 4 },
+            new TesselationLevel{ Distance = 2, Tesselation = 2 },
         };
 
         // Fake initialization
