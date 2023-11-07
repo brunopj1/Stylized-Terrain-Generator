@@ -1,6 +1,9 @@
 ﻿using Engine.Graphics;
+using TerrainGenerator;
+using TerrainGenerator.Graphics;
+using TerrainGenerator.Terrain;
 
-namespace TerrainGenerator.Vertices;
+namespace TerrainGenerator.Graphics;
 internal struct TerrainVertex : IVertex
 {
     public Vector2 Position { get; set; }

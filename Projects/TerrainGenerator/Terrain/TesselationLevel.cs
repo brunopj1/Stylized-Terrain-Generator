@@ -2,6 +2,6 @@
 
 internal class TesselationLevel
 {
-    public int Distance { get; set; }
-    public int Tesselation { get; set; }
+    public uint Distance { get; set; }
+    public float Tesselation { get; set; }
 }

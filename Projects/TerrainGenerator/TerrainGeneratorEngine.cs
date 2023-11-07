@@ -2,8 +2,9 @@
 using Engine.Core.Controllers;
 using Engine.Graphics;
 using OpenTK.Windowing.Common;
+using TerrainGenerator.Graphics;
 using TerrainGenerator.Services;
-using TerrainGenerator.Vertices;
+using TerrainGenerator.Terrain;
 
 namespace TerrainGenerator;
 internal class TerrainGeneratorEngine : AEngineBase
