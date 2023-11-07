@@ -90,13 +90,14 @@ public abstract class AEngineBase : GameWindow
             base.Title = $"{Title} ({(int)ImGui.GetIO().Framerate} fps)";
         }
 
+        PlayerController?.Update((float)args.Time);
+
+        _imGuiLayer.ProcessInputs(KeyboardState);
+
         if (KeyboardState.IsKeyDown(Keys.Escape))
         {
             Close();
-            return;
         }
-
-        PlayerController?.Update((float)args.Time);
     }
 
     protected override sealed void OnRenderFrame(FrameEventArgs args)
