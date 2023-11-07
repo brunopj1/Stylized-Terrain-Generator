@@ -8,19 +8,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\..\Engine\Engine.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Engine\Engine.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <Using Include="OpenTK.Graphics.OpenGL4" />
     <Using Include="OpenTK.Mathematics" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Assets\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

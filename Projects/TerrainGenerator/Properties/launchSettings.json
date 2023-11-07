@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TerrainGenerator": {
+      "commandName": "Project",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}
