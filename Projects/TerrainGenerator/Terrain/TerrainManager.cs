@@ -238,7 +238,7 @@ internal class TerrainManager : ICustomUniformManager
         if (ImGuiHelper.DragFloat("Chunk height", ref tempF, 1, 0, 1000)) ChunkHeight = tempF;
 
         var tempI = (int)_chunkRadius;
-        if (ImGuiHelper.DragInt("Chunk radius", ref tempI, 1, 1, 50)) ChunkRadius = (uint)tempI;
+        if (ImGuiHelper.DragInt("Chunk radius", ref tempI, 1, 0, 50)) ChunkRadius = (uint)tempI;
 
         tempF = _terrainFrequency;
         if (ImGuiHelper.DragFloat("Terrain frequency", ref tempF, 0.0001f, 0.001f, 0.03f)) _terrainFrequency = tempF;
