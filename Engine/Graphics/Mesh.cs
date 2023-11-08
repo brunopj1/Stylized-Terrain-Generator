@@ -32,7 +32,7 @@ public class Mesh<T> : Mesh where T : struct, IVertex
 
         if (vertices == null || vertices.Length == 0)
         {
-            throw new ArgumentException("Invalid vertex array.");
+            throw new ArgumentException("Invalid vertex array");
         }
 
         var vertexSize = layout.GetVertexSize();

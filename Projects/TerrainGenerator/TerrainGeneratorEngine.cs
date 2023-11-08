@@ -19,31 +19,11 @@ internal class TerrainGeneratorEngine : AEngineBase
 
         // Player Controller
         PlayerController = new DefaultPlayerController(this);
-        ((DefaultPlayerController)PlayerController).MovementSpeed = 40f;
-        ((DefaultPlayerController)PlayerController).RunMultiplier = 2.5f;
-
-        // Terrain chunk
-        var terrainShader = Renderer.CreateShader
-        (
-            vertPath: "Assets/Shaders/terrain.vert",
-            tescPath: "Assets/Shaders/terrain.tesc",
-            tesePath: "Assets/Shaders/terrain.tese",
-            fragPath: "Assets/Shaders/terrain.frag"
-        );
-
-        var terrainVertices = new TerrainVertex[]
-        {
-            new TerrainVertex{ Position = new(1, 1) },
-            new TerrainVertex{ Position = new(1, 0) },
-            new TerrainVertex{ Position = new(0, 1) },
-            new TerrainVertex{ Position = new(0, 0) }
-        };
-        var terrainIndices = new uint[] { 0, 1, 2, 2, 1, 3 };
-
-        var terrainMesh = Renderer.CreateMesh(terrainVertices, terrainIndices, TerrainVertex.GetLayout(), new MeshParameters { PrimitiveType = PrimitiveType.Patches });
+        ((DefaultPlayerController)PlayerController).MovementSpeed = 150f;
+        ((DefaultPlayerController)PlayerController).RunMultiplier = 5f;
 
         // Terrain Manager
-        _terrainManager = new(Renderer, terrainMesh, terrainShader);
+        _terrainManager = new(Renderer);
 
         // Camera
         Renderer.Camera.Position = new
@@ -74,7 +54,7 @@ internal class TerrainGeneratorEngine : AEngineBase
     {
         base.OnRenderFrameInternal(args);
 
-        _terrainManager.Render(UniformManager);
+        _terrainManager.RenderTerrain(UniformManager);
 
         _terrainManager.RenderOverlay();
     }

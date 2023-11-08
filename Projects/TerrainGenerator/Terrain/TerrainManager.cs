@@ -1,29 +1,34 @@
-﻿using Engine.Core.Services;
+﻿using System.ComponentModel.DataAnnotations;
+using Engine.Core.Services;
 using Engine.Graphics;
 using Engine.Helpers;
 using ImGuiNET;
+using TerrainGenerator.Extensions;
 using TerrainGenerator.Terrain;
+using TerrainGenerator.Terrain.Entities;
 
 namespace TerrainGenerator.Services;
 
+// TODO connections betwwen LODs
 internal class TerrainManager : ICustomUniformManager
 {
-    public TerrainManager(Renderer renderer, Mesh mesh, Shader shader)
+    public TerrainManager(Renderer renderer)
     {
         _renderer = renderer;
-        _mesh = mesh;
-        _shader = shader;
 
-        _tesselationLevels = new()
+        _shader = renderer.CreateShader
+        (
+            vertPath: "Assets/Shaders/terrain.vert",
+            fragPath: "Assets/Shaders/terrain.frag"
+        );
+
+        _tessellationZones = new()
         {
-            new TesselationLevel{ Distance = 4, Tesselation = 16 },
-            new TesselationLevel{ Distance = 2, Tesselation = 14 },
-            new TesselationLevel{ Distance = 2, Tesselation = 12 },
-            new TesselationLevel{ Distance = 2, Tesselation = 10 },
-            new TesselationLevel{ Distance = 2, Tesselation = 8 },
-            new TesselationLevel{ Distance = 2, Tesselation = 6 },
-            new TesselationLevel{ Distance = 2, Tesselation = 4 },
-            new TesselationLevel{ Distance = 2, Tesselation = 2 },
+            new(4, 5, renderer),
+            new(4, 4, renderer),
+            new(4, 3, renderer),
+            new(4, 2, renderer),
+            new(4, 1, renderer)
         };
 
         // Fake initialization
@@ -36,49 +41,39 @@ internal class TerrainManager : ICustomUniformManager
     }
 
     private readonly Renderer _renderer;
-    private readonly Mesh _mesh;
+
     private readonly Shader _shader;
 
     private Chunk[,] _chunkGrid;
-    private Chunk? _currentChunk;
+    private uint _chunkRadius;
     private Vector2i _gridOffset;
 
-    private uint _chunkRadius = 16;
-    public uint ChunkRadius
-    {
-        get => _chunkRadius;
-        set
-        {
-            _chunkRadius = value;
-            UpdateChunkGrid();
-            UpdateCameraViewDistance();
-        }
-    }
+    private Chunk? _currentChunk;
 
-    private float _chunkLength = 200;
+    private float _chunkLength = 500;
     public float ChunkLength
     {
         get => _chunkLength;
         set
         {
             _chunkLength = value;
-            UpdateChunkModels();
+            UpdateChunkTransformsAndBVs();
             UpdateCameraViewDistance();
         }
     }
 
-    private float _chunkHeight = 200;
+    private float _chunkHeight = 400;
     public float ChunkHeight
     {
         get => _chunkHeight;
         set
         {
             _chunkHeight = value;
-            UpdateChunkModels();
+            UpdateChunkTransformsAndBVs();
         }
     }
 
-    private readonly List<TesselationLevel> _tesselationLevels;
+    private readonly List<TesselationZone> _tessellationZones;
 
     // TODO move this to a different class
     private float _terrainFrequency = 0.01f;
@@ -106,33 +101,55 @@ internal class TerrainManager : ICustomUniformManager
             _renderer.DestroyModel(chunk.Model);
         }
 
-        var size = _chunkRadius * 2 + 1;
-        _chunkGrid = new Chunk[size, size];
+        _chunkRadius = (uint)_tessellationZones.Sum(zone => zone.Distance);
+        var gridSize = _chunkRadius * 2 + 1;
+        _chunkGrid = new Chunk[gridSize, gridSize];
 
-        for (var i = 0; i < size; i++)
+        for (var i = 0; i < gridSize; i++)
         {
-            for (var j = 0; j < size; j++)
+            for (var j = 0; j < gridSize; j++)
             {
-                var mesh = _renderer.CreateModel(_mesh, _shader, customUniformManager: this);
-                _chunkGrid[i, j] = new(mesh);
+                var model = _renderer.CreateModel(null, _shader, customUniformManager: this);
+                _chunkGrid[i, j] = new(model);
             }
         }
 
-        UpdateChunkModels();
+        UpdateChunkMeshesAndTessellations();
+        UpdateChunkTransformsAndBVs();
         UpdateChunkOffsets();
-        UpdateChunkTesselations();
     }
 
-    private void UpdateChunkModels()
+    private void UpdateChunkTransformsAndBVs()
     {
         for (var i = 0; i < _chunkGrid.GetLength(0); i++)
         {
             for (var j = 0; j < _chunkGrid.GetLength(1); j++)
             {
                 var model = _chunkGrid[i, j].Model;
+
                 model.Transform.Position = new((i - _chunkRadius) * _chunkLength, 0, (j - _chunkRadius) * _chunkLength);
                 model.Transform.Scale = new(_chunkLength, 1, _chunkLength);
+
                 model.BoundingVolume = new AxisAlignedBoundingBox(Vector3.Zero, new Vector3(1, _chunkHeight, 1));
+            }
+        }
+    }
+
+    private void UpdateChunkMeshesAndTessellations()
+    {
+        for (var i = 0; i < _chunkGrid.GetLength(0); i++)
+        {
+            for (var j = 0; j < _chunkGrid.GetLength(1); j++)
+            {
+                var chunk = _chunkGrid[i, j];
+
+                var localOffset = new Vector2i(i - (int)_chunkRadius, j - (int)_chunkRadius);
+                var centerDistance = (uint)MathF.Max(MathF.Abs(localOffset.X), MathF.Abs(localOffset.Y));
+                var zone = _tessellationZones.GetCorrespondingZone(localOffset);
+
+                chunk.Model.Mesh = zone.Mesh;
+                chunk.Divisions = zone.Divisions;
+
             }
         }
     }
@@ -151,41 +168,6 @@ internal class TerrainManager : ICustomUniformManager
         }
     }
 
-    private void UpdateChunkTesselations()
-    {
-        for (var i = 0; i < _chunkGrid.GetLength(0); i++)
-        {
-            for (var j = 0; j < _chunkGrid.GetLength(1); j++)
-            {
-                var chunk = _chunkGrid[i, j];
-                var localOffset = new Vector2i(i - (int)_chunkRadius, j - (int)_chunkRadius);
-
-                chunk.UpdateTesselations(CalculateChunkTesselation(localOffset));
-                if (localOffset.X >= 0) chunk.TesselationPosX = CalculateChunkTesselation(localOffset + Vector2i.UnitX);
-                if (localOffset.X <= 0) chunk.TesselationNegX = CalculateChunkTesselation(localOffset - Vector2i.UnitX);
-                if (localOffset.Y >= 0) chunk.TesselationPosZ = CalculateChunkTesselation(localOffset + Vector2i.UnitY);
-                if (localOffset.Y <= 0) chunk.TesselationNegZ = CalculateChunkTesselation(localOffset - Vector2i.UnitY);
-            }
-        }
-    }
-
-    private float CalculateChunkTesselation(Vector2i localOffset)
-    {
-        var centerDistance = MathF.Max(MathF.Abs(localOffset.X), MathF.Abs(localOffset.Y));
-
-        foreach (var level in _tesselationLevels)
-        {
-            if (centerDistance <= level.Distance)
-            {
-                return level.Tesselation;
-            }
-
-            centerDistance -= level.Distance;
-        }
-
-        return 1;
-    }
-
     private void UpdateCameraViewDistance()
     {
         _renderer.Camera.Far = MathF.Max((_chunkRadius + 1) * 1.3f * _chunkLength, 1000);
@@ -198,16 +180,12 @@ internal class TerrainManager : ICustomUniformManager
         shader.BindUniform("uChunkHeight", _chunkHeight);
 
         shader.BindUniform("uChunkOffset", _currentChunk!.Offset);
-        shader.BindUniform("uChunkTesselation", _currentChunk!.Tesselation);
-        shader.BindUniform("uChunkTesselationPosX", _currentChunk!.TesselationPosX);
-        shader.BindUniform("uChunkTesselationNegX", _currentChunk!.TesselationNegX);
-        shader.BindUniform("uChunkTesselationPosZ", _currentChunk!.TesselationPosZ);
-        shader.BindUniform("uChunkTesselationNegZ", _currentChunk!.TesselationNegZ);
+        shader.BindUniform("uChunkDivisions", _currentChunk!.Divisions);
 
         shader.BindUniform("uTerrainFrequency", _terrainFrequency);
     }
 
-    public void Render(EngineUniformManager uniformManager)
+    public void RenderTerrain(EngineUniformManager uniformManager)
     {
         for (var i = 0; i < _chunkGrid.GetLength(0); i++)
         {
@@ -224,81 +202,76 @@ internal class TerrainManager : ICustomUniformManager
     public void RenderOverlay()
     {
         RenderTerrainSettingsWindow();
-        RenderTesselationSettingsWindow();
+        RenderTessellationSettingsWindow();
     }
 
     private void RenderTerrainSettingsWindow()
     {
         ImGui.Begin("Grid Settings");
 
-        var tempF = _chunkLength;
-        if (ImGuiHelper.DragFloat("Chunk length", ref tempF, 1, 10, 500)) ChunkLength = tempF;
+        var temp = _chunkLength;
+        if (ImGuiHelper.DragFloat("Chunk length", ref temp, 1, 10, 1000)) ChunkLength = temp;
 
-        tempF = _chunkHeight;
-        if (ImGuiHelper.DragFloat("Chunk height", ref tempF, 1, 0, 1000)) ChunkHeight = tempF;
+        temp = _chunkHeight;
+        if (ImGuiHelper.DragFloat("Chunk height", ref temp, 1, 0, 2000)) ChunkHeight = temp;
 
-        var tempI = (int)_chunkRadius;
-        if (ImGuiHelper.DragInt("Chunk radius", ref tempI, 1, 0, 50)) ChunkRadius = (uint)tempI;
-
-        tempF = _terrainFrequency;
-        if (ImGuiHelper.DragFloat("Terrain frequency", ref tempF, 0.0001f, 0.001f, 0.03f)) _terrainFrequency = tempF;
+        temp = _terrainFrequency;
+        if (ImGuiHelper.DragFloat("Terrain frequency", ref temp, 0.0001f, 0.001f, 0.03f)) _terrainFrequency = temp;
 
         ImGui.End();
     }
 
-    private void RenderTesselationSettingsWindow()
+    public void RenderTessellationSettingsWindow()
     {
-        var modified = false;
+        ImGui.Begin("Tessellation Settings");
 
-        ImGui.Begin("Tesselation Settings");
-
-        for (var i = 0; i < _tesselationLevels.Count; i++)
+        for (var i = 0; i < _tessellationZones.Count; i++)
         {
-            var level = _tesselationLevels[i];
+            var zone = _tessellationZones[i];
 
             ImGui.PushID(i);
 
-            var tempI = (int)level.Distance;
-            if (ImGuiHelper.DragInt("Distance", ref tempI, 1, 1, 50))
+            var temp = (int)zone.Distance;
+            if (ImGuiHelper.DragInt("Distance", ref temp, 1, 1, 50))
             {
-                level.Distance = (uint)tempI;
-                modified = true;
+                zone.Distance = (uint)temp;
+                UpdateChunkGrid();
+                UpdateCameraViewDistance();
             }
 
-            var tempF = level.Tesselation;
-            if (ImGuiHelper.DragFloat("Tesselation", ref tempF, 0.1f, 1, 64))
+            temp = (int)zone.DivisionsLog2;
+            if (ImGuiHelper.DragInt("Divisions", ref temp, 1, 1, 8))
             {
-                level.Tesselation = tempF;
-                modified = true;
+                zone.DivisionsLog2 = (uint)temp;
+                zone.UpdateMesh(_renderer);
+                UpdateChunkMeshesAndTessellations();
             }
 
             if (ImGui.Button(@"/\") && i != 0)
             {
-                var temp = _tesselationLevels[i - 1];
-                _tesselationLevels[i - 1] = level;
-                _tesselationLevels[i] = temp;
-                modified = true;
-                break;
+                var tempZone = _tessellationZones[i - 1];
+                _tessellationZones[i - 1] = zone;
+                _tessellationZones[i] = tempZone;
+                UpdateChunkMeshesAndTessellations();
             }
 
             ImGui.SameLine();
 
-            if (ImGui.Button(@"\/") && i != _tesselationLevels.Count - 1)
+            if (ImGui.Button(@"\/") && i != _tessellationZones.Count - 1)
             {
-                var temp = _tesselationLevels[i + 1];
-                _tesselationLevels[i + 1] = level;
-                _tesselationLevels[i] = temp;
-                modified = true;
-                break;
+                var tempZone = _tessellationZones[i + 1];
+                _tessellationZones[i + 1] = zone;
+                _tessellationZones[i] = tempZone;
+                UpdateChunkMeshesAndTessellations();
             }
 
             ImGui.SameLine();
 
-            if (ImGui.Button("X"))
+            if (ImGui.Button("X") && _tessellationZones.Count > 1)
             {
-                _tesselationLevels.RemoveAt(i);
-                modified = true;
-                break;
+                _tessellationZones.RemoveAt(i);
+                _renderer.DestroyMesh(zone.Mesh);
+                UpdateChunkGrid();
             }
 
             ImGui.PopID();
@@ -309,12 +282,10 @@ internal class TerrainManager : ICustomUniformManager
 
         if (ImGui.Button("+"))
         {
-            _tesselationLevels.Add(new TesselationLevel());
-            modified = true;
+            _tessellationZones.Add(new TesselationZone(1, 0, _renderer));
+            UpdateChunkGrid();
         }
 
         ImGui.End();
-
-        if (modified) UpdateChunkTesselations();
     }
 }
