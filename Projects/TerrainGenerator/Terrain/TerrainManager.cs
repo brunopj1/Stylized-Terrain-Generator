@@ -210,13 +210,13 @@ internal class TerrainManager : ICustomUniformManager
         ImGui.Begin("Grid Settings");
 
         var temp = _chunkLength;
-        if (ImGuiHelper.DragFloat("Chunk length", ref temp, 1, 10, 1000)) ChunkLength = temp;
+        if (ImGuiHelper.DragFloatClamped("Chunk length", ref temp, 2, 10, 1000)) ChunkLength = temp;
 
         temp = _chunkHeight;
-        if (ImGuiHelper.DragFloat("Chunk height", ref temp, 1, 0, 2000)) ChunkHeight = temp;
+        if (ImGuiHelper.DragFloatClamped("Chunk height", ref temp, 5, 0, 5000)) ChunkHeight = temp;
 
         temp = _terrainFrequency;
-        if (ImGuiHelper.DragFloat("Terrain frequency", ref temp, 0.0001f, 0.001f, 0.03f)) _terrainFrequency = temp;
+        if (ImGuiHelper.DragFloatClamped("Terrain frequency", ref temp, 0.0001f, 0.001f, 0.03f)) _terrainFrequency = temp;
 
         ImGui.End();
     }
@@ -232,7 +232,7 @@ internal class TerrainManager : ICustomUniformManager
             ImGui.PushID(i);
 
             var temp = (int)zone.Distance;
-            if (ImGuiHelper.DragInt("Distance", ref temp, 1, 1, 50))
+            if (ImGuiHelper.DragIntClamped("Distance", ref temp, 1, 1, 50))
             {
                 zone.Distance = (uint)temp;
                 UpdateChunkGrid();
@@ -240,7 +240,7 @@ internal class TerrainManager : ICustomUniformManager
             }
 
             temp = (int)zone.DivisionsLog2;
-            if (ImGuiHelper.DragInt("Divisions", ref temp, 1, 1, 8))
+            if (ImGuiHelper.InputIntClamped("Divisions", ref temp, 1, 0, 8))
             {
                 zone.DivisionsLog2 = (uint)temp;
                 zone.UpdateMesh(_renderer);

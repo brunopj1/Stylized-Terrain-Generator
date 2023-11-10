@@ -9,8 +9,9 @@ in Data {
 
 out vec4 FragColor;
 
-void main() {
-    // TODO find better way to get the face normal
+void main()
+{
+    // TODO maybe find better way to get the face normal
     vec3 xTangent = dFdx(DataIn.viewPos);
     vec3 yTangent = dFdy(DataIn.viewPos);
     vec3 faceNormal = normalize(cross(xTangent, yTangent));

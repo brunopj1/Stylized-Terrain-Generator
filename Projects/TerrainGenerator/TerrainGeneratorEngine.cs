@@ -39,8 +39,6 @@ internal class TerrainGeneratorEngine : AEngineBase
     protected override void OnLoad()
     {
         base.OnLoad();
-
-        GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
     }
 
     protected override void OnUpdateFrame(FrameEventArgs args)
