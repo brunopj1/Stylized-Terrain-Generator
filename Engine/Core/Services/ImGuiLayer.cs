@@ -47,7 +47,7 @@ internal class ImGuiLayer
         }
     }
 
-    private void ToggleWireframeMode()
+    private static void ToggleWireframeMode()
     {
         var wireframeMode = GL.GetInteger(GetPName.PolygonMode) != (int)PolygonMode.Line;
         if (wireframeMode)

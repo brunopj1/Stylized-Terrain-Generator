@@ -29,7 +29,7 @@ internal class TerrainGeneratorEngine : AEngineBase
         Renderer.Camera.Position = new
         (
             _terrainManager.ChunkLength * 0.5f,
-            _terrainManager.ChunkHeight * 1.5f,
+            _terrainManager.ChunkHeight * 1.0f,
             _terrainManager.ChunkLength * 0.5f
         );
     }

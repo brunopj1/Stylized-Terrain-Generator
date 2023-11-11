@@ -29,7 +29,8 @@ out Data {
 
 #define VORONOI_JITTER 0.43701595
 
-const float[] gradients2D = {
+const float[] gradients2D =
+{
      0.130526192220052,  0.99144486137381,   0.38268343236509,   0.923879532511287,  0.608761429008721,  0.793353340291235,  0.793353340291235,  0.608761429008721,
      0.923879532511287,  0.38268343236509,   0.99144486137381,   0.130526192220051,  0.99144486137381,  -0.130526192220051,  0.923879532511287, -0.38268343236509,
      0.793353340291235, -0.60876142900872,   0.608761429008721, -0.793353340291235,  0.38268343236509,  -0.923879532511287,  0.130526192220052, -0.99144486137381,
@@ -64,7 +65,8 @@ const float[] gradients2D = {
     -0.38268343236509,  -0.923879532511287, -0.923879532511287, -0.38268343236509,  -0.923879532511287,  0.38268343236509,  -0.38268343236509,   0.923879532511287,
 };
 
-const float[] randVecs2D = {
+const float[] randVecs2D =
+{
     -0.2700222198f, -0.9628540911f, 0.3863092627f, -0.9223693152f, 0.04444859006f, -0.999011673f, -0.5992523158f, -0.8005602176f, -0.7819280288f, 0.6233687174f, 0.9464672271f, 0.3227999196f, -0.6514146797f, -0.7587218957f, 0.9378472289f, 0.347048376f,
     -0.8497875957f, -0.5271252623f, -0.879042592f, 0.4767432447f, -0.892300288f, -0.4514423508f, -0.379844434f, -0.9250503802f, -0.9951650832f, 0.0982163789f, 0.7724397808f, -0.6350880136f, 0.7573283322f, -0.6530343002f, -0.9928004525f, -0.119780055f,
     -0.0532665713f, 0.9985803285f, 0.9754253726f, -0.2203300762f, -0.7665018163f, 0.6422421394f, 0.991636706f, 0.1290606184f, -0.994696838f, 0.1028503788f, -0.5379205513f, -0.84299554f, 0.5022815471f, -0.8647041387f, 0.4559821461f, -0.8899889226f,
@@ -114,23 +116,20 @@ const float[] randVecs2D = {
 #define VORONOI_RETURN_DISTANCE_2_MUL 5
 #define VORONOI_RETURN_DISTANCE_2_DIV 6
 
-// Helper functions / macros
+// Noise helper functions / macros
 
-#define FAST_MIN(x, y) x < y ? x : y
-#define FAST_MAX(x, y) x > y ? x : y
-#define FAST_ABS(x) x < 0 ? -x : x
-#define FAST_FLOOR(x) x > 0 ? int(x) : int(x) - 1
-#define FAST_ROUND(x) x > 0 ? int(x + 0.5) : int(x - 0.5)
 #define INTERP_QUINTIC(x) x * x * x * (x * (x * 6 - 15) + 10)
 
-int hash(int seed, int xPrimed, int yPrimed) {
+int hash(int seed, int xPrimed, int yPrimed)
+{
     int hash = seed ^ xPrimed ^ yPrimed;
 
     hash *= 0x27d4eb2d;
     return hash;
 }
 
-float gradCoord(int seed, int xPrimed, int yPrimed, float xd, float yd) {
+float gradCoord(int seed, int xPrimed, int yPrimed, float xd, float yd)
+{
     int hash = hash(seed, xPrimed, yPrimed);
     hash ^= hash >> 15;
     hash &= 127 << 1;
@@ -143,9 +142,10 @@ float gradCoord(int seed, int xPrimed, int yPrimed, float xd, float yd) {
 
 // Noise functions
 
-float perlinNoise(int seed, vec2 uv) {
-    int x0 = FAST_FLOOR(uv.x);
-    int y0 = FAST_FLOOR(uv.y);
+float perlinNoise(int seed, vec2 uv)
+{
+    int x0 = int(floor(uv.x));
+    int y0 = int(floor(uv.y));
 
     float xd0 = float(uv.x - x0);
     float yd0 = float(uv.y - y0);
@@ -168,8 +168,8 @@ float perlinNoise(int seed, vec2 uv) {
 
 float voronoiNoise(int seed, vec2 uv, int distanceFunction, int returnType)
 {
-    int xr = FAST_ROUND(uv.x);
-    int yr = FAST_ROUND(uv.y);
+    int xr = int(round(uv.x));
+    int yr = int(round(uv.y));
 
     float distance0 = 9999999999999999999999999999999999.9999999999;
     float distance1 = 9999999999999999999999999999999999.9999999999;
@@ -197,7 +197,7 @@ float voronoiNoise(int seed, vec2 uv, int distanceFunction, int returnType)
 
                     float newDistance = vecX * vecX + vecY * vecY;
 
-                    distance1 = FAST_MAX(FAST_MIN(distance1, newDistance), distance0);
+                    distance1 = max(min(distance1, newDistance), distance0);
                     if (newDistance < distance0)
                     {
                         distance0 = newDistance;
@@ -221,9 +221,9 @@ float voronoiNoise(int seed, vec2 uv, int distanceFunction, int returnType)
                     float vecX = float(xi - uv.x) + randVecs2D[idx] * VORONOI_JITTER;
                     float vecY = float(yi - uv.y) + randVecs2D[idx | 1] * VORONOI_JITTER;
 
-                    float newDistance = FAST_ABS(vecX) + FAST_ABS(vecY);
+                    float newDistance = abs(vecX) + abs(vecY);
 
-                    distance1 = FAST_MAX(FAST_MIN(distance1, newDistance), distance0);
+                    distance1 = max(min(distance1, newDistance), distance0);
                     if (newDistance < distance0)
                     {
                         distance0 = newDistance;
@@ -247,9 +247,9 @@ float voronoiNoise(int seed, vec2 uv, int distanceFunction, int returnType)
                     float vecX = float(xi - uv.x) + randVecs2D[idx] * VORONOI_JITTER;
                     float vecY = float(yi - uv.y) + randVecs2D[idx | 1] * VORONOI_JITTER;
 
-                    float newDistance = (FAST_ABS(vecX) + FAST_ABS(vecY)) + (vecX * vecX + vecY * vecY);
+                    float newDistance = (abs(vecX) + abs(vecY)) + (vecX * vecX + vecY * vecY);
 
-                    distance1 = FAST_MAX(FAST_MIN(distance1, newDistance), distance0);
+                    distance1 = max(min(distance1, newDistance), distance0);
                     if (newDistance < distance0)
                     {
                         distance0 = newDistance;
@@ -293,29 +293,103 @@ float voronoiNoise(int seed, vec2 uv, int distanceFunction, int returnType)
     }
 }
 
+// Color helper functions
+
+vec3 mapColor1(float colorNoise, vec3[2] colors) {
+    int idx = int(floor(colorNoise * 1));
+    idx = idx * 2 + int(aTriangleIdx);
+    return colors[idx];
+}
+
+vec3 mapColor2(float colorNoise, vec3[4] colors) {
+    int idx = int(floor(colorNoise * 2));
+    idx = idx * 2 + int(aTriangleIdx);
+    return colors[idx];
+}
+
+vec3 mapColor3(float colorNoise, vec3[6] colors) {
+    int idx = int(floor(colorNoise * 3));
+    idx = idx * 2 + int(aTriangleIdx);
+    return colors[idx];
+}
+
 // Main functions
 
-#define HEIGHT_SEED 12345
-#define COLOR_SEED 67890
+float getHeightNoise(vec2 uv)
+{
+    const int seed = 167856433;
+    uv = (uChunkOffset + uv) * uChunkLength;
+    
+    float freq1 = 0.001;
+    float noise1 = voronoiNoise(seed, uv * freq1, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_DISTANCE);
+    noise1 = noise1 * 0.5 + 0.5;
+    noise1 = pow(noise1, 2);
+    float factor1 = 100;
 
-float getHeight(vec2 uv) {
-    vec2 uvHeight = (uChunkOffset + uv) * uChunkLength * uTerrainFrequency;
-    float heightNorm = voronoiNoise(HEIGHT_SEED, uvHeight, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_DISTANCE) * 0.5 + 0.5;
-    heightNorm = pow(heightNorm, 2.0);
-    return heightNorm * uChunkHeight;
+    float freq2 = 0.01;
+    float noise2 = perlinNoise(seed, uv * freq2);
+    noise2 = noise2 * 0.5 + 0.5;
+    float factor2 = 0.1;
+
+    float freq3 = 0.001;
+    float noise3 = perlinNoise(seed, uv * freq3);
+    noise3 = noise3 * 0.5 + 0.5;
+    float factor3 = 0.1;
+
+    return (noise1 * factor1 +  noise2 * factor2 + noise3 * factor3) / (factor1 + factor2 + factor3);
 }
 
-float getColor(vec2 uv) {
-    vec2 uvColor = (uChunkOffset + uv) * uChunkLength * uTerrainFrequency;
-    return perlinNoise(COLOR_SEED, uvColor) * 0.5 + 0.5;
+vec3 getColor(vec2 uv, float hightNoise)
+{
+    const int seedHight = 75984732;
+    const int seedColor = 89361823;
+    uv = (uChunkOffset + uv) * uChunkLength;
+
+    hightNoise *= 4;
+    hightNoise += voronoiNoise(seedHight, uv * 0.02, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_CELL_VALUE) * 0.1;
+
+    float colorNoise = voronoiNoise(seedColor, uv * 0.01, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_CELL_VALUE) * 0.5 + 0.5;
+
+    if (hightNoise < 0.2) // Grass
+    {
+        const vec3[] colors =
+        {
+            vec3(0.137,0.686,0.349), vec3(0.196,0.871,0.251),
+            vec3(0.137,0.686,0.349), vec3(0.247,1.,0.275),
+            vec3(0.196,0.871,0.251), vec3(0.102,0.627,0.314)
+        };
+
+        return mapColor3(colorNoise, colors);
+    }
+    if (hightNoise < 0.8) // Dirt
+    {
+        const vec3[] colors =
+        {
+            vec3(0.376,0.255,0.22), vec3(0.443,0.302,0.259),
+            vec3(0.318,0.204,0.184), vec3(0.376,0.255,0.22),
+            vec3(0.251,0.153,0.137), vec3(0.318,0.204,0.184)
+        };
+
+        return mapColor3(colorNoise, colors);
+    }
+    else // Snow
+    {
+        const vec3[] colors =
+        {
+            vec3(0.98,0.98,0.98), vec3(0.878,0.878,0.878)
+        };
+
+        return mapColor1(colorNoise, colors);
+    }
 }
 
-void main() {
-    vec3 pos = vec3(aPosition.x, getHeight(aPosition), aPosition.y);
+void main()
+{
+    float hightNoise = getHeightNoise(aPosition);
+    vec3 pos = vec3(aPosition.x, hightNoise * uChunkHeight, aPosition.y);
     DataOut.viewPos = vec3(uViewMatrix * uModelMatrix * vec4(pos, 1.0));
     gl_Position = uPVMMatrix * vec4(pos, 1.0);
     
-    float colorF = getColor(aTexCoord);
-    if (aTriangleIdx == 1.0) colorF -= 0.05;
-    DataOut.color = vec3(colorF);
+    vec3 color = getColor(aTexCoord, hightNoise);
+    DataOut.color = color;
 }

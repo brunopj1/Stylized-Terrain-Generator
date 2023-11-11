@@ -5,6 +5,7 @@ Task list:
 - [X] Texture class
 - [X] View frustum culling
 - [X] Option to automatically generate Bounding Volume from vertices
+- [ ] Scene hierarchy with automatic rendering
 - [ ] Add compute shaders
 - [ ] Light abstraction (in c# and in shaders))
 - [ ] PBR abstraction

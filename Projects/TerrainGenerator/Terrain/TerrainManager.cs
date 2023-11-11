@@ -62,7 +62,7 @@ internal class TerrainManager : ICustomUniformManager
         }
     }
 
-    private float _chunkHeight = 400;
+    private float _chunkHeight = 3500;
     public float ChunkHeight
     {
         get => _chunkHeight;
@@ -74,9 +74,6 @@ internal class TerrainManager : ICustomUniformManager
     }
 
     private readonly List<TesselationZone> _tessellationZones;
-
-    // TODO move this to a different class
-    private float _terrainFrequency = 0.01f;
 
     public void Update()
     {
@@ -181,8 +178,6 @@ internal class TerrainManager : ICustomUniformManager
 
         shader.BindUniform("uChunkOffset", _currentChunk!.Offset);
         shader.BindUniform("uChunkDivisions", _currentChunk!.Divisions);
-
-        shader.BindUniform("uTerrainFrequency", _terrainFrequency);
     }
 
     public void RenderTerrain(EngineUniformManager uniformManager)
@@ -213,10 +208,7 @@ internal class TerrainManager : ICustomUniformManager
         if (ImGuiHelper.DragFloatClamped("Chunk length", ref temp, 2, 10, 1000)) ChunkLength = temp;
 
         temp = _chunkHeight;
-        if (ImGuiHelper.DragFloatClamped("Chunk height", ref temp, 5, 0, 5000)) ChunkHeight = temp;
-
-        temp = _terrainFrequency;
-        if (ImGuiHelper.DragFloatClamped("Terrain frequency", ref temp, 0.0001f, 0.001f, 0.03f)) _terrainFrequency = temp;
+        if (ImGuiHelper.DragFloatClamped("Chunk height", ref temp, 8, 0, 10000)) ChunkHeight = temp;
 
         ImGui.End();
     }
