@@ -4,7 +4,7 @@ namespace Engine.Graphics;
 
 public class Model
 {
-    internal Model(Mesh mesh, Shader shader, BoundingVolume? boundingVolume = null, ICustomUniformManager? customUniformManager = null)
+    internal Model(Mesh mesh, RenderShader shader, BoundingVolume? boundingVolume = null, ICustomUniformManager? customUniformManager = null)
     {
         Mesh = mesh;
         Shader = shader;
@@ -15,7 +15,7 @@ public class Model
     }
 
     public Mesh Mesh { get; set; }
-    public Shader Shader { get; set; }
+    public RenderShader Shader { get; set; }
     public List<TextureUniform> Textures { get; set; }
     public Transform Transform { get; set; }
     public BoundingVolume? BoundingVolume { get; set; }
@@ -38,8 +38,7 @@ public class Model
         for (var i = 0; i < Textures.Count; i++)
         {
             var textureUniform = Textures[i];
-            textureUniform.Texture.Bind(i);
-            Shader.BindUniform(textureUniform.Name, i);
+            Shader.BindUniform(textureUniform.Name, textureUniform.Texture, i);
         }
 
         engineUniformManager.BindUniforms(Shader, ref modelMatrix);

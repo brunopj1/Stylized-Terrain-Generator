@@ -1,5 +1,5 @@
 ﻿namespace Engine.Graphics;
 public interface ICustomUniformManager
 {
-    void BindUniforms(Shader shader);
+    void BindUniforms(RenderShader shader);
 }

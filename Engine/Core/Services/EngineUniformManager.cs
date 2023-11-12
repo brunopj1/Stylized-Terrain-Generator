@@ -31,7 +31,7 @@ public class EngineUniformManager
         internal set => _normalMatrix = value;
     }
 
-    internal void BindUniforms(Shader shader, ref Matrix4 modelMatrix)
+    internal void BindUniforms(RenderShader shader, ref Matrix4 modelMatrix)
     {
         // Time
         shader.BindUniform("uTotalTime", (float)TotalTime);

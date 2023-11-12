@@ -16,7 +16,7 @@ internal class TerrainManager : ICustomUniformManager
     {
         _renderer = renderer;
 
-        _shader = renderer.CreateShader
+        _shader = renderer.CreateRenderShader
         (
             vertPath: "Assets/Shaders/terrain.vert",
             fragPath: "Assets/Shaders/terrain.frag"
@@ -42,7 +42,7 @@ internal class TerrainManager : ICustomUniformManager
 
     private readonly Renderer _renderer;
 
-    private readonly Shader _shader;
+    private readonly RenderShader _shader;
 
     private Chunk[,] _chunkGrid;
     private uint _chunkRadius;
@@ -95,7 +95,8 @@ internal class TerrainManager : ICustomUniformManager
     {
         foreach (var chunk in _chunkGrid)
         {
-            _renderer.DestroyModel(chunk.Model);
+            _renderer.DestroyMesh(chunk.Model.Mesh);
+            // TODO!!! destroy textures
         }
 
         _chunkRadius = (uint)_tessellationZones.Sum(zone => zone.Distance);
@@ -106,8 +107,10 @@ internal class TerrainManager : ICustomUniformManager
         {
             for (var j = 0; j < gridSize; j++)
             {
-                var model = _renderer.CreateModel(null, _shader, customUniformManager: this);
-                _chunkGrid[i, j] = new(model);
+                var chunk = new Chunk();
+                chunk.Model = _renderer.CreateModel(null, _shader, customUniformManager: this);
+
+                _chunkGrid[i, j] = chunk;
             }
         }
 
@@ -146,7 +149,6 @@ internal class TerrainManager : ICustomUniformManager
 
                 chunk.Model.Mesh = zone.Mesh;
                 chunk.Divisions = zone.Divisions;
-
             }
         }
     }
@@ -171,7 +173,7 @@ internal class TerrainManager : ICustomUniformManager
         _renderer.Camera.Near = _renderer.Camera.Far * 0.001f;
     }
 
-    public void BindUniforms(Shader shader)
+    public void BindUniforms(RenderShader shader)
     {
         shader.BindUniform("uChunkLength", _chunkLength);
         shader.BindUniform("uChunkHeight", _chunkHeight);

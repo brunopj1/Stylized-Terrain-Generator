@@ -47,9 +47,21 @@ public abstract class AEngineBase : GameWindow
     // Debug
     private static void OnDebugMessage(DebugSource source, DebugType type, int id, DebugSeverity severity, int length, IntPtr pMessage, IntPtr pUserParam)
     {
-        string message = Marshal.PtrToStringAnsi(pMessage, length);
+        var message = Marshal.PtrToStringAnsi(pMessage, length);
         Console.WriteLine($"[{severity} source={source} type={type} id={id}] {message}");
         if (type == DebugType.DebugTypeError) throw new Exception(message);
+    }
+
+    public static void PrintOpenGLInfo()
+    {
+        Console.WriteLine("---------------------------------------------------");
+
+        Console.WriteLine("OpenGL Version: " + GL.GetString(StringName.Version));
+        Console.WriteLine("GLSL Version: " + GL.GetString(StringName.ShadingLanguageVersion));
+        Console.WriteLine("Vendor: " + GL.GetString(StringName.Vendor));
+        Console.WriteLine("Renderer: " + GL.GetString(StringName.Renderer));
+
+        Console.WriteLine("---------------------------------------------------");
     }
 
     // Methods

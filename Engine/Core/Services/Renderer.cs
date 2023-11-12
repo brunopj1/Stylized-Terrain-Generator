@@ -15,20 +15,28 @@ public class Renderer
     public Camera Camera { get; set; } = new();
 
     // TODO when destroying the graphics objects check if they are being used by a model
-    private readonly List<Shader> _shaders = new();
+    private readonly List<AShader> _shaders = new();
     private readonly List<Texture> _textures = new();
     private readonly List<Mesh> _meshes = new();
     private readonly List<Model> _models = new();
 
-    public Shader CreateShader(string vertPath, string fragPath, string? tescPath = null, string? tesePath = null, string? geomPath = null)
+    public RenderShader CreateRenderShader(string vertPath, string fragPath, string? tescPath = null, string? tesePath = null, string? geomPath = null)
     {
-        var shader = new Shader(vertPath, tescPath, tesePath, geomPath, fragPath);
+        var shader = new RenderShader(vertPath, tescPath, tesePath, geomPath, fragPath);
         if (_isLoaded) shader.Compile();
         _shaders.Add(shader);
         return shader;
     }
 
-    public void DestroyShader(Shader shader)
+    public ComputeShader CreateComputeShader(string path)
+    {
+        var shader = new ComputeShader(path);
+        if (_isLoaded) shader.Compile();
+        _shaders.Add(shader);
+        return shader;
+    }
+
+    public void DestroyShader(AShader shader)
     {
         shader.Dispose();
         _shaders.Remove(shader);
@@ -37,6 +45,13 @@ public class Renderer
     public Texture CreateTexture(string path, TextureParameters? parameters = null)
     {
         var texture = new Texture(path, parameters);
+        if (_isLoaded) texture.Load();
+        _textures.Add(texture);
+        return texture;
+    }
+    public Texture CreateTexture(Vector2i size, TextureParameters? parameters = null)
+    {
+        var texture = new Texture(size, parameters);
         if (_isLoaded) texture.Load();
         _textures.Add(texture);
         return texture;
@@ -70,7 +85,7 @@ public class Renderer
         _meshes.Remove(mesh);
     }
 
-    public Model CreateModel(Mesh mesh, Shader shader, BoundingVolume? boundingVolume = null, ICustomUniformManager? customUniformManager = null)
+    public Model CreateModel(Mesh mesh, RenderShader shader, BoundingVolume? boundingVolume = null, ICustomUniformManager? customUniformManager = null)
     {
         var model = new Model(mesh, shader, boundingVolume, customUniformManager);
         _models.Add(model);
