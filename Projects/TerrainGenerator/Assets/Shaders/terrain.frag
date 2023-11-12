@@ -11,7 +11,7 @@ out vec4 FragColor;
 
 void main()
 {
-    // TODO maybe find better way to get the face normal
+    // TODO calculate the normal in the vertex shader and send it as a flat vector
     vec3 xTangent = dFdx(DataIn.viewPos);
     vec3 yTangent = dFdy(DataIn.viewPos);
     vec3 faceNormal = normalize(cross(xTangent, yTangent));
@@ -21,5 +21,5 @@ void main()
 
     float diffuse = max(0.1, dot(faceNormal, lightDir));
 
-    FragColor = vec4(diffuse * DataIn.color, 1);
+    FragColor = vec4(/*diffuse **/ DataIn.color, 1);
 }

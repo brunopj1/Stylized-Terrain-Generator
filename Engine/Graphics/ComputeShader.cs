@@ -8,8 +8,6 @@ public class ComputeShader : AShader
 
     private readonly string _path;
 
-    public Vector3i GroupSize { get; set; } = new(1, 1, 1);
-
     public override void Compile()
     {
         base.Compile();
@@ -22,10 +20,11 @@ public class ComputeShader : AShader
         DeleteShaders(_handle, shaderArray);
     }
 
-    public void Dispatch()
+    public void Dispatch(int groupsX, int groupsY, int groupsZ)
     {
         GL.UseProgram(_handle);
-        GL.DispatchCompute(GroupSize.X, GroupSize.Y, GroupSize.Z);
+        GL.DispatchCompute(groupsX, groupsY, groupsZ);
         GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
     }
+    public void Dispatch(Vector3i groups) => Dispatch(groups.X, groups.Y, groups.Z);
 }

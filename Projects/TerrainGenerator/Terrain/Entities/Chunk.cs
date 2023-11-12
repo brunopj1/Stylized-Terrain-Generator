@@ -12,6 +12,6 @@ internal class Chunk
     public uint Divisions { get; set; }
 
     public Model Model { get; set; }
-    public Texture HightTexture { get; set; }
-    public Texture ColorTexture { get; set; }
+    public Texture HightmapTexture { get; set; }
+    public Texture ColormapTexture { get; set; }
 }

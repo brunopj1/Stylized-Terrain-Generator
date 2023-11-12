@@ -39,6 +39,8 @@ internal class TerrainGeneratorEngine : AEngineBase
     protected override void OnLoad()
     {
         base.OnLoad();
+
+        _terrainManager.Load();
     }
 
     protected override void OnUpdateFrame(FrameEventArgs args)

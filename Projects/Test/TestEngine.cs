@@ -105,12 +105,9 @@ internal class TestEngine : AEngineBase
 
         // Compute shader
         var computeShader = Renderer.CreateComputeShader(@"Assets\Shaders\texture.comp");
-        computeShader.GroupSize = new(100, 100, 1);
         computeShader.Use();
-
         computeShader.BindUniform("texture0", _computedTexture, 0, TextureAccess.WriteOnly);
-
-        computeShader.Dispatch();
+        computeShader.Dispatch(100, 100, 1);
     }
 
     protected override void OnRenderFrameInternal(FrameEventArgs e)

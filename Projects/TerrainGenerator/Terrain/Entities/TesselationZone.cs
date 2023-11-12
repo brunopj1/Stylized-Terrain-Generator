@@ -1,29 +1,24 @@
-﻿using Engine.Core.Services;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Engine.Core.Services;
 using Engine.Graphics;
-using TerrainGenerator;
-using TerrainGenerator.Graphics;
-using TerrainGenerator.Terrain;
-using TerrainGenerator.Terrain.Entities;
+using TerrainGenerator.Services;
 
 namespace TerrainGenerator.Terrain.Entities;
-
 internal class TesselationZone
 {
-    public TesselationZone(uint distance, uint divisions, Renderer renderer)
+    public TesselationZone(uint distance, uint divisions, TerrainManager terrainManager)
     {
         Distance = distance;
         DivisionsLog2 = divisions;
-        Mesh = Generator.CreateChunkMesh(renderer, (int)Divisions);
+        Mesh = terrainManager.CreateChunkMesh(Divisions);
     }
 
     public uint Distance { get; set; }
     public uint DivisionsLog2 { get; set; }
     public uint Divisions => (uint)MathF.Pow(2, DivisionsLog2);
-    public Mesh Mesh { get; private set; }
-
-    public void UpdateMesh(Renderer renderer)
-    {
-        renderer.DestroyMesh(Mesh);
-        Mesh = Generator.CreateChunkMesh(renderer, (int)Divisions);
-    }
+    public Mesh Mesh { get; set; }
 }
