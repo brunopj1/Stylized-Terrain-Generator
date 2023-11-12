@@ -19,7 +19,7 @@ void main()
     vec3 lightDirWorld = normalize(vec3(1.0, 1.0, 1.0));
     vec3 lightDir = normalize(uViewMatrix * vec4(lightDirWorld, 0.0)).xyz;
 
-    float diffuse = max(0.1, dot(faceNormal, lightDir));
+    float diffuse = clamp(dot(faceNormal, lightDir), 0.2, 0.8) + 0.2;
 
-    FragColor = vec4(/*diffuse **/ DataIn.color, 1);
+    FragColor = vec4(diffuse * DataIn.color, 1);
 }

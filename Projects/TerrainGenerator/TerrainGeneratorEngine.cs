@@ -54,7 +54,8 @@ internal class TerrainGeneratorEngine : AEngineBase
     {
         base.OnRenderFrameInternal(args);
 
-        _terrainManager.RenderTerrain(UniformManager);
+        var triangleCount = _terrainManager.RenderTerrain(UniformManager);
+        Title = $"Terrain Generator ({triangleCount / 3} triangles)";
 
         _terrainManager.RenderOverlay();
     }

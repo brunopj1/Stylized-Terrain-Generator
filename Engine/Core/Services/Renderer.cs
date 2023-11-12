@@ -126,12 +126,16 @@ public class Renderer
         _shaders.Clear();
     }
 
-    public void RenderAllModels()
+    public long RenderAllModels()
     {
+        var count = 0L;
+
         foreach (var model in _models)
         {
-            model.Render(Camera, _uniformManager);
+            count += model.Render(Camera, _uniformManager);
         }
+
+        return count;
     }
 
     public void RecompileAllShaders()

@@ -26,12 +26,12 @@ public class Model
         BoundingVolume = Mesh.ComputeBoundingVolume();
     }
 
-    public void Render(Camera camera, EngineUniformManager engineUniformManager, Matrix4? parentModelMatrix = null)
+    public long Render(Camera camera, EngineUniformManager engineUniformManager, Matrix4? parentModelMatrix = null)
     {
         var modelMatrix = Transform.GetModelMatrix();
         if (parentModelMatrix.HasValue) modelMatrix = parentModelMatrix.Value * modelMatrix;
 
-        if (BoundingVolume != null && !camera.Intersect(BoundingVolume, modelMatrix)) return;
+        if (BoundingVolume != null && !camera.Intersect(BoundingVolume, modelMatrix)) return 0;
 
         Shader.Use();
 
@@ -44,6 +44,6 @@ public class Model
         engineUniformManager.BindUniforms(Shader, ref modelMatrix);
         CustomUniformManager?.BindUniforms(Shader);
 
-        Mesh.Render();
+        return Mesh.Render();
     }
 }

@@ -11,7 +11,7 @@ internal class Chunk
     public Vector2i Offset { get; set; }
     public uint Divisions { get; set; }
 
-    public Model Model { get; set; }
-    public Texture HightmapTexture { get; set; }
-    public Texture ColormapTexture { get; set; }
+    public Model Model { get; set; } = null;
+    public Texture HightmapTexture { get; set; } = null;
+    public Texture ColormapTexture { get; set; } = null;
 }

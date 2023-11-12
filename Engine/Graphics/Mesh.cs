@@ -16,7 +16,7 @@ public abstract class Mesh
 {
     internal abstract void Build();
     internal abstract void Dispose();
-    public abstract void Render();
+    public abstract long Render();
 
     internal abstract BoundingVolume ComputeBoundingVolume();
 }
@@ -95,19 +95,21 @@ public class Mesh<T> : Mesh where T : struct, IVertex
         _vertexArray = -1;
     }
 
-    public override void Render()
+    public override long Render()
     {
         if (_elementBuffer != -1)
         {
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBuffer);
             GL.BindVertexArray(_vertexArray);
             GL.DrawElements(_parameters.PrimitiveType, _indices!.Length, DrawElementsType.UnsignedInt, 0);
+            return _indices.Length / 3;
         }
         else
         {
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer);
             GL.BindVertexArray(_vertexArray);
             GL.DrawArrays(_parameters.PrimitiveType, 0, _vertices.Length);
+            return _vertices.Length / 3;
         }
     }
 
