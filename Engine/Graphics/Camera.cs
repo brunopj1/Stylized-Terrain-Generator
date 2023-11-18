@@ -11,6 +11,7 @@ public class Camera
         set
         {
             _position = value;
+            UpdateViewAndNormalMatrices();
             UpdateViewFrustum();
         }
     }
@@ -24,7 +25,6 @@ public class Camera
             var angle = MathHelper.Clamp(value, -89f, 89f);
             _pitch = MathHelper.DegreesToRadians(angle);
             UpdateVectors();
-            UpdateViewFrustum();
         }
     }
 
@@ -36,7 +36,6 @@ public class Camera
         {
             _yaw = MathHelper.DegreesToRadians(value);
             UpdateVectors();
-            UpdateViewFrustum();
         }
     }
 
@@ -52,6 +51,7 @@ public class Camera
         {
             var angle = MathHelper.Clamp(value, 1f, 90f);
             _fov = MathHelper.DegreesToRadians(angle);
+            UpdateProjectionMatrix();
             UpdateViewFrustum();
         }
     }
@@ -65,6 +65,7 @@ public class Camera
             if (value <= 0f) throw new ArgumentOutOfRangeException(nameof(value), "Near plane must be greater than 0.");
             if (value >= _far) throw new ArgumentOutOfRangeException(nameof(value), "Near plane must be less than far plane.");
             _near = value;
+            UpdateProjectionMatrix();
             UpdateViewFrustum();
         }
     }
@@ -78,6 +79,7 @@ public class Camera
             if (value <= 0f) throw new ArgumentOutOfRangeException(nameof(value), "Far plane must be greater than 0.");
             if (value <= _near) throw new ArgumentOutOfRangeException(nameof(value), "Far plane must be greater than near plane.");
             _far = value;
+            UpdateProjectionMatrix();
             UpdateViewFrustum();
         }
     }
@@ -89,6 +91,7 @@ public class Camera
         set
         {
             _aspectRatio = value;
+            UpdateProjectionMatrix();
             UpdateViewFrustum();
         }
     }
@@ -96,20 +99,9 @@ public class Camera
     private readonly Vector4[] _viewFrustumPlanes = new Vector4[6];
     internal Vector4[] ViewFrustumPlanes => _viewFrustumPlanes;
 
-    public Matrix4 GetViewMatrix()
-    {
-        return Matrix4.LookAt(_position, _position + Front, Up);
-    }
-
-    public Matrix4 GetProjectionMatrix()
-    {
-        return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, _near, _far);
-    }
-
-    public Matrix4 GetNormalMatrix()
-    {
-        return Matrix4.Transpose(Matrix4.Invert(GetViewMatrix()));
-    }
+    public Matrix4 ViewMatrix { get; private set; }
+    public Matrix4 ProjectionMatrix { get; private set; }
+    public Matrix4 NormalMatrix { get; private set; }
 
     private void UpdateVectors()
     {
@@ -122,6 +114,20 @@ public class Camera
 
         Right = Vector3.Normalize(Vector3.Cross(Front, Vector3.UnitY));
         Up = Vector3.Normalize(Vector3.Cross(Right, Front));
+
+        UpdateViewAndNormalMatrices();
+        UpdateViewFrustum();
+    }
+
+    private void UpdateViewAndNormalMatrices()
+    {
+        ViewMatrix = Matrix4.LookAt(_position, _position + Front, Up);
+        NormalMatrix = Matrix4.Transpose(Matrix4.Invert(ViewMatrix));
+    }
+
+    private void UpdateProjectionMatrix()
+    {
+        ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, _near, _far);
     }
 
     private void UpdateViewFrustum()

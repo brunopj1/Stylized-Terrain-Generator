@@ -35,7 +35,6 @@ public class Model
 
         Shader.Use();
 
-        // TODO improve uniform binding
         for (var i = 0; i < Textures.Count; i++)
         {
             var textureUniform = Textures[i];

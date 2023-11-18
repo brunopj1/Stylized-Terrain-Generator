@@ -171,8 +171,8 @@ public abstract class AEngineBase : GameWindow
         UniformManager.CurrentFrame = EngineClock.CurrentFrame;
 
         // Matrices
-        UniformManager.ViewMatrix = Renderer.Camera.GetViewMatrix();
-        UniformManager.ProjectionMatrix = Renderer.Camera.GetProjectionMatrix();
-        UniformManager.NormalMatrix = Renderer.Camera.GetNormalMatrix();
+        UniformManager.ViewMatrix = Renderer.Camera.ViewMatrix;
+        UniformManager.ProjectionMatrix = Renderer.Camera.ProjectionMatrix;
+        UniformManager.NormalMatrix = Renderer.Camera.NormalMatrix;
     }
 }

@@ -5,8 +5,8 @@ namespace Engine.Core.Services;
 public class EngineUniformManager
 {
     // Time
-    public double TotalTime { get; internal set; }
-    public double DeltaTime { get; internal set; }
+    public float TotalTime { get; internal set; }
+    public float DeltaTime { get; internal set; }
     public ulong CurrentFrame { get; internal set; }
 
     // Matrices
@@ -34,9 +34,9 @@ public class EngineUniformManager
     internal void BindUniforms(RenderShader shader, ref Matrix4 modelMatrix)
     {
         // Time
-        shader.BindUniform("uTotalTime", (float)TotalTime);
+        shader.BindUniform("uTotalTime", TotalTime);
 
-        shader.BindUniform("uDeltaTime", (float)DeltaTime);
+        shader.BindUniform("uDeltaTime", DeltaTime);
 
         shader.BindUniform("uCurrentFrame", CurrentFrame);
 
@@ -49,7 +49,6 @@ public class EngineUniformManager
 
         shader.BindUniform("uNormalMatrix", _normalMatrix);
 
-        var pvmMatrix = modelMatrix * _viewMatrix * _projectionMatrix;
-        shader.BindUniform("uPVMMatrix", pvmMatrix);
+        shader.BindUniform("uPVMMatrix", modelMatrix * _viewMatrix * _projectionMatrix);
     }
 }
