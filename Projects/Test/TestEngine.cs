@@ -99,8 +99,6 @@ internal class TestEngine : AEngineBase
     {
         base.OnLoad();
 
-        PrintOpenGLInfo();
-
         VSync = VSyncMode.On;
 
         // Compute shader
@@ -108,12 +106,5 @@ internal class TestEngine : AEngineBase
         computeShader.Use();
         computeShader.BindUniform("texture0", _computedTexture, 0, TextureAccess.WriteOnly);
         computeShader.Dispatch(100, 100, 1);
-    }
-
-    protected override void OnRenderFrameInternal(FrameEventArgs e)
-    {
-        base.OnRenderFrameInternal(e);
-
-        Renderer.RenderAllModels();
     }
 }

@@ -10,7 +10,6 @@ using TerrainGenerator.Terrain.Entities;
 namespace TerrainGenerator.Services;
 
 // TODO connections between LODs
-// TODO fix weird lines in the terrain color (easy to notice when changing chunk length)
 internal class TerrainManager : ICustomUniformManager
 {
     public TerrainManager(Renderer renderer, ImGuiRenderer imGuiRenderer)

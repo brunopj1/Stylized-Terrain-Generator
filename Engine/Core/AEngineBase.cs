@@ -75,6 +75,8 @@ public abstract class AEngineBase : GameWindow
     {
         base.OnLoad();
 
+        PrintOpenGLInfo();
+
         GL.DebugMessageCallback(OnDebugMessage, IntPtr.Zero);
         GL.Enable(EnableCap.DebugOutput);
 

@@ -40,6 +40,8 @@ internal class TerrainGeneratorEngine : AEngineBase
     {
         base.OnLoad();
 
+        GL.ProvokingVertex(ProvokingVertexMode.FirstVertexConvention);
+
         _terrainManager.Load();
     }
 

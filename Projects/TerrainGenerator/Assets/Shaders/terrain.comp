@@ -382,8 +382,6 @@ void main()
     ivec2 heightPixel = ivec2(gl_GlobalInvocationID.xy);
     imageStore(uChunkHeightmap, heightPixel, vec4(height));
 
-    if (gl_GlobalInvocationID.x == gl_NumWorkGroups.x - 1 || gl_GlobalInvocationID.y == gl_NumWorkGroups.y - 1) return;
-
     // Color 0
     vec2 uvColor0 = (gl_GlobalInvocationID.xy + vec2(0.33333333)) * divisionSize;
     float heightColor0 = getHeightNoise(uvColor0);
@@ -391,6 +389,7 @@ void main()
 
     ivec2 color0Pixel = ivec2(gl_GlobalInvocationID.x * 2, gl_GlobalInvocationID.y);
     imageStore(uChunkColormap, color0Pixel, vec4(color0, 1));
+    //imageStore(uChunkColormap, color0Pixel, vec4(uvColor0, 0, 1));
         
     // Color 1
     vec2 uvColor1 = (gl_GlobalInvocationID.xy + vec2(0.66666667)) * divisionSize;
@@ -399,4 +398,5 @@ void main()
 
     ivec2 color1Pixel = ivec2(gl_GlobalInvocationID.x * 2 + 1, gl_GlobalInvocationID.y);
     imageStore(uChunkColormap, color1Pixel, vec4(color1, 1));
+    //imageStore(uChunkColormap, color1Pixel, vec4(uvColor1, 0, 1));
 }

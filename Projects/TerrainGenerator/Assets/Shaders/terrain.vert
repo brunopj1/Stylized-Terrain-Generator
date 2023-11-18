@@ -28,6 +28,6 @@ void main() {
     gl_Position = uPVMMatrix * pos;
 
     vec2 colormapSize = vec2(2, 1) * uChunkDivisions;
-    vec2 uvColor = (aPosition * colormapSize + vec2(aTriangleIdx, 0) + 0.5) / colormapSize;
+    vec2 uvColor = (aPosition * colormapSize - aTriangleIdx + 0.5) / colormapSize;
     DataOut.color = texture(uChunkColormap, uvColor).xyz;
 }
