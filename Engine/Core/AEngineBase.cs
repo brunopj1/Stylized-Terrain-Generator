@@ -33,6 +33,9 @@ public abstract class AEngineBase : GameWindow
     public new string Title { get; set; } = "My Game";
     public Vector3 ClearColor { get; set; } = new(0.2f, 0.3f, 0.3f);
 
+    // Information
+    public ulong TriangleCount { get; private set; } = 0;
+
     // Public services
     public EngineClock EngineClock { get; private set; } = new();
     public EngineUniformManager UniformManager { get; private set; } = new();
@@ -99,7 +102,7 @@ public abstract class AEngineBase : GameWindow
 
         if (EngineClock.NewSecond)
         {
-            base.Title = $"{Title} ({(int)ImGui.GetIO().Framerate} fps)";
+            base.Title = $"{Title} | {TriangleCount} triangles | {(int)ImGui.GetIO().Framerate} fps";
         }
 
         PlayerController?.Update((float)args.Time);
@@ -123,17 +126,14 @@ public abstract class AEngineBase : GameWindow
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         GL.ClearColor(ClearColor.X, ClearColor.Y, ClearColor.Z, 1.0f);
 
+        Renderer.UpdateBoundingVolumes();
+        TriangleCount = Renderer.Render() / 3;
+
+        // TODO create a renderer for ImGui
         _imGuiLayer.RenderMenuBar();
-
-        OnRenderFrameInternal(args);
-
         _imGuiController?.Render();
 
         SwapBuffers();
-    }
-
-    protected virtual void OnRenderFrameInternal(FrameEventArgs args)
-    {
     }
 
     protected override void OnResize(ResizeEventArgs args)

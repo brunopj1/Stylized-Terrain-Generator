@@ -9,9 +9,45 @@ public class Transform
         Scale = Vector3.One;
     }
 
-    public Vector3 Position { get; set; }
-    public Quaternion Rotation { get; set; }
-    public Vector3 Scale { get; set; }
+    private Vector3 _position;
+    public Vector3 Position
+    {
+        get => _position;
+        set
+        {
+            _position = value;
+            UpdateModelMatrix();
+        }
+    }
+
+    private Quaternion _rotation;
+    public Quaternion Rotation
+    {
+        get => _rotation;
+        set
+        {
+            _rotation = value;
+            UpdateModelMatrix();
+        }
+    }
+
+    private Vector3 _scale;
+    public Vector3 Scale
+    {
+        get => _scale;
+        set
+        {
+            _scale = value;
+            UpdateModelMatrix();
+        }
+    }
+
+    private Matrix4 _modeLMatrix;
+    public Matrix4 ModelMatrix
+    {
+        get => _modeLMatrix;
+        private set => _modeLMatrix = value;
+    }
 
     public void TranslateBy(Vector3 translation)
     {
@@ -28,12 +64,12 @@ public class Transform
         Scale *= scale;
     }
 
-    public Matrix4 GetModelMatrix()
+    private void UpdateModelMatrix()
     {
         var translationMatrix = Matrix4.CreateTranslation(Position);
         var rotationMatrix = Matrix4.CreateFromQuaternion(Rotation);
         var scaleMatrix = Matrix4.CreateScale(Scale);
 
-        return scaleMatrix * rotationMatrix * translationMatrix;
+        _modeLMatrix = scaleMatrix * rotationMatrix * translationMatrix;
     }
 }

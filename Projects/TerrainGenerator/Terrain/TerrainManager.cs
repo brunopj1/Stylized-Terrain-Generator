@@ -35,7 +35,6 @@ internal class TerrainManager : ICustomUniformManager
         // Fake initialization
         _chunkGrid = new Chunk[0, 0];
         _gridOffset = Vector2i.Zero;
-        _currentChunk = null;
     }
 
     private readonly Renderer _renderer;
@@ -47,7 +46,7 @@ internal class TerrainManager : ICustomUniformManager
     private uint _chunkRadius;
     private Vector2i _gridOffset;
 
-    private Chunk? _currentChunk;
+    private Chunk? _currentChunk = null;
 
     private float _chunkLength = 500;
     public float ChunkLength
@@ -112,8 +111,9 @@ internal class TerrainManager : ICustomUniformManager
         {
             for (var j = 0; j < gridSize; j++)
             {
-                var chunk = new Chunk();
-                chunk.Model = _renderer.CreateModel(null, _renderShader, customUniformManager: this);
+                var chunk = new Chunk(this);
+                chunk.Model = _renderer.CreateModel(null, _renderShader);
+                chunk.Model.CustomUniformManager = chunk;
 
                 _chunkGrid[i, j] = chunk;
             }
@@ -269,32 +269,6 @@ internal class TerrainManager : ICustomUniformManager
         shader.BindUniform("uChunkLength", _chunkLength);
         shader.BindUniform("uChunkHeight", _chunkHeight);
         shader.BindUniform("uMaxChunkDivisions", _tessellationMap.MaxDivisions);
-
-        if (_currentChunk != null)
-        {
-            shader.BindUniform("uChunkOffset", _currentChunk.Offset);
-            shader.BindUniform("uChunkDivisions", _currentChunk.Divisions);
-            shader.BindUniform("uChunkHeightmap", _currentChunk.HightmapTexture, 0);
-            shader.BindUniform("uChunkColormap", _currentChunk.ColormapTexture, 1);
-        }
-    }
-
-    public long RenderTerrain(EngineUniformManager uniformManager)
-    {
-        var count = 0L;
-
-        for (var i = 0; i < _chunkGrid.GetLength(0); i++)
-        {
-            for (var j = 0; j < _chunkGrid.GetLength(1); j++)
-            {
-                _currentChunk = _chunkGrid[i, j];
-                count += _currentChunk.Model.Render(_renderer.Camera, uniformManager);
-            }
-        }
-
-        _currentChunk = null;
-
-        return count;
     }
 
     public void RenderOverlay()
@@ -445,7 +419,7 @@ internal class TerrainManager : ICustomUniformManager
 
         _computeShader.Use();
 
-        BindUniforms(_computeShader);
+        chunk.BindUniforms(_computeShader);
         // TODO try to optimize this to use only one texture
         _computeShader.BindUniform("uChunkHeightmap", chunk.HightmapTexture, 0, TextureAccess.WriteOnly);
         _computeShader.BindUniform("uChunkColormap", chunk.ColormapTexture, 1, TextureAccess.WriteOnly);

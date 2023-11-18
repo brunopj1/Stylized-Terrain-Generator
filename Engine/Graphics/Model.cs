@@ -26,15 +26,16 @@ public class Model
         BoundingVolume = Mesh.ComputeBoundingVolume();
     }
 
-    public long Render(Camera camera, EngineUniformManager engineUniformManager, Matrix4? parentModelMatrix = null)
+    public ulong Render(EngineUniformManager engineUniformManager, Matrix4? parentModelMatrix = null)
     {
-        var modelMatrix = Transform.GetModelMatrix();
+        var modelMatrix = Transform.ModelMatrix;
         if (parentModelMatrix.HasValue) modelMatrix = parentModelMatrix.Value * modelMatrix;
 
-        if (BoundingVolume != null && !camera.Intersect(BoundingVolume, modelMatrix)) return 0;
+        if (BoundingVolume?.IsVisible == false) return 0;
 
         Shader.Use();
 
+        // TODO improve uniform binding
         for (var i = 0; i < Textures.Count; i++)
         {
             var textureUniform = Textures[i];

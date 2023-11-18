@@ -126,13 +126,23 @@ public class Renderer
         _shaders.Clear();
     }
 
-    public long RenderAllModels()
+    internal void UpdateBoundingVolumes()
     {
-        var count = 0L;
+        var vfPlanes = Camera.ViewFrustumPlanes;
+
+        Parallel.ForEach(_models, model =>
+        {
+            model.BoundingVolume?.UpdateVisibility(model.Transform.ModelMatrix, vfPlanes);
+        });
+    }
+
+    internal ulong Render()
+    {
+        var count = 0UL;
 
         foreach (var model in _models)
         {
-            count += model.Render(Camera, _uniformManager);
+            count += model.Render(_uniformManager);
         }
 
         return count;

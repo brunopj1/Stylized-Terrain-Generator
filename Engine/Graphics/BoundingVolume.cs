@@ -4,6 +4,13 @@ namespace Engine.Graphics;
 
 public abstract class BoundingVolume
 {
+    internal bool IsVisible { get; set; } = false;
+
+    internal void UpdateVisibility(Matrix4 modelMatrix, IEnumerable<Vector4> frustumPlanes)
+    {
+        IsVisible = IsOnFrustum(modelMatrix, frustumPlanes);
+    }
+
     internal abstract bool IsOnFrustum(Matrix4 modelMatrix, IEnumerable<Vector4> frustumPlanes);
 }
 

@@ -49,14 +49,4 @@ internal class TerrainGeneratorEngine : AEngineBase
 
         _terrainManager.Update();
     }
-
-    protected override void OnRenderFrameInternal(FrameEventArgs args)
-    {
-        base.OnRenderFrameInternal(args);
-
-        var triangleCount = _terrainManager.RenderTerrain(UniformManager);
-        Title = $"Terrain Generator ({triangleCount / 3} triangles)";
-
-        _terrainManager.RenderOverlay();
-    }
 }

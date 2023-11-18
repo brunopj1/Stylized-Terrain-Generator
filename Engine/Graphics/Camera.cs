@@ -94,6 +94,7 @@ public class Camera
     }
 
     private readonly Vector4[] _viewFrustumPlanes = new Vector4[6];
+    internal Vector4[] ViewFrustumPlanes => _viewFrustumPlanes;
 
     public Matrix4 GetViewMatrix()
     {
@@ -108,11 +109,6 @@ public class Camera
     public Matrix4 GetNormalMatrix()
     {
         return Matrix4.Transpose(Matrix4.Invert(GetViewMatrix()));
-    }
-
-    public bool Intersect(BoundingVolume volume, Matrix4 modelMatrix)
-    {
-        return volume.IsOnFrustum(modelMatrix, _viewFrustumPlanes);
     }
 
     private void UpdateVectors()
