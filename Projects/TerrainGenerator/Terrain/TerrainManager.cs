@@ -10,7 +10,6 @@ using TerrainGenerator.Terrain.Entities;
 namespace TerrainGenerator.Services;
 
 // TODO connections between LODs
-// TODO chunk textures -> move textures between chunks on offset change
 internal class TerrainManager : ICustomUniformManager
 {
     public TerrainManager(Renderer renderer)
@@ -89,18 +88,19 @@ internal class TerrainManager : ICustomUniformManager
 
         if (offsetX != 0 || offsetZ != 0)
         {
-            _gridOffset += new Vector2i(offsetX, offsetZ);
+            Vector2i cameraOffset = new Vector2i(offsetX, offsetZ);
+            _gridOffset += cameraOffset;
             _renderer.Camera.Position -= new Vector3(offsetX * _chunkLength, 0, offsetZ * _chunkLength);
 
             UpdateChunkOffsets();
-            UpdateChunkTextures();
+            OffsetChunkTextures(cameraOffset);
         }
     }
 
     private void UpdateChunkGrid()
     {
-        DestroyAllModels();
-        DestroyChunkTextures();
+        DestroyAllChunkModels();
+        DestroyAllChunkTextures();
 
         _chunkRadius = _tessellationMap.TotalRadius;
         var gridSize = _chunkRadius * 2 + 1;
@@ -177,14 +177,55 @@ internal class TerrainManager : ICustomUniformManager
         {
             for (var j = 0; j < _chunkGrid.GetLength(1); j++)
             {
-                _currentChunk = _chunkGrid[i, j];
+                var chunk = _chunkGrid[i, j];
 
-                if (_currentChunk.HightmapTexture == null) CreateChunkTextures(_currentChunk);
-                ComputeChunkTextures(_currentChunk);
+                if (chunk.HightmapTexture == null) CreateChunkTextures(chunk);
+                ComputeChunkTextures(chunk);
             }
         }
+    }
 
-        _currentChunk = null;
+    private void OffsetChunkTextures(Vector2i localOffset)
+    {
+        int startI = 0, endI = _chunkGrid.GetLength(0), deltaI = 1;
+        int startJ = 0, endJ = _chunkGrid.GetLength(1), deltaJ = 1;
+
+        if (localOffset.X < 0)
+        {
+            startI = endI - 1;
+            endI = -1;
+            deltaI = -1;
+        }
+        else if (localOffset.Y < 0)
+        {
+            startJ = endJ - 1;
+            endJ = -1;
+            deltaJ = -1;
+        }
+
+        for (var i = startI; i != endI; i += deltaI)
+        {
+            for (var j = startJ; j != endJ; j += deltaJ)
+            {
+                var chunk = _chunkGrid[i, j];
+                var otherChunk = GetChunk(i + localOffset.X, j + localOffset.Y);
+
+                if (otherChunk == null || chunk.Divisions != otherChunk.Divisions)
+                {
+                    ComputeChunkTextures(chunk);
+                }
+                else
+                {
+                    var temp = (chunk.HightmapTexture, chunk.ColormapTexture);
+
+                    chunk.HightmapTexture = otherChunk.HightmapTexture;
+                    chunk.ColormapTexture = otherChunk.ColormapTexture;
+
+                    otherChunk.HightmapTexture = temp.Item1;
+                    otherChunk.ColormapTexture = temp.Item2;
+                }
+            }
+        }
     }
 
     private void UpdateCameraViewDistance()
@@ -193,7 +234,13 @@ internal class TerrainManager : ICustomUniformManager
         _renderer.Camera.Near = _renderer.Camera.Far * 0.001f;
     }
 
-    private void DestroyAllModels()
+    private Chunk? GetChunk(int i, int j)
+    {
+        if (i < 0 || i >= _chunkGrid.GetLength(0) || j < 0 || j >= _chunkGrid.GetLength(1)) return null;
+        return _chunkGrid[i, j];
+    }
+
+    private void DestroyAllChunkModels()
     {
         foreach (var chunk in _chunkGrid)
         {
@@ -202,7 +249,7 @@ internal class TerrainManager : ICustomUniformManager
         }
     }
 
-    private void DestroyChunkTextures()
+    private void DestroyAllChunkTextures()
     {
         foreach (var chunk in _chunkGrid)
         {
@@ -292,7 +339,7 @@ internal class TerrainManager : ICustomUniformManager
                 _renderer.DestroyMesh(zone.Mesh);
                 zone.Mesh = CreateChunkMesh(zone.Divisions);
                 UpdateChunkMeshesAndTessellations();
-                DestroyChunkTextures();
+                DestroyAllChunkTextures();
                 UpdateChunkTextures();
             }
 
@@ -302,7 +349,7 @@ internal class TerrainManager : ICustomUniformManager
                 _tessellationMap[i - 1] = zone;
                 _tessellationMap[i] = tempZone;
                 UpdateChunkMeshesAndTessellations();
-                DestroyChunkTextures();
+                DestroyAllChunkTextures();
                 UpdateChunkTextures();
             }
 
@@ -314,7 +361,7 @@ internal class TerrainManager : ICustomUniformManager
                 _tessellationMap[i + 1] = zone;
                 _tessellationMap[i] = tempZone;
                 UpdateChunkMeshesAndTessellations();
-                DestroyChunkTextures();
+                DestroyAllChunkTextures();
                 UpdateChunkTextures();
             }
 
@@ -392,7 +439,7 @@ internal class TerrainManager : ICustomUniformManager
 
     private void ComputeChunkTextures(Chunk chunk)
     {
-        var size = new Vector2i((int)chunk.Divisions + 1);
+        _currentChunk = chunk;
 
         _computeShader.Use();
 
@@ -401,6 +448,9 @@ internal class TerrainManager : ICustomUniformManager
         _computeShader.BindUniform("uChunkHeightmap", chunk.HightmapTexture, 0, TextureAccess.WriteOnly);
         _computeShader.BindUniform("uChunkColormap", chunk.ColormapTexture, 1, TextureAccess.WriteOnly);
 
+        var size = new Vector2i((int)chunk.Divisions + 1);
         _computeShader.Dispatch(size.X, size.Y, 1);
+
+        _currentChunk = null;
     }
 }
