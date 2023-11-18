@@ -13,7 +13,7 @@ namespace TerrainGenerator.Services;
 // TODO fix weird lines in the terrain color (easy to notice when changing chunk length)
 internal class TerrainManager : ICustomUniformManager
 {
-    public TerrainManager(Renderer renderer)
+    public TerrainManager(Renderer renderer, ImGuiRenderer imGuiRenderer)
     {
         _renderer = renderer;
 
@@ -35,6 +35,9 @@ internal class TerrainManager : ICustomUniformManager
         // Fake initialization
         _chunkGrid = new Chunk[0, 0];
         _gridOffset = Vector2i.Zero;
+
+        imGuiRenderer.AddOverlay(RenderTerrainSettingsWindow);
+        imGuiRenderer.AddOverlay(RenderTessellationSettingsWindow);
     }
 
     private readonly Renderer _renderer;
@@ -269,12 +272,6 @@ internal class TerrainManager : ICustomUniformManager
         shader.BindUniform("uChunkLength", _chunkLength);
         shader.BindUniform("uChunkHeight", _chunkHeight);
         shader.BindUniform("uMaxChunkDivisions", _tessellationMap.MaxDivisions);
-    }
-
-    public void RenderOverlay()
-    {
-        RenderTerrainSettingsWindow();
-        RenderTessellationSettingsWindow();
     }
 
     private void RenderTerrainSettingsWindow()

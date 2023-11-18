@@ -23,7 +23,7 @@ internal class TerrainGeneratorEngine : AEngineBase
         ((DefaultPlayerController)PlayerController).RunMultiplier = 5f;
 
         // Terrain Manager
-        _terrainManager = new(Renderer);
+        _terrainManager = new(Renderer, ImGuiRenderer);
 
         // Camera
         Renderer.Camera.Position = new

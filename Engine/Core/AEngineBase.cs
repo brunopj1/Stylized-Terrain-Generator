@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Engine.Core.Controllers;
-using Engine.Core.Internal;
 using Engine.Core.Services;
+using Engine.Core.Services.Internal;
 using Engine.Exceptions;
 using ImGuiNET;
 using OpenTK.Windowing.Common;
@@ -19,15 +19,16 @@ public abstract class AEngineBase : GameWindow
         if (s_wasAlreadyCreated) throw new MultipleEnginesException();
         else s_wasAlreadyCreated = true;
 
+        EngineClock = new();
+        UniformManager = new();
         Renderer = new(UniformManager);
-        _imGuiLayer = new(this);
+        ImGuiRenderer = new();
+
+        _imGuiOverlay = new(this);
     }
 
     // Singleton
     private static bool s_wasAlreadyCreated = false;
-
-    // Internal
-    private ImGuiController? _imGuiController = null;
 
     // Settings
     public new string Title { get; set; } = "My Game";
@@ -37,12 +38,14 @@ public abstract class AEngineBase : GameWindow
     public ulong TriangleCount { get; private set; } = 0;
 
     // Public services
-    public EngineClock EngineClock { get; private set; } = new();
-    public EngineUniformManager UniformManager { get; private set; } = new();
+    public EngineClock EngineClock { get; private set; }
+    public EngineUniformManager UniformManager { get; private set; }
     public Renderer Renderer { get; private set; }
+    public ImGuiRenderer ImGuiRenderer { get; private set; }
 
     // Private services
-    private readonly ImGuiLayer _imGuiLayer;
+    private ImGuiController? _imGuiController = null;
+    private readonly EngineImGuiOverlay _imGuiOverlay;
 
     // Player controller
     public IPlayerController? PlayerController { get; set; } = null;
@@ -107,7 +110,7 @@ public abstract class AEngineBase : GameWindow
 
         PlayerController?.Update((float)args.Time);
 
-        _imGuiLayer.ProcessInputs(KeyboardState);
+        _imGuiOverlay.ProcessInputs(KeyboardState);
 
         if (KeyboardState.IsKeyDown(Keys.Escape))
         {
@@ -129,8 +132,7 @@ public abstract class AEngineBase : GameWindow
         Renderer.UpdateBoundingVolumes();
         TriangleCount = Renderer.Render() / 3;
 
-        // TODO create a renderer for ImGui
-        _imGuiLayer.RenderMenuBar();
+        ImGuiRenderer.Render();
         _imGuiController?.Render();
 
         SwapBuffers();

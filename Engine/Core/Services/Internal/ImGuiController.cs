@@ -5,7 +5,7 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using ErrorCode = OpenTK.Graphics.OpenGL4.ErrorCode;
 
-namespace Engine.Core.Internal;
+namespace Engine.Core.Services.Internal;
 
 public sealed class ImGuiController : IDisposable
 {

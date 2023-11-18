@@ -1,21 +1,21 @@
 ﻿using ImGuiNET;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace Engine.Core.Services;
+namespace Engine.Core.Services.Internal;
 
-internal class ImGuiLayer
+internal class EngineImGuiOverlay
 {
-    public ImGuiLayer(AEngineBase engine)
+    public EngineImGuiOverlay(AEngineBase engine)
     {
         _engine = engine;
+
+        _engine.ImGuiRenderer.AddMainMenuBarOverlay(Render);
     }
 
     private readonly AEngineBase _engine;
 
-    public void RenderMenuBar()
+    public void Render()
     {
-        ImGui.BeginMainMenuBar();
-
         if (ImGui.BeginMenu("Engine"))
         {
             if (ImGui.MenuItem("Toggle wireframe mode", "F2"))
@@ -30,8 +30,6 @@ internal class ImGuiLayer
 
             ImGui.EndMenu();
         }
-
-        ImGui.EndMainMenuBar();
     }
 
     public void ProcessInputs(KeyboardState keyboardState)
