@@ -21,6 +21,8 @@ public class Model
     public BoundingVolume? BoundingVolume { get; set; }
     public ICustomUniformManager? CustomUniformManager { get; set; }
 
+    public bool IsEnabled { get; set; } = true;
+
     public void CumputeDefaultBoundingVolume()
     {
         BoundingVolume = Mesh.ComputeBoundingVolume();
@@ -28,10 +30,11 @@ public class Model
 
     public ulong Render(EngineUniformManager engineUniformManager, Matrix4? parentModelMatrix = null)
     {
+        if (!IsEnabled) return 0;
+        if (BoundingVolume?.IsVisible == false) return 0;
+
         var modelMatrix = Transform.ModelMatrix;
         if (parentModelMatrix.HasValue) modelMatrix = parentModelMatrix.Value * modelMatrix;
-
-        if (BoundingVolume?.IsVisible == false) return 0;
 
         Shader.Use();
 

@@ -14,6 +14,8 @@ internal class EngineImGuiOverlay
 
     private readonly AEngineBase _engine;
 
+    private bool _recompileShaders = false;
+
     public void Render()
     {
         if (ImGui.BeginMenu("Engine"))
@@ -25,7 +27,8 @@ internal class EngineImGuiOverlay
 
             if (ImGui.MenuItem("Recompile shaders", "F3"))
             {
-                RecompileShaders();
+                // Delayed recompilation to avoid ImGui crash
+                _recompileShaders = true;
             }
 
             ImGui.EndMenu();
@@ -39,9 +42,10 @@ internal class EngineImGuiOverlay
             ToggleWireframeMode();
         }
 
-        if (keyboardState.IsKeyPressed(Keys.F3))
+        if (keyboardState.IsKeyPressed(Keys.F3) || _recompileShaders)
         {
             RecompileShaders();
+            _recompileShaders = false;
         }
     }
 

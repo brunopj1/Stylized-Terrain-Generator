@@ -50,6 +50,8 @@ internal class TerrainManager : ICustomUniformManager
 
     private Chunk? _currentChunk = null;
 
+    // TODO Settings abstraction (value + window + uniform)
+
     private float _chunkLength = 500;
     public float ChunkLength
     {
@@ -74,7 +76,7 @@ internal class TerrainManager : ICustomUniformManager
         }
     }
 
-    private float _chunkHeightStep = 0.1f;
+    private float _chunkHeightStep = 5f;
     public float ChunkHeightStep
     {
         get => _chunkHeightStep;
@@ -84,6 +86,8 @@ internal class TerrainManager : ICustomUniformManager
             UpdateChunkTextures();
         }
     }
+
+    public bool DynamicTerrainOffset { get; set; } = true;
 
     private readonly TesselationMap _tessellationMap;
 
@@ -100,7 +104,7 @@ internal class TerrainManager : ICustomUniformManager
         var offsetX = (int)MathF.Floor(cameraPos.X / _chunkLength);
         var offsetZ = (int)MathF.Floor(cameraPos.Z / _chunkLength);
 
-        if (offsetX != 0 || offsetZ != 0)
+        if (DynamicTerrainOffset && (offsetX != 0 || offsetZ != 0))
         {
             Vector2i cameraOffset = new Vector2i(offsetX, offsetZ);
             _gridOffset += cameraOffset;
@@ -281,14 +285,17 @@ internal class TerrainManager : ICustomUniformManager
     {
         ImGui.Begin("Grid Settings");
 
-        var temp = _chunkLength;
-        if (ImGuiHelper.DragFloatClamped("Chunk length", ref temp, 2, 10, 1000)) ChunkLength = temp;
+        var tempB = DynamicTerrainOffset;
+        if (ImGui.Checkbox("Dynamic terrain offset", ref tempB)) DynamicTerrainOffset = tempB;
 
-        temp = _chunkHeight;
-        if (ImGuiHelper.DragFloatClamped("Chunk height", ref temp, 8, 0, 10000)) ChunkHeight = temp;
+        var tempF = _chunkLength;
+        if (ImGuiHelper.DragFloatClamped("Chunk length", ref tempF, 2, 10, 1000)) ChunkLength = tempF;
 
-        temp = _chunkHeightStep;
-        if (ImGuiHelper.DragFloatClamped("Chunk height step", ref temp, 0.1f, 0.1f, 100)) ChunkHeightStep = temp;
+        tempF = _chunkHeight;
+        if (ImGuiHelper.DragFloatClamped("Chunk height", ref tempF, 8, 0, 10000)) ChunkHeight = tempF;
+
+        tempF = _chunkHeightStep;
+        if (ImGuiHelper.DragFloatClamped("Chunk height step", ref tempF, 0.1f, 0.1f, 100)) ChunkHeightStep = tempF;
 
         ImGui.End();
     }

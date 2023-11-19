@@ -314,17 +314,12 @@ float getHeightNoise(vec2 uv)
     noise1 = pow(noise1, 2);
     float factor1 = 100;
 
-    float freq2 = 0.01;
+    float freq2 = 0.002;
     float noise2 = perlinNoise(seed, uv * freq2);
     noise2 = noise2 * 0.5 + 0.5;
-    float factor2 = 0.1;
+    float factor2 = 1;
 
-    float freq3 = 0.001;
-    float noise3 = perlinNoise(seed, uv * freq3);
-    noise3 = noise3 * 0.5 + 0.5;
-    float factor3 = 0.1;
-
-    float noise = (noise1 * factor1 +  noise2 * factor2 + noise3 * factor3) / (factor1 + factor2 + factor3);
+    float noise = (noise1 * factor1 +  noise2 * factor2) / (factor1 + factor2);
     
     float normalizedStep = uChunkHeightStep / uChunkHeight;
     return floor(noise / normalizedStep) * normalizedStep;

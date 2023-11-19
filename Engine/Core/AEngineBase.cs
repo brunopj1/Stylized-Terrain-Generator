@@ -124,7 +124,7 @@ public abstract class AEngineBase : GameWindow
     {
         base.OnRenderFrame(args);
 
-        _imGuiController?.Update(this, (float)args.Time);
+        _imGuiController!.Update(this, (float)args.Time);
 
         UpdateUniforms();
 
@@ -135,7 +135,7 @@ public abstract class AEngineBase : GameWindow
         TriangleCount = Renderer.Render() / 3;
 
         ImGuiRenderer.Render();
-        _imGuiController?.Render();
+        _imGuiController!.Render();
 
         SwapBuffers();
     }
@@ -155,14 +155,14 @@ public abstract class AEngineBase : GameWindow
     {
         base.OnTextInput(e);
 
-        _imGuiController?.PressChar((char)e.Unicode);
+        _imGuiController!.PressChar((char)e.Unicode);
     }
 
     protected override void OnMouseWheel(MouseWheelEventArgs e)
     {
         base.OnMouseWheel(e);
 
-        _imGuiController?.MouseScroll(e.Offset);
+        _imGuiController!.MouseScroll(e.Offset);
     }
 
     private void UpdateUniforms()
