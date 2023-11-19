@@ -11,7 +11,6 @@ out vec4 FragColor;
 
 void main()
 {
-    // TODO calculate the normal in the vertex shader and send it as a flat vector
     vec3 xTangent = dFdx(DataIn.viewPos);
     vec3 yTangent = dFdy(DataIn.viewPos);
     vec3 faceNormal = normalize(cross(xTangent, yTangent));

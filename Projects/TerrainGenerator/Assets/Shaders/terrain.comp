@@ -338,7 +338,7 @@ uint getColor(vec2 uv, float hightNoise, bool firstTriangle)
 
     if (hightNoise < 0.2) // Grass
     {
-        const uint[] colors = { 0x22AE58, 0x31DE40, 0x22AE58, 0x3EFF46, 0x31DE40, 0x1A9F50 };
+        const uint[] colors = { 0x22AE58, 0x31DE40, 0x22AE58, 0x3EFF46, 0x1A9F50, 0x31DE40 };
         return mapColor3(colorNoise, firstTriangle, colors);
     }
     if (hightNoise < 0.8) // Dirt
