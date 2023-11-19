@@ -183,7 +183,7 @@ internal class TerrainManager : ICustomUniformManager
             {
                 var chunk = _chunkGrid[i, j];
 
-                if (chunk.HightmapTexture == null) CreateChunkTextures(chunk);
+                if (chunk.Texture == null) CreateChunkTexture(chunk);
                 ComputeChunkTextures(chunk);
             }
         }
@@ -220,13 +220,9 @@ internal class TerrainManager : ICustomUniformManager
                 }
                 else
                 {
-                    var temp = (chunk.HightmapTexture, chunk.ColormapTexture);
-
-                    chunk.HightmapTexture = otherChunk.HightmapTexture;
-                    chunk.ColormapTexture = otherChunk.ColormapTexture;
-
-                    otherChunk.HightmapTexture = temp.Item1;
-                    otherChunk.ColormapTexture = temp.Item2;
+                    var temp = chunk.Texture;
+                    chunk.Texture = otherChunk.Texture;
+                    otherChunk.Texture = temp;
                 }
             }
         }
@@ -257,12 +253,8 @@ internal class TerrainManager : ICustomUniformManager
     {
         foreach (var chunk in _chunkGrid)
         {
-            _renderer.DestroyTexture(chunk.HightmapTexture);
-            chunk.HightmapTexture = null;
-
-            _renderer.DestroyTexture(chunk.ColormapTexture);
-            chunk.ColormapTexture = null;
-
+            _renderer.DestroyTexture(chunk.Texture);
+            chunk.Texture = null;
         }
     }
 
@@ -392,21 +384,23 @@ internal class TerrainManager : ICustomUniformManager
         return _renderer.CreateMesh(vertices, TerrainVertex.GetLayout());
     }
 
-    private void CreateChunkTextures(Chunk chunk)
+    private void CreateChunkTexture(Chunk chunk)
     {
-        var heightmapSize = new Vector2i((int)chunk.Divisions + 1);
-        var colormapSize = new Vector2i((int)chunk.Divisions) * new Vector2i(2, 1);
+        var textureSize = new Vector2i((int)chunk.Divisions + 1);
 
         var parameters = new TextureParameters
         {
+            PixelInternalFormat = PixelInternalFormat.Rgba32ui,
+            PixelFormat = PixelFormat.RgInteger,
+            PixelType = PixelType.UnsignedInt,
+
             MinFilter = TextureMinFilter.Nearest,
             MagFilter = TextureMagFilter.Nearest,
             WrapModeS = TextureWrapMode.ClampToEdge,
             WrapModeT = TextureWrapMode.ClampToEdge
         };
 
-        chunk.HightmapTexture = _renderer.CreateTexture(heightmapSize, parameters);
-        chunk.ColormapTexture = _renderer.CreateTexture(colormapSize, parameters);
+        chunk.Texture = _renderer.CreateTexture(textureSize, parameters);
     }
 
     private void ComputeChunkTextures(Chunk chunk)
@@ -416,9 +410,8 @@ internal class TerrainManager : ICustomUniformManager
         _computeShader.Use();
 
         chunk.BindUniforms(_computeShader);
-        // TODO try to optimize this to use only one texture
-        _computeShader.BindUniform("uChunkHeightmap", chunk.HightmapTexture, 0, TextureAccess.WriteOnly);
-        _computeShader.BindUniform("uChunkColormap", chunk.ColormapTexture, 1, TextureAccess.WriteOnly);
+
+        _computeShader.BindUniform("uChunkTexture", chunk.Texture, 0, TextureAccess.WriteOnly);
 
         var size = new Vector2i((int)chunk.Divisions + 1);
         _computeShader.Dispatch(size.X, size.Y, 1);

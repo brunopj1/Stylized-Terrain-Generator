@@ -20,8 +20,7 @@ internal class Chunk : ICustomUniformManager
     public uint Divisions { get; set; }
 
     public Model Model { get; set; } = null;
-    public Texture HightmapTexture { get; set; } = null;
-    public Texture ColormapTexture { get; set; } = null;
+    public Texture Texture { get; set; } = null;
 
     public void BindUniforms(AShader shader)
     {
@@ -29,7 +28,6 @@ internal class Chunk : ICustomUniformManager
 
         shader.BindUniform("uChunkOffset", Offset);
         shader.BindUniform("uChunkDivisions", Divisions);
-        shader.BindUniform("uChunkHeightmap", HightmapTexture, 0);
-        shader.BindUniform("uChunkColormap", ColormapTexture, 1);
+        shader.BindUniform("uChunkTexture", Texture, 0);
     }
 }

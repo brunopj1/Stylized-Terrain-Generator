@@ -5,8 +5,7 @@ layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 uniform float uChunkLength;
 uniform ivec2 uChunkOffset;
 
-layout(rgba32f) uniform image2D uChunkHeightmap;
-layout(rgba32f) uniform image2D uChunkColormap;
+layout(rgba32ui) uniform uimage2D uChunkTexture;
 
 // Constant variables / macros
 
@@ -282,19 +281,19 @@ float voronoiNoise(int seed, vec2 uv, int distanceFunction, int returnType)
 
 // Color helper functions
 
-vec3 mapColor1(float colorNoise, bool firstTriangle, vec3[2] colors) {
+uint mapColor1(float colorNoise, bool firstTriangle, uint[2] colors) {
     int idx = int(floor(colorNoise * 1));
     idx = idx * 2 + int(firstTriangle);
     return colors[idx];
 }
 
-vec3 mapColor2(float colorNoise, bool firstTriangle, vec3[4] colors) {
+uint mapColor2(float colorNoise, bool firstTriangle, uint[4] colors) {
     int idx = int(floor(colorNoise * 2));
     idx = idx * 2 + int(firstTriangle);
     return colors[idx];
 }
 
-vec3 mapColor3(float colorNoise, bool firstTriangle, vec3[6] colors) {
+uint mapColor3(float colorNoise, bool firstTriangle, uint[6] colors) {
     int idx = int(floor(colorNoise * 3));
     idx = idx * 2 + int(firstTriangle);
     return colors[idx];
@@ -326,7 +325,7 @@ float getHeightNoise(vec2 uv)
     return (noise1 * factor1 +  noise2 * factor2 + noise3 * factor3) / (factor1 + factor2 + factor3);
 }
 
-vec3 getColor(vec2 uv, float hightNoise, bool firstTriangle)
+uint getColor(vec2 uv, float hightNoise, bool firstTriangle)
 {
     const int seedHight = 75984732;
     const int seedColor = 89361823;
@@ -339,47 +338,30 @@ vec3 getColor(vec2 uv, float hightNoise, bool firstTriangle)
 
     if (hightNoise < 0.2) // Grass
     {
-        const vec3[] colors =
-        {
-            vec3(0.137,0.686,0.349), vec3(0.196,0.871,0.251),
-            vec3(0.137,0.686,0.349), vec3(0.247,1.,0.275),
-            vec3(0.196,0.871,0.251), vec3(0.102,0.627,0.314)
-        };
-
+        const uint[] colors = { 0x22AE58, 0x31DE40, 0x22AE58, 0x3EFF46, 0x31DE40, 0x1A9F50 };
         return mapColor3(colorNoise, firstTriangle, colors);
     }
     if (hightNoise < 0.8) // Dirt
     {
-        const vec3[] colors =
-        {
-            vec3(0.376,0.255,0.22), vec3(0.443,0.302,0.259),
-            vec3(0.318,0.204,0.184), vec3(0.376,0.255,0.22),
-            vec3(0.251,0.153,0.137), vec3(0.318,0.204,0.184)
-        };
-        
+        const uint[] colors = { 0x5F4138, 0x704D42, 0x51342E, 0x5F4138, 0x402722, 0x51342E };
         return mapColor3(colorNoise, firstTriangle, colors);
     }
     else // Snow
     {
-        const vec3[] colors =
-        {
-            vec3(0.98,0.98,0.98), vec3(0.878,0.878,0.878)
-        };
-        
+        const uint[] colors = { 0xF9F9F9, 0xDFDFDF };
         return mapColor1(colorNoise, firstTriangle, colors);
     }
 }
 
 void main()
 {
-   float divisionSize =  1 / (gl_NumWorkGroups.x - 1.0);
+    float divisionSize =  1 / (gl_NumWorkGroups.x - 1.0);
+    ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
 
     // Height
     vec2 uvHeight = vec2(gl_GlobalInvocationID.xy) * divisionSize;
     float height = getHeightNoise(uvHeight);
-
-    ivec2 heightPixel = ivec2(gl_GlobalInvocationID.xy);
-    imageStore(uChunkHeightmap, heightPixel, vec4(height));
+    uint heightUint = uint(height * 4294967295.0);
 
     // Full triangle hights (for color calculation)
     vec2 uvHeight1 = vec2(gl_GlobalInvocationID.xy + vec2(1, 0)) * divisionSize;
@@ -391,19 +373,15 @@ void main()
     vec2 uvHeight3 = vec2(gl_GlobalInvocationID.xy + vec2(1, 1)) * divisionSize;
     float height3 = getHeightNoise(uvHeight3);
 
-    // Color 0
+    // Color
     vec2 uvColor0 = (gl_GlobalInvocationID.xy + vec2(0.33333333)) * divisionSize;
     float heightColor0 = (height + height1 + height2) / 3;
-    vec3 color0 = getColor(uvColor0, heightColor0, true);
+    uint color0 = getColor(uvColor0, heightColor0, true);
 
-    ivec2 color0Pixel = ivec2(gl_GlobalInvocationID.x * 2, gl_GlobalInvocationID.y);
-    imageStore(uChunkColormap, color0Pixel, vec4(color0, 1));
-        
-    // Color 1
     vec2 uvColor1 = (gl_GlobalInvocationID.xy + vec2(0.66666667)) * divisionSize;
     float heightColor1 = (height1 + height2 + height3) / 3;
-    vec3 color1 = getColor(uvColor1, heightColor1, false);
-
-    ivec2 color1Pixel = ivec2(gl_GlobalInvocationID.x * 2 + 1, gl_GlobalInvocationID.y);
-    imageStore(uChunkColormap, color1Pixel, vec4(color1, 1));
+    uint color1 = getColor(uvColor1, heightColor1, false);
+    
+    // Save to texture
+    imageStore(uChunkTexture, pixel, uvec4(heightUint, color0, color1, 0));
 }

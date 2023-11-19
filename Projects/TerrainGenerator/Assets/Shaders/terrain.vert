@@ -8,8 +8,7 @@ uniform mat4 uNormalMatrix;
 uniform float uChunkHeight;
 uniform uint uChunkDivisions;
 
-uniform sampler2D uChunkHeightmap;
-uniform sampler2D uChunkColormap;
+uniform usampler2D uChunkTexture;
 
 layout (location = 0) in vec2 aPosition;
 layout (location = 1) in float aTriangleIdx;
@@ -19,15 +18,23 @@ out Data {
     flat vec3 color;
 } DataOut;
 
+vec3 hexToRgb(uint hex) {
+    return vec3(
+        ((hex >> 16) & 0xFF) / 255.0,
+        ((hex >> 8) & 0xFF) / 255.0,
+        (hex & 0xFF) / 255.0
+    );
+}
+
 void main() {
-    vec2 uvHeight = (aPosition * uChunkDivisions + 0.5) / (uChunkDivisions + 1);
-    float height = texture(uChunkHeightmap, uvHeight).x * uChunkHeight;
+    vec2 uv = (aPosition * uChunkDivisions + 0.5) / (uChunkDivisions + 1);
+    uvec4 texValue = texture(uChunkTexture, uv);
+
+    float height = (texValue.x / 4294967295.0) * uChunkHeight;
 
     vec4 pos = vec4(aPosition.x, height, aPosition.y, 1);
     DataOut.viewPos = vec3(uViewMatrix * uModelMatrix * pos);
     gl_Position = uPVMMatrix * pos;
 
-    vec2 colormapSize = vec2(2, 1) * uChunkDivisions;
-    vec2 uvColor = (aPosition * colormapSize - aTriangleIdx + 0.5) / colormapSize;
-    DataOut.color = texture(uChunkColormap, uvColor).xyz;
+    DataOut.color = aTriangleIdx == 0.0 ? hexToRgb(texValue.y) : hexToRgb(texValue.z);
 }

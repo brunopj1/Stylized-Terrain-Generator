@@ -8,7 +8,9 @@ public struct TextureParameters
     {
     }
 
-    public PixelInternalFormat InternalFormat { get; set; } = PixelInternalFormat.Rgba32f;
+    public PixelInternalFormat PixelInternalFormat { get; set; } = PixelInternalFormat.Rgba32f;
+    public PixelFormat PixelFormat { get; set; } = PixelFormat.Rgba;
+    public PixelType PixelType { get; set; } = PixelType.UnsignedByte;
 
     public TextureMinFilter MinFilter { get; set; } = TextureMinFilter.LinearMipmapLinear;
     public TextureMagFilter MagFilter { get; set; } = TextureMagFilter.Linear;
@@ -54,11 +56,11 @@ public class Texture
         if (_path != null)
         {
             var image = ImageResult.FromStream(File.OpenRead(_path), ColorComponents.RedGreenBlueAlpha);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, _params.InternalFormat, image.Width, image.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, image.Data);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, _params.PixelInternalFormat, image.Width, image.Height, 0, _params.PixelFormat, _params.PixelType, image.Data);
         }
         else
         {
-            GL.TexImage2D(TextureTarget.Texture2D, 0, _params.InternalFormat, _size!.Value.X, _size!.Value.Y, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, _params.PixelInternalFormat, _size!.Value.X, _size!.Value.Y, 0, _params.PixelFormat, _params.PixelType, IntPtr.Zero);
         }
 
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)_params.MinFilter);
@@ -90,7 +92,7 @@ public class Texture
         if (_handle != -1)
         {
             GL.ActiveTexture(TextureUnit.Texture0 + unit);
-            GL.BindImageTexture(unit, _handle, 0, false, 0, access, (SizedInternalFormat)_params.InternalFormat);
+            GL.BindImageTexture(unit, _handle, 0, false, 0, access, (SizedInternalFormat)_params.PixelInternalFormat);
         }
     }
 }
