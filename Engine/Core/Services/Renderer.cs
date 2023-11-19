@@ -129,11 +129,18 @@ public class Renderer
     internal void UpdateBoundingVolumes()
     {
         var vfPlanes = Camera.ViewFrustumPlanes;
+        var wasViewFrustumUpdated = Camera.WasViewFrustumUpdated;
 
         Parallel.ForEach(_models, model =>
         {
-            model.BoundingVolume?.UpdateVisibility(model.Transform.ModelMatrix, vfPlanes);
+            if (model.BoundingVolume == null) return;
+
+            if (!wasViewFrustumUpdated && !model.BoundingVolume.WasUpdated) return;
+
+            model.BoundingVolume.UpdateVisibility(model.Transform.ModelMatrix, vfPlanes);
         });
+
+        Camera.WasViewFrustumUpdated = false;
     }
 
     internal ulong Render()

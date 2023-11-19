@@ -4,11 +4,13 @@ namespace Engine.Graphics;
 
 public abstract class BoundingVolume
 {
-    internal bool IsVisible { get; set; } = false;
+    internal bool WasUpdated { get; set; } = true;
+    internal bool IsVisible { get; set; } = true;
 
     internal void UpdateVisibility(Matrix4 modelMatrix, IEnumerable<Vector4> frustumPlanes)
     {
         IsVisible = IsOnFrustum(modelMatrix, frustumPlanes);
+        WasUpdated = false;
     }
 
     internal abstract bool IsOnFrustum(Matrix4 modelMatrix, IEnumerable<Vector4> frustumPlanes);
@@ -18,22 +20,41 @@ public class BoundingSphere : BoundingVolume
 {
     public BoundingSphere(Vector3 center, float radius)
     {
-        Center = center;
-        Radius = radius;
+        _center = center;
+        _radius = radius;
     }
 
-    public Vector3 Center { get; set; }
-    public float Radius { get; set; }
+    private Vector3 _center;
+    public Vector3 Center
+    {
+        get => _center;
+        set
+        {
+            _center = value;
+            WasUpdated = true;
+        }
+    }
+
+    private float _radius;
+    public float Radius
+    {
+        get => _radius;
+        set
+        {
+            _radius = value;
+            WasUpdated = true;
+        }
+    }
 
     internal override bool IsOnFrustum(Matrix4 modelMatrix, IEnumerable<Vector4> frustumPlanes)
     {
-        var tempCenter = Center;
-        var tempRadius = Radius;
+        var tempCenter = _center;
+        var tempRadius = _radius;
 
         if (modelMatrix != Matrix4.Identity)
         {
             var scale = modelMatrix.ExtractScale();
-            tempCenter = (new Vector4(Center, 1f) * modelMatrix).Xyz;
+            tempCenter = (new Vector4(_center, 1f) * modelMatrix).Xyz;
             tempRadius = MathF.Max(MathF.Max(MathF.Abs(scale.X), MathF.Abs(scale.Y)), MathF.Abs(scale.Z));
         }
 
@@ -59,8 +80,27 @@ public class AxisAlignedBoundingBox : BoundingVolume
         Extents = new(extentX, extentY, extentZ);
     }
 
-    public Vector3 Center { get; set; }
-    public Vector3 Extents { get; set; }
+    private Vector3 _center;
+    public Vector3 Center
+    {
+        get => _center;
+        set
+        {
+            _center = value;
+            WasUpdated = true;
+        }
+    }
+
+    private Vector3 _extents;
+    public Vector3 Extents
+    {
+        get => _extents;
+        set
+        {
+            _extents = value;
+            WasUpdated = true;
+        }
+    }
 
     internal override bool IsOnFrustum(Matrix4 modelMatrix, IEnumerable<Vector4> frustumPlanes)
     {
@@ -97,14 +137,26 @@ public class MultiBoundingVolume : BoundingVolume
 {
     public MultiBoundingVolume(IEnumerable<BoundingVolume> boundingVolumes)
     {
-        BoundingVolumes = boundingVolumes;
+        _boundingVolumes = boundingVolumes;
     }
 
-    public IEnumerable<BoundingVolume> BoundingVolumes { get; set; }
+    private IEnumerable<BoundingVolume> _boundingVolumes;
+
+    public void AddBoundingVolume(BoundingVolume boundingVolume)
+    {
+        _boundingVolumes = _boundingVolumes.Append(boundingVolume);
+        WasUpdated = true;
+    }
+
+    public void RemoveBoundingVolume(BoundingVolume boundingVolume)
+    {
+        _boundingVolumes = _boundingVolumes.Where(bv => bv != boundingVolume);
+        WasUpdated = true;
+    }
 
     internal override bool IsOnFrustum(Matrix4 modelMatrix, IEnumerable<Vector4> frustumPlanes)
     {
-        foreach (var boundingVolume in BoundingVolumes)
+        foreach (var boundingVolume in _boundingVolumes)
         {
             if (boundingVolume.IsOnFrustum(modelMatrix, frustumPlanes)) return true;
         }

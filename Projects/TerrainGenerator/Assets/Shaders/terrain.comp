@@ -370,7 +370,6 @@ vec3 getColor(vec2 uv, float hightNoise, bool firstTriangle)
     }
 }
 
-// TODO calcular cor com base nas 3 alturas
 void main()
 {
    float divisionSize =  1 / (gl_NumWorkGroups.x - 1.0);
@@ -382,21 +381,29 @@ void main()
     ivec2 heightPixel = ivec2(gl_GlobalInvocationID.xy);
     imageStore(uChunkHeightmap, heightPixel, vec4(height));
 
+    // Full triangle hights (for color calculation)
+    vec2 uvHeight1 = vec2(gl_GlobalInvocationID.xy + vec2(1, 0)) * divisionSize;
+    float height1 = getHeightNoise(uvHeight1);
+
+    vec2 uvHeight2 = vec2(gl_GlobalInvocationID.xy + vec2(0, 1)) * divisionSize;
+    float height2 = getHeightNoise(uvHeight2);
+
+    vec2 uvHeight3 = vec2(gl_GlobalInvocationID.xy + vec2(1, 1)) * divisionSize;
+    float height3 = getHeightNoise(uvHeight3);
+
     // Color 0
     vec2 uvColor0 = (gl_GlobalInvocationID.xy + vec2(0.33333333)) * divisionSize;
-    float heightColor0 = getHeightNoise(uvColor0);
+    float heightColor0 = (height + height1 + height2) / 3;
     vec3 color0 = getColor(uvColor0, heightColor0, true);
 
     ivec2 color0Pixel = ivec2(gl_GlobalInvocationID.x * 2, gl_GlobalInvocationID.y);
     imageStore(uChunkColormap, color0Pixel, vec4(color0, 1));
-    //imageStore(uChunkColormap, color0Pixel, vec4(uvColor0, 0, 1));
         
     // Color 1
     vec2 uvColor1 = (gl_GlobalInvocationID.xy + vec2(0.66666667)) * divisionSize;
-    float heightColor1 = getHeightNoise(uvColor1);
+    float heightColor1 = (height1 + height2 + height3) / 3;
     vec3 color1 = getColor(uvColor1, heightColor1, false);
 
     ivec2 color1Pixel = ivec2(gl_GlobalInvocationID.x * 2 + 1, gl_GlobalInvocationID.y);
     imageStore(uChunkColormap, color1Pixel, vec4(color1, 1));
-    //imageStore(uChunkColormap, color1Pixel, vec4(uvColor1, 0, 1));
 }

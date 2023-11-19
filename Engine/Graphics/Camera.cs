@@ -98,6 +98,7 @@ public class Camera
 
     private readonly Vector4[] _viewFrustumPlanes = new Vector4[6];
     internal Vector4[] ViewFrustumPlanes => _viewFrustumPlanes;
+    internal bool WasViewFrustumUpdated { get; set; } = true;
 
     public Matrix4 ViewMatrix { get; private set; }
     public Matrix4 ProjectionMatrix { get; private set; }
@@ -142,5 +143,7 @@ public class Camera
         _viewFrustumPlanes[3] = ViewFrustumHelper.Plane(_position, Vector3.Cross(Up, frontMultFar + Right * halfHSide).Normalized());
         _viewFrustumPlanes[4] = ViewFrustumHelper.Plane(_position, Vector3.Cross(Right, frontMultFar - Up * halfVSide).Normalized());
         _viewFrustumPlanes[5] = ViewFrustumHelper.Plane(_position, Vector3.Cross(frontMultFar + Up * halfVSide, Right).Normalized());
+
+        WasViewFrustumUpdated = true;
     }
 }
