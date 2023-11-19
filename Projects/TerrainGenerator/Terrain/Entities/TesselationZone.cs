@@ -13,12 +13,11 @@ internal class TesselationZone
     public TesselationZone(uint distance, uint divisions, TerrainManager terrainManager)
     {
         Distance = distance;
-        DivisionsLog2 = divisions;
+        Divisions = divisions;
         Mesh = terrainManager.CreateChunkMesh(Divisions);
     }
 
     public uint Distance { get; set; }
-    public uint DivisionsLog2 { get; set; }
-    public uint Divisions => (uint)MathF.Pow(2, DivisionsLog2);
+    public uint Divisions { get; set; }
     public Mesh Mesh { get; set; }
 }

@@ -15,7 +15,7 @@ internal class TesselationMap : List<TesselationZone>
     }
 
     public uint TotalRadius => (uint)this.Sum(zone => zone.Distance);
-    public uint MaxDivisions => (uint)MathF.Pow(2, this.Max(zone => zone.DivisionsLog2));
+    public uint MaxDivisions => this.Max(zone => zone.Divisions);
 
     public TesselationZone GetCorrespondingZone(Vector2i localOffset)
     {

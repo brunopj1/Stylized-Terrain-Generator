@@ -25,11 +25,11 @@ internal class TerrainManager : ICustomUniformManager
         _computeShader = renderer.CreateComputeShader("Assets/Shaders/terrain.comp");
 
         _tessellationMap = new();
-        _tessellationMap.Add(new(4, 5, this));
+        _tessellationMap.Add(new(4, 32, this));
+        _tessellationMap.Add(new(4, 16, this));
+        _tessellationMap.Add(new(4, 8, this));
         _tessellationMap.Add(new(4, 4, this));
-        _tessellationMap.Add(new(4, 3, this));
         _tessellationMap.Add(new(4, 2, this));
-        _tessellationMap.Add(new(4, 1, this));
 
         // Fake initialization
         _chunkGrid = new Chunk[0, 0];
@@ -71,6 +71,17 @@ internal class TerrainManager : ICustomUniformManager
         {
             _chunkHeight = value;
             UpdateChunkTransformsAndBVs();
+        }
+    }
+
+    private float _chunkHeightStep = 0.1f;
+    public float ChunkHeightStep
+    {
+        get => _chunkHeightStep;
+        set
+        {
+            _chunkHeightStep = value;
+            UpdateChunkTextures();
         }
     }
 
@@ -262,6 +273,7 @@ internal class TerrainManager : ICustomUniformManager
     {
         shader.BindUniform("uChunkLength", _chunkLength);
         shader.BindUniform("uChunkHeight", _chunkHeight);
+        shader.BindUniform("uChunkHeightStep", _chunkHeightStep);
         shader.BindUniform("uMaxChunkDivisions", _tessellationMap.MaxDivisions);
     }
 
@@ -274,6 +286,9 @@ internal class TerrainManager : ICustomUniformManager
 
         temp = _chunkHeight;
         if (ImGuiHelper.DragFloatClamped("Chunk height", ref temp, 8, 0, 10000)) ChunkHeight = temp;
+
+        temp = _chunkHeightStep;
+        if (ImGuiHelper.DragFloatClamped("Chunk height step", ref temp, 0.1f, 0.1f, 100)) ChunkHeightStep = temp;
 
         ImGui.End();
     }
@@ -296,10 +311,10 @@ internal class TerrainManager : ICustomUniformManager
                 UpdateCameraViewDistance();
             }
 
-            temp = (int)zone.DivisionsLog2;
-            if (ImGuiHelper.InputIntClamped("Divisions", ref temp, 1, 0, 8))
+            temp = (int)zone.Divisions;
+            if (ImGuiHelper.DragIntClamped("Divisions", ref temp, 1, 1, 256))
             {
-                zone.DivisionsLog2 = (uint)temp;
+                zone.Divisions = (uint)temp;
                 _renderer.DestroyMesh(zone.Mesh);
                 zone.Mesh = CreateChunkMesh(zone.Divisions);
                 UpdateChunkMeshesAndTessellations();

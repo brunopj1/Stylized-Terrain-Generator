@@ -3,6 +3,8 @@
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 uniform float uChunkLength;
+uniform float uChunkHeight;
+uniform float uChunkHeightStep;
 uniform ivec2 uChunkOffset;
 
 layout(rgba32ui) uniform uimage2D uChunkTexture;
@@ -322,7 +324,10 @@ float getHeightNoise(vec2 uv)
     noise3 = noise3 * 0.5 + 0.5;
     float factor3 = 0.1;
 
-    return (noise1 * factor1 +  noise2 * factor2 + noise3 * factor3) / (factor1 + factor2 + factor3);
+    float noise = (noise1 * factor1 +  noise2 * factor2 + noise3 * factor3) / (factor1 + factor2 + factor3);
+    
+    float normalizedStep = uChunkHeightStep / uChunkHeight;
+    return floor(noise / normalizedStep) * normalizedStep;
 }
 
 uint getColor(vec2 uv, float hightNoise, bool firstTriangle)
