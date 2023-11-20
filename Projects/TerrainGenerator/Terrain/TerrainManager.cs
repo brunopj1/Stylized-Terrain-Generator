@@ -46,11 +46,23 @@ internal class TerrainManager : ICustomUniformManager
 
     private Chunk[,] _chunkGrid;
     private uint _chunkRadius;
-    private Vector2i _gridOffset;
-
     private Chunk? _currentChunk = null;
 
     // TODO Settings abstraction (value + window + uniform)
+
+    private Vector2i _gridOffset;
+    public Vector2i GridOffset
+    {
+        get => _gridOffset;
+        set
+        {
+            var offset = value - _gridOffset;
+            _gridOffset = value;
+            UpdateChunkOffsets();
+            OffsetChunkTextures(offset);
+        }
+    }
+
 
     private float _chunkLength = 500;
     public float ChunkLength
@@ -108,11 +120,8 @@ internal class TerrainManager : ICustomUniformManager
         if (DynamicTerrainOffset && (offsetX != 0 || offsetZ != 0))
         {
             Vector2i cameraOffset = new Vector2i(offsetX, offsetZ);
-            _gridOffset += cameraOffset;
             _renderer.Camera.Position -= new Vector3(offsetX * _chunkLength, 0, offsetZ * _chunkLength);
-
-            UpdateChunkOffsets();
-            OffsetChunkTextures(cameraOffset);
+            GridOffset += cameraOffset;
         }
     }
 
@@ -288,6 +297,9 @@ internal class TerrainManager : ICustomUniformManager
 
         var tempB = DynamicTerrainOffset;
         if (ImGui.Checkbox("Dynamic terrain offset", ref tempB)) DynamicTerrainOffset = tempB;
+
+        int[] tempV2 = new int[] { _gridOffset.X, _gridOffset.Y };
+        if (ImGui.DragInt2("Grid offset", ref tempV2[0], 1f)) GridOffset = new Vector2i(tempV2[0], tempV2[1]);
 
         var tempF = _chunkLength;
         if (ImGuiHelper.DragFloatClamped("Chunk length", ref tempF, 2, 10, 1000)) ChunkLength = tempF;

@@ -1,4 +1,5 @@
 ﻿using Engine.Extensions;
+using ImGuiNET;
 
 namespace Engine.Graphics;
 
@@ -62,9 +63,7 @@ public class Camera
         get => _near;
         set
         {
-            if (value <= 0f) throw new ArgumentOutOfRangeException(nameof(value), "Near plane must be greater than 0.");
-            if (value >= _far) throw new ArgumentOutOfRangeException(nameof(value), "Near plane must be less than far plane.");
-            _near = value;
+            _near = MathHelper.Clamp(value, 0.1f, _far);
             UpdateProjectionMatrix();
             UpdateViewFrustum();
         }
@@ -76,9 +75,7 @@ public class Camera
         get => _far;
         set
         {
-            if (value <= 0f) throw new ArgumentOutOfRangeException(nameof(value), "Far plane must be greater than 0.");
-            if (value <= _near) throw new ArgumentOutOfRangeException(nameof(value), "Far plane must be greater than near plane.");
-            _far = value;
+            _far = MathHelper.Clamp(value, _near + 0.1f, float.MaxValue);
             UpdateProjectionMatrix();
             UpdateViewFrustum();
         }
@@ -145,5 +142,37 @@ public class Camera
         _viewFrustumPlanes[5] = ViewFrustumHelper.Plane(_position, Vector3.Cross(frontMultFar + Up * halfVSide, Right).Normalized());
 
         WasViewFrustumUpdated = true;
+    }
+
+    internal void RenderCameraWindow()
+    {
+        ImGui.Begin("Camera Settings");
+
+        System.Numerics.Vector3 tempV3 = new(_position.X, _position.Y, _position.Z);
+        if (ImGui.DragFloat3("Position", ref tempV3)) Position = new(tempV3.X, tempV3.Y, tempV3.Z);
+
+        var tempF = MathHelper.RadiansToDegrees(_pitch);
+        if (ImGui.DragFloat("Pitch", ref tempF, 0.1f)) Pitch = tempF;
+
+        tempF = MathHelper.RadiansToDegrees(_yaw);
+        if (ImGui.DragFloat("Yaw", ref tempF, 0.1f)) Yaw = tempF;
+
+        tempF = MathHelper.RadiansToDegrees(_fov);
+        if (ImGui.DragFloat("Fov", ref tempF, 0.1f)) Fov = tempF;
+
+        System.Numerics.Vector2 tempV2 = new(_near, _far);
+        if (ImGui.DragFloat2("Near / Far", ref tempV2, 5f))
+        {
+            if (tempV2.X != _near) Near = tempV2.X;
+            if (tempV2.Y != _far) Far = tempV2.Y;
+        }
+
+        ImGui.Separator();
+        ImGui.Separator();
+
+        tempV3 = new(Front.X, Front.Y, Front.Z);
+        if (ImGui.InputFloat3("Front", ref tempV3, null, ImGuiInputTextFlags.ReadOnly)) Front = new(tempV3.X, tempV3.Y, tempV3.Z);
+
+        ImGui.End();
     }
 }

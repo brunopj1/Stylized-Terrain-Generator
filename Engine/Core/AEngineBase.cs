@@ -135,6 +135,7 @@ public abstract class AEngineBase : GameWindow
         TriangleCount = Renderer.Render() / 3;
 
         ImGuiRenderer.Render();
+        Renderer.Camera?.RenderCameraWindow();
         _imGuiController!.Render();
 
         SwapBuffers();
