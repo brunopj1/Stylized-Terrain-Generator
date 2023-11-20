@@ -24,7 +24,7 @@ public abstract class AEngineBase : GameWindow
         Renderer = new(UniformManager);
         ImGuiRenderer = new();
 
-        _imGuiOverlay = new(this);
+        _imGuiOverlay = new(this, OnRecompileShaders);
     }
 
     // Singleton
@@ -149,6 +149,10 @@ public abstract class AEngineBase : GameWindow
         _imGuiController?.WindowResized(ClientSize.X, ClientSize.Y);
 
         Renderer.Camera.AspectRatio = (float)args.Width / args.Height;
+    }
+
+    protected virtual void OnRecompileShaders()
+    {
     }
 
     protected override void OnTextInput(TextInputEventArgs e)

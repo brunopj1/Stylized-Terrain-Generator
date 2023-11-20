@@ -51,4 +51,9 @@ internal class TerrainGeneratorEngine : AEngineBase
 
         _terrainManager.Update();
     }
+
+    protected override void OnRecompileShaders()
+    {
+        _terrainManager.UpdateChunkTextures();
+    }
 }

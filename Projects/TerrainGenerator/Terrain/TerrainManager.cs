@@ -73,6 +73,7 @@ internal class TerrainManager : ICustomUniformManager
         {
             _chunkHeight = value;
             UpdateChunkTransformsAndBVs();
+            UpdateChunkTextures();
         }
     }
 
@@ -190,7 +191,7 @@ internal class TerrainManager : ICustomUniformManager
         }
     }
 
-    private void UpdateChunkTextures()
+    public void UpdateChunkTextures()
     {
         for (var i = 0; i < _chunkGrid.GetLength(0); i++)
         {

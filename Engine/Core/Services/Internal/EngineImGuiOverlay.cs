@@ -5,9 +5,10 @@ namespace Engine.Core.Services.Internal;
 
 internal class EngineImGuiOverlay
 {
-    public EngineImGuiOverlay(AEngineBase engine)
+    public EngineImGuiOverlay(AEngineBase engine, Action onRecompileShaders)
     {
         _engine = engine;
+        _onRecompileShaders = onRecompileShaders;
 
         _engine.ImGuiRenderer.AddMainMenuBarOverlay(Render);
     }
@@ -15,6 +16,7 @@ internal class EngineImGuiOverlay
     private readonly AEngineBase _engine;
 
     private bool _recompileShaders = false;
+    private readonly Action _onRecompileShaders;
 
     public void Render()
     {
@@ -67,5 +69,6 @@ internal class EngineImGuiOverlay
     private void RecompileShaders()
     {
         _engine.Renderer.RecompileAllShaders();
+        _onRecompileShaders();
     }
 }
