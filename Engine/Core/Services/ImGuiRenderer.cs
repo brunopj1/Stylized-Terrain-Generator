@@ -6,6 +6,10 @@ public delegate void ImGuiOverlay();
 
 public class ImGuiRenderer
 {
+    internal ImGuiRenderer()
+    {
+    }
+
     private readonly List<ImGuiOverlay> _generalOverlays = new();
     private readonly List<ImGuiOverlay> _mainMenuBarOverlays = new();
 

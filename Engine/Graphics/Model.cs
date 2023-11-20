@@ -1,4 +1,4 @@
-﻿using Engine.Core.Services;
+﻿using Engine.Core.Services.Internal;
 
 namespace Engine.Graphics;
 
@@ -28,7 +28,7 @@ public class Model
         BoundingVolume = Mesh.ComputeBoundingVolume();
     }
 
-    public ulong Render(EngineUniformManager engineUniformManager, Matrix4? parentModelMatrix = null)
+    internal ulong Render(EngineUniformManager engineUniformManager, Matrix4? parentModelMatrix = null)
     {
         if (!IsEnabled) return 0;
         if (BoundingVolume?.IsVisible == false) return 0;

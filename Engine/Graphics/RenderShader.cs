@@ -17,10 +17,8 @@ public class RenderShader : AShader
     private readonly string? _geomPath;
     private readonly string? _fragPath;
 
-    public override void Compile()
+    protected override void CompileInternal()
     {
-        base.Compile();
-
         var shaders = new List<int>();
 
         if (_vertPath != null) shaders.Add(CompileShader(_vertPath, ShaderType.VertexShader));

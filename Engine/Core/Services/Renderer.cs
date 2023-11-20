@@ -1,16 +1,14 @@
-﻿using Engine.Graphics;
+﻿using Engine.Core.Services.Internal;
+using Engine.Graphics;
 
 namespace Engine.Core.Services;
 public class Renderer
 {
-    public Renderer(EngineUniformManager uniformManager)
+    internal Renderer()
     {
-        _uniformManager = uniformManager;
     }
 
     private bool _isLoaded = false;
-
-    private readonly EngineUniformManager _uniformManager;
 
     public Camera Camera { get; set; } = new();
 
@@ -143,13 +141,13 @@ public class Renderer
         Camera.WasViewFrustumUpdated = false;
     }
 
-    internal ulong Render()
+    internal ulong Render(EngineUniformManager uniformManager)
     {
         var count = 0UL;
 
         foreach (var model in _models)
         {
-            count += model.Render(_uniformManager);
+            count += model.Render(uniformManager);
         }
 
         return count;

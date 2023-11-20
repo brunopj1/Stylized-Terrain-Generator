@@ -298,9 +298,6 @@ internal class TerrainManager : ICustomUniformManager
         var tempB = DynamicTerrainOffset;
         if (ImGui.Checkbox("Dynamic terrain offset", ref tempB)) DynamicTerrainOffset = tempB;
 
-        int[] tempV2 = new int[] { _gridOffset.X, _gridOffset.Y };
-        if (ImGui.DragInt2("Grid offset", ref tempV2[0], 1f)) GridOffset = new Vector2i(tempV2[0], tempV2[1]);
-
         var tempF = _chunkLength;
         if (ImGuiHelper.DragFloatClamped("Chunk length", ref tempF, 2, 10, 1000)) ChunkLength = tempF;
 
@@ -309,6 +306,12 @@ internal class TerrainManager : ICustomUniformManager
 
         tempF = _chunkHeightStep;
         if (ImGuiHelper.DragFloatClamped("Chunk height step", ref tempF, 0.1f, 0.1f, 100)) ChunkHeightStep = tempF;
+
+        ImGui.Separator();
+        ImGui.Separator();
+
+        Vector2i tempV2 = _gridOffset;
+        if (ImGui.DragInt2("Grid offset", ref tempV2.X, 1f)) GridOffset = new Vector2i(tempV2[0], tempV2[1]);
 
         ImGui.End();
     }

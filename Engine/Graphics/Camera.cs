@@ -84,7 +84,7 @@ public class Camera
     private float _aspectRatio = 1;
     public float AspectRatio
     {
-        private get => _aspectRatio;
+        get => _aspectRatio;
         set
         {
             _aspectRatio = value;

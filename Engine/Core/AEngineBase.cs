@@ -19,10 +19,11 @@ public abstract class AEngineBase : GameWindow
         if (s_wasAlreadyCreated) throw new MultipleEnginesException();
         else s_wasAlreadyCreated = true;
 
-        EngineClock = new();
-        UniformManager = new();
-        Renderer = new(UniformManager);
+        Clock = new();
+        Renderer = new();
         ImGuiRenderer = new();
+
+        _uniformManager = new(Clock, Renderer);
 
         _imGuiOverlay = new(this, OnRecompileShaders);
     }
@@ -38,12 +39,13 @@ public abstract class AEngineBase : GameWindow
     public ulong TriangleCount { get; private set; } = 0;
 
     // Public services
-    public EngineClock EngineClock { get; private set; }
-    public EngineUniformManager UniformManager { get; private set; }
+    public EngineClock Clock { get; private set; }
     public Renderer Renderer { get; private set; }
     public ImGuiRenderer ImGuiRenderer { get; private set; }
 
     // Private services
+    private EngineUniformManager _uniformManager;
+
     private ImGuiController? _imGuiController = null;
     private readonly EngineImGuiOverlay _imGuiOverlay;
 
@@ -103,9 +105,9 @@ public abstract class AEngineBase : GameWindow
     {
         base.OnUpdateFrame(args);
 
-        EngineClock.Update((float)args.Time);
+        Clock.Update((float)args.Time);
 
-        if (EngineClock.NewSecond)
+        if (Clock.NewSecond)
         {
             base.Title = $"{Title} | {TriangleCount} triangles | {(int)ImGui.GetIO().Framerate} fps";
         }
@@ -126,13 +128,11 @@ public abstract class AEngineBase : GameWindow
 
         _imGuiController!.Update(this, (float)args.Time);
 
-        UpdateUniforms();
-
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         GL.ClearColor(ClearColor.X, ClearColor.Y, ClearColor.Z, 1.0f);
 
         Renderer.UpdateBoundingVolumes();
-        TriangleCount = Renderer.Render() / 3;
+        TriangleCount = Renderer.Render(_uniformManager) / 3;
 
         ImGuiRenderer.Render();
         Renderer.Camera?.RenderCameraWindow();
@@ -168,18 +168,5 @@ public abstract class AEngineBase : GameWindow
         base.OnMouseWheel(e);
 
         _imGuiController!.MouseScroll(e.Offset);
-    }
-
-    private void UpdateUniforms()
-    {
-        // Time
-        UniformManager.TotalTime = EngineClock.TotalTime;
-        UniformManager.DeltaTime = EngineClock.DeltaTime;
-        UniformManager.CurrentFrame = EngineClock.CurrentFrame;
-
-        // Matrices
-        UniformManager.ViewMatrix = Renderer.Camera.ViewMatrix;
-        UniformManager.ProjectionMatrix = Renderer.Camera.ProjectionMatrix;
-        UniformManager.NormalMatrix = Renderer.Camera.NormalMatrix;
     }
 }

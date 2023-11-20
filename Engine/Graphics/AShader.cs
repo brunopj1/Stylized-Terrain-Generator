@@ -7,10 +7,16 @@ public abstract class AShader
     protected int _handle = -1;
     private readonly Dictionary<string, int> _uniformHandles = new();
 
-    public virtual void Compile()
+    public void Compile()
     {
         if (_handle != -1) Dispose();
+
+        CompileInternal();
+
+        SetupUniforms();
     }
+
+    protected abstract void CompileInternal();
 
     protected static int CompileShader(string path, ShaderType type)
     {
@@ -50,6 +56,18 @@ public abstract class AShader
         return handle;
     }
 
+    protected void SetupUniforms()
+    {
+        GL.GetProgram(_handle, GetProgramParameterName.ActiveUniforms, out int activeUniforms);
+
+        for (var i = 0; i < activeUniforms; i++)
+        {
+            GL.GetActiveUniform(_handle, i, 256, out _, out _, out _, out string name);
+            var location = GL.GetUniformLocation(_handle, name);
+            _uniformHandles[name] = location;
+        }
+    }
+
     protected static void DeleteShaders(int handle, IEnumerable<int> shaders)
     {
         foreach (var shader in shaders)
@@ -71,96 +89,87 @@ public abstract class AShader
         GL.UseProgram(_handle);
     }
 
-    protected int GetUniformHandle(string name)
-    {
-        if (_uniformHandles.TryGetValue(name, out var handle)) return handle;
-
-        handle = GL.GetUniformLocation(_handle, name);
-        _uniformHandles[name] = handle;
-        return handle;
-    }
-
     public void BindUniform(string name, bool value)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1) GL.Uniform1(uniformHandle, value ? 1 : 0);
     }
 
     public void BindUniform(string name, int value)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1) GL.Uniform1(uniformHandle, value);
     }
 
     public void BindUniform(string name, uint value)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1) GL.Uniform1(uniformHandle, value);
     }
 
     public void BindUniform(string name, float value)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1) GL.Uniform1(uniformHandle, value);
     }
 
     public void BindUniform(string name, Vector2i value)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1) GL.Uniform2(uniformHandle, ref value);
     }
 
     public void BindUniform(string name, Vector3i value)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1) GL.Uniform3(uniformHandle, ref value);
     }
 
     public void BindUniform(string name, Vector4i value)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1) GL.Uniform4(uniformHandle, ref value);
     }
 
     public void BindUniform(string name, Vector2 value)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1) GL.Uniform2(uniformHandle, ref value);
     }
 
     public void BindUniform(string name, Vector3 value)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1) GL.Uniform3(uniformHandle, ref value);
     }
 
     public void BindUniform(string name, Vector4 value)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1) GL.Uniform4(uniformHandle, ref value);
     }
 
     public void BindUniform(string name, Matrix2 value)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1) GL.UniformMatrix2(uniformHandle, false, ref value);
     }
 
     public void BindUniform(string name, Matrix3 value)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1) GL.UniformMatrix3(uniformHandle, false, ref value);
     }
 
     public void BindUniform(string name, Matrix4 value)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1) GL.UniformMatrix4(uniformHandle, false, ref value);
     }
 
     public void BindUniform(string name, Texture texture, int textureUnit)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1)
         {
             texture.BindTexture(textureUnit);
@@ -170,7 +179,7 @@ public abstract class AShader
 
     public void BindUniform(string name, Texture texture, int textureUnit, TextureAccess access)
     {
-        var uniformHandle = GetUniformHandle(name);
+        var uniformHandle = _uniformHandles.GetValueOrDefault(name, -1);
         if (uniformHandle != -1)
         {
             texture.BindImageTexture(textureUnit, access);

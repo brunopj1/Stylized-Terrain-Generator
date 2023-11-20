@@ -8,10 +8,8 @@ public class ComputeShader : AShader
 
     private readonly string _path;
 
-    public override void Compile()
+    protected override void CompileInternal()
     {
-        base.Compile();
-
         var shader = CompileShader(_path, ShaderType.ComputeShader);
         var shaderArray = new[] { shader };
 
