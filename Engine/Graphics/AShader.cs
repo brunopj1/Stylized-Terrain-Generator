@@ -1,11 +1,15 @@
-﻿using Engine.Exceptions;
+﻿using System.Text.RegularExpressions;
+using Engine.Exceptions;
 
 namespace Engine.Graphics;
 
-public abstract class AShader
+public abstract partial class AShader
 {
     protected int _handle = -1;
     private readonly Dictionary<string, int> _uniformHandles = new();
+
+    [GeneratedRegex("^\\s*(#include\\s+\"([^\"]+)\").*$")]
+    private static partial Regex GlslIncludeRegex();
 
     public void Compile()
     {
@@ -20,7 +24,7 @@ public abstract class AShader
 
     protected static int CompileShader(string path, ShaderType type)
     {
-        var shaderSource = File.ReadAllText(path);
+        var shaderSource = ReadShaderFile(type, path);
         var shader = GL.CreateShader(type);
         GL.ShaderSource(shader, shaderSource);
         GL.CompileShader(shader);
@@ -33,6 +37,46 @@ public abstract class AShader
         }
 
         return shader;
+    }
+
+    private static string ReadShaderFile(ShaderType type, string path)
+    {
+        return ReadShaderFileInternal(type, path, null, GlslIncludeRegex(), new(), new());
+    }
+
+    private static string ReadShaderFileInternal(ShaderType type, string path, string? parentPath, Regex regex, HashSet<string> alreadyIncluded, List<string> includeStack)
+    {
+        var combinedPath = parentPath != null ? Path.Combine(Path.GetDirectoryName(parentPath) ?? "", path) : path;
+        var fullPath = new Uri(Path.GetFullPath(combinedPath)).LocalPath;
+
+        if (includeStack.Contains(fullPath))
+        {
+            var message = $"Circular include detected:\n";
+            foreach (var p in includeStack) message += $" -> \"{p}\"\n";
+            message += $" -> \"{fullPath}\"";
+
+            throw new ShaderCompilationException(includeStack[0], type, message);
+        }
+        includeStack.Add(fullPath);
+
+        if (alreadyIncluded.Contains(fullPath)) return "";
+        alreadyIncluded.Add(fullPath);
+
+        var content = File.ReadAllText(fullPath).Split("\n");
+
+        for (var i = 0; i < content.Length; i++)
+        {
+            var match = regex.Match(content[i]);
+            if (!match.Success) continue;
+
+            var includePath = match.Groups[2].Value;
+            var includeContent = ReadShaderFileInternal(type, includePath, fullPath, regex, alreadyIncluded, includeStack);
+            content[i] = content[i].Replace(match.Groups[1].Value, $"\n{includeContent}\n");
+        }
+
+        includeStack.RemoveAt(includeStack.Count - 1);
+
+        return string.Join("\n", content);
     }
 
     protected static int CreateProgram(IEnumerable<int> shaders)
@@ -58,11 +102,11 @@ public abstract class AShader
 
     protected void SetupUniforms()
     {
-        GL.GetProgram(_handle, GetProgramParameterName.ActiveUniforms, out int activeUniforms);
+        GL.GetProgram(_handle, GetProgramParameterName.ActiveUniforms, out var activeUniforms);
 
         for (var i = 0; i < activeUniforms; i++)
         {
-            GL.GetActiveUniform(_handle, i, 256, out _, out _, out _, out string name);
+            GL.GetActiveUniform(_handle, i, 256, out _, out _, out _, out var name);
             var location = GL.GetUniformLocation(_handle, name);
             _uniformHandles[name] = location;
         }
