@@ -148,8 +148,8 @@ public class Camera
     {
         ImGui.Begin("Camera Settings");
 
-        System.Numerics.Vector3 tempV3 = new(_position.X, _position.Y, _position.Z);
-        if (ImGui.DragFloat3("Position", ref tempV3)) Position = new(tempV3.X, tempV3.Y, tempV3.Z);
+        var tempV3 = _position.ToNumerics();
+        if (ImGui.DragFloat3("Position", ref tempV3)) Position = tempV3.ToOpenTK();
 
         var tempF = MathHelper.RadiansToDegrees(_pitch);
         if (ImGui.DragFloat("Pitch", ref tempF, 0.1f)) Pitch = tempF;
@@ -160,7 +160,7 @@ public class Camera
         tempF = MathHelper.RadiansToDegrees(_fov);
         if (ImGui.DragFloat("Fov", ref tempF, 0.1f)) Fov = tempF;
 
-        System.Numerics.Vector2 tempV2 = new(_near, _far);
+        var tempV2 = new System.Numerics.Vector2(_near, _far);
         if (ImGui.DragFloat2("Near / Far", ref tempV2, 5f))
         {
             if (tempV2.X != _near) Near = tempV2.X;

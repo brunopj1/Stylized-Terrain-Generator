@@ -24,11 +24,11 @@ internal class TerrainManager : ICustomUniformManager
         _computeShader = renderer.CreateComputeShader("Assets/Shaders/terrain.comp");
 
         _tessellationMap = new();
+        _tessellationMap.Add(new(4, 64, this));
         _tessellationMap.Add(new(4, 32, this));
         _tessellationMap.Add(new(4, 16, this));
         _tessellationMap.Add(new(4, 8, this));
         _tessellationMap.Add(new(4, 4, this));
-        _tessellationMap.Add(new(4, 2, this));
 
         // Fake initialization
         _chunkGrid = new Chunk[0, 0];
@@ -88,7 +88,7 @@ internal class TerrainManager : ICustomUniformManager
         }
     }
 
-    private float _chunkHeightStep = 5f;
+    private float _chunkHeightStep = 3f;
     public float ChunkHeightStep
     {
         get => _chunkHeightStep;

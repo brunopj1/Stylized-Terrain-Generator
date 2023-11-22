@@ -2,6 +2,8 @@
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Engine.Core.Controllers;
+
+// TODO whem cursor is disabled, the ImGui still detects hovering and clicking
 public class DefaultPlayerController : IPlayerController
 {
     public DefaultPlayerController(AEngineBase engine)
@@ -32,7 +34,7 @@ public class DefaultPlayerController : IPlayerController
         if (!_engine.IsFocused) return;
 
         if (_engine.KeyboardState.IsKeyPressed(Keys.F1)) CursorEnabled = !CursorEnabled;
-        if (CursorEnabled) return;
+        if (_cursorEnabled) return;
 
         var camera = _engine.Renderer.Camera;
 

@@ -27,7 +27,7 @@
 
 // Functions
 
-float voronoiNoise(int seed, vec2 p, int distanceFunction, int returnType, out ivec2 closestCenter)
+float voronoiNoise(int seed, vec2 p, int distanceFunction, int returnType, out vec2 closestCenter)
 {
     ivec2 pr = ivec2(round(p));
 
@@ -47,7 +47,8 @@ float voronoiNoise(int seed, vec2 p, int distanceFunction, int returnType, out i
             int hash = hash(seed, primed);
             int idx = hash & (255 << 1);
 
-            vec2 v = vec2(xi, yi) - p + vec2(randVecs2D[idx], randVecs2D[idx | 1]) * VORONOI_JITTER;
+            vec2 center = vec2(xi, yi) + vec2(randVecs2D[idx], randVecs2D[idx | 1]) * VORONOI_JITTER;
+            vec2 v = center - p;
 
             float newDistance;
             switch (distanceFunction)
@@ -71,7 +72,7 @@ float voronoiNoise(int seed, vec2 p, int distanceFunction, int returnType, out i
             {
                 distance0 = newDistance;
                 closestHash = hash;
-                closestCenter = primed;
+                closestCenter = center;
             }
             primed.y += PRIME_Y;
         }
@@ -110,7 +111,7 @@ float voronoiNoise(int seed, vec2 p, int distanceFunction, int returnType, out i
 }
 
 
-float voronoiNoise(int seed, vec3 p, int distanceFunction, int returnType, out ivec3 closestCenter)
+float voronoiNoise(int seed, vec3 p, int distanceFunction, int returnType, out vec3 closestCenter)
 {
     ivec3 pr = ivec3(round(p));
     
@@ -135,7 +136,8 @@ float voronoiNoise(int seed, vec3 p, int distanceFunction, int returnType, out i
                 int hash = hash(seed, primed);
                 int idx = hash & (255 << 2);
                 
-                vec3 v = vec3(xi, yi, zi) - p + vec3(randVecs3D[idx], randVecs3D[idx | 1], randVecs3D[idx | 2]) * VORONOI_JITTER;
+                vec3 center = vec3(xi, yi, zi) + vec3(randVecs3D[idx], randVecs3D[idx | 1], randVecs3D[idx | 2]) * VORONOI_JITTER;
+                vec3 v = center - p;
 
                 float newDistance;
                 switch (distanceFunction)
@@ -159,7 +161,7 @@ float voronoiNoise(int seed, vec3 p, int distanceFunction, int returnType, out i
                 {
                     distance0 = newDistance;
                     closestHash = hash;
-                    closestCenter = primed;
+                    closestCenter = center;
                 }
                 primed.z += PRIME_Z;
             }
