@@ -3,9 +3,8 @@ using Engine.Core.Services;
 using Engine.Graphics;
 using Engine.Helpers;
 using ImGuiNET;
+using TerrainGenerator.Entities;
 using TerrainGenerator.Graphics;
-using TerrainGenerator.Terrain;
-using TerrainGenerator.Terrain.Entities;
 
 namespace TerrainGenerator.Services;
 

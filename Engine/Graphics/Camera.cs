@@ -35,7 +35,7 @@ public class Camera
         get => MathHelper.RadiansToDegrees(_yaw);
         set
         {
-            _yaw = MathHelper.DegreesToRadians(value);
+            _yaw = MathHelper.DegreesToRadians(MathHelper.ClampAngle(value));
             UpdateVectors();
         }
     }

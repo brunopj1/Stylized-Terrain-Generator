@@ -1,22 +1,23 @@
 ﻿using Engine.Graphics;
+using OpenTK.Windowing.Desktop;
 
 namespace Engine.Core.Services.Internal;
 
 internal class EngineUniformManager
 {
-    public EngineUniformManager(EngineClock clock, Renderer renderer)
+    public EngineUniformManager(GameWindow window, EngineClock clock, Renderer renderer)
     {
+        _window = window;
         _clock = clock;
         _renderer = renderer;
     }
 
+    private readonly GameWindow _window;
     private readonly EngineClock _clock;
     private readonly Renderer _renderer;
 
     internal void BindUniforms(RenderShader shader, ref Matrix4 modelMatrix)
     {
-        var camera = _renderer.Camera;
-
         // Time
 
         shader.BindUniform("uTotalTime", _clock.TotalTime);
@@ -29,6 +30,8 @@ internal class EngineUniformManager
 
         shader.BindUniform("uModelMatrix", modelMatrix);
 
+        var camera = _renderer.Camera;
+
         if (camera != null)
         {
             shader.BindUniform("uViewMatrix", camera.ViewMatrix);
@@ -39,6 +42,14 @@ internal class EngineUniformManager
 
             shader.BindUniform("uPVMMatrix", modelMatrix * camera.ViewMatrix * camera.ProjectionMatrix);
         }
+
+        // Window
+
+        var resolution = _window.Size;
+
+        shader.BindUniform("uWindowResolution", resolution);
+
+        shader.BindUniform("uWindowAspectRatio", resolution.X / (float)resolution.Y);
 
         // Camera
 

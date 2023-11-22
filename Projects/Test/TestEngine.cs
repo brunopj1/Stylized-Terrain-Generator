@@ -1,4 +1,5 @@
-﻿using Engine.Core;
+﻿using Engine.Common.ObjMesh;
+using Engine.Core;
 using Engine.Core.Controllers;
 using Engine.Graphics;
 using OpenTK.Windowing.Common;
@@ -30,6 +31,12 @@ internal class TestEngine : AEngineBase
         );
 
         var shader2 = Renderer.CreateRenderShader
+        (
+            @"Assets\Shaders\square.vert",
+            @"Assets\Shaders\square.frag"
+        );
+
+        var shader3 = Renderer.CreateRenderShader
         (
             @"Assets\Shaders\box.vert",
             @"Assets\Shaders\box.frag"
@@ -67,7 +74,7 @@ internal class TestEngine : AEngineBase
         triangleModel.Transform.Position = new(15, 0, 0);
         triangleModel.Transform.Scale = new(10);
 
-        // Square 1
+        // Square
         var squareVertices = new BoxVertex[]
         {
             new BoxVertex{ Position = new( -1f, -1f, 0f), TexCoord = new(0f, 0f) },
@@ -77,20 +84,20 @@ internal class TestEngine : AEngineBase
         };
         var squareIndices = new uint[] { 0, 1, 2, 1, 3, 2 };
         var squareMesh = Renderer.CreateMesh(squareVertices, squareIndices, BoxVertex.GetLayout());
-        var squareModel1 = Renderer.CreateModel(squareMesh, shader2);
-        squareModel1.CumputeDefaultBoundingVolume();
-        squareModel1.Textures.Add(new(boxTexture, "texture0"));
-        squareModel1.Textures.Add(new(smileTexture, "texture1"));
-        squareModel1.Transform.Position = new(-15, 0, 0);
-        squareModel1.Transform.Scale = new(10);
+        var squareModel = Renderer.CreateModel(squareMesh, shader2);
+        squareModel.CumputeDefaultBoundingVolume();
+        squareModel.Textures.Add(new(_computedTexture, "texture0"));
+        squareModel.Textures.Add(new(smileTexture, "texture1"));
+        squareModel.Transform.Position = new(-15, 0, 0);
+        squareModel.Transform.Scale = new(10);
 
-        // Square 2
-        var squareModel2 = Renderer.CreateModel(squareMesh, shader2);
-        squareModel2.CumputeDefaultBoundingVolume();
-        squareModel2.Textures.Add(new(_computedTexture, "texture0"));
-        squareModel2.Textures.Add(new(smileTexture, "texture1"));
-        squareModel2.Transform.Position = new(-40, 0, 0);
-        squareModel2.Transform.Scale = new(10);
+        // Box
+        var boxMesh = ObjParser.Parse(@"Assets\Meshes\cube.obj", Renderer);
+        var boxModel = Renderer.CreateModel(boxMesh, shader3);
+        boxModel.CumputeDefaultBoundingVolume();
+        boxModel.Textures.Add(new(boxTexture, "texture0"));
+        boxModel.Transform.Position = new(-40, 0, -10);
+        boxModel.Transform.Scale = new(10);
     }
 
     private readonly Texture _computedTexture;

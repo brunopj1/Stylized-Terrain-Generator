@@ -7,7 +7,7 @@ using Engine.Core.Services;
 using Engine.Graphics;
 using TerrainGenerator.Services;
 
-namespace TerrainGenerator.Terrain.Entities;
+namespace TerrainGenerator.Entities;
 internal class TesselationZone
 {
     public TesselationZone(uint distance, uint divisions, TerrainManager terrainManager)

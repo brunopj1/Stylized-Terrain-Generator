@@ -1,11 +1,10 @@
 ﻿using Engine.Core.Services;
 using Engine.Graphics;
 using TerrainGenerator;
+using TerrainGenerator.Entities;
 using TerrainGenerator.Services;
-using TerrainGenerator.Terrain;
-using TerrainGenerator.Terrain.Entities;
 
-namespace TerrainGenerator.Terrain.Entities;
+namespace TerrainGenerator.Entities;
 
 internal class Chunk : ICustomUniformManager
 {

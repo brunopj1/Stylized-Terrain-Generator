@@ -1,7 +1,6 @@
 ﻿using Engine.Graphics;
 using TerrainGenerator;
 using TerrainGenerator.Graphics;
-using TerrainGenerator.Terrain;
 
 namespace TerrainGenerator.Graphics;
 internal struct TerrainVertex : IVertex

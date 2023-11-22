@@ -4,7 +4,6 @@ using Engine.Graphics;
 using OpenTK.Windowing.Common;
 using TerrainGenerator.Graphics;
 using TerrainGenerator.Services;
-using TerrainGenerator.Terrain;
 
 namespace TerrainGenerator;
 internal class TerrainGeneratorEngine : AEngineBase
@@ -15,15 +14,16 @@ internal class TerrainGeneratorEngine : AEngineBase
         Size = new(1600, 900);
         ClientLocation = new(50, 50);
         Title = "Terrain Generator";
-        ClearColor = new(0.2f, 0.3f, 0.3f);
+        ClearColor = null;
 
         // Player Controller
         PlayerController = new DefaultPlayerController(this);
         ((DefaultPlayerController)PlayerController).MovementSpeed = 150f;
         ((DefaultPlayerController)PlayerController).RunMultiplier = 5f;
 
-        // Terrain Manager
+        // Services
         _terrainManager = new(Renderer, ImGuiRenderer);
+        _skyManager = new(Renderer, ImGuiRenderer);
 
         // Camera
         Renderer.Camera.Position = new
@@ -35,6 +35,7 @@ internal class TerrainGeneratorEngine : AEngineBase
     }
 
     private readonly TerrainManager _terrainManager;
+    private readonly SkyManager _skyManager;
 
     protected override void OnLoad()
     {

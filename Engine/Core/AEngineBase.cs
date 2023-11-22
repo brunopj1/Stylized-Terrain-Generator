@@ -23,7 +23,7 @@ public abstract class AEngineBase : GameWindow
         Renderer = new();
         ImGuiRenderer = new();
 
-        _uniformManager = new(Clock, Renderer);
+        _uniformManager = new(this, Clock, Renderer);
 
         _imGuiOverlay = new(this, OnRecompileShaders);
     }
@@ -33,7 +33,7 @@ public abstract class AEngineBase : GameWindow
 
     // Settings
     public new string Title { get; set; } = "My Game";
-    public Vector3 ClearColor { get; set; } = new(0.2f, 0.3f, 0.3f);
+    public Vector3? ClearColor { get; set; } = new(0.2f, 0.3f, 0.3f);
 
     // Information
     public ulong TriangleCount { get; private set; } = 0;
@@ -44,7 +44,7 @@ public abstract class AEngineBase : GameWindow
     public ImGuiRenderer ImGuiRenderer { get; private set; }
 
     // Private services
-    private EngineUniformManager _uniformManager;
+    private readonly EngineUniformManager _uniformManager;
 
     private ImGuiController? _imGuiController = null;
     private readonly EngineImGuiOverlay _imGuiOverlay;
@@ -129,7 +129,7 @@ public abstract class AEngineBase : GameWindow
         _imGuiController!.Update(this, (float)args.Time);
 
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        GL.ClearColor(ClearColor.X, ClearColor.Y, ClearColor.Z, 1.0f);
+        if (ClearColor != null) GL.ClearColor(ClearColor.Value.X, ClearColor.Value.Y, ClearColor.Value.Z, 1f);
 
         Renderer.UpdateBoundingVolumes();
         TriangleCount = Renderer.Render(_uniformManager) / 3;

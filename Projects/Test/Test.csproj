@@ -17,4 +17,8 @@
     <Using Include="OpenTK.Mathematics" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Assets\Meshes\" />
+  </ItemGroup>
+
 </Project>

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TerrainGenerator.Services;
 
-namespace TerrainGenerator.Terrain.Entities;
+namespace TerrainGenerator.Entities;
 
 internal class TesselationMap : List<TesselationZone>
 {

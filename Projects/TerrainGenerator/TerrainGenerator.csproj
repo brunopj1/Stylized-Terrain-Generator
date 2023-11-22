@@ -24,8 +24,4 @@
     <Using Include="OpenTK.Mathematics" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Assets\Shaders\noise\internal\" />
-  </ItemGroup>
-
 </Project>

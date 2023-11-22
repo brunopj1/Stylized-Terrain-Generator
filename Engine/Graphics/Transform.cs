@@ -64,6 +64,11 @@ public class Transform
         Scale *= scale;
     }
 
+    public void ScaleBy(float scale)
+    {
+        Scale *= scale;
+    }
+
     private void UpdateModelMatrix()
     {
         var translationMatrix = Matrix4.CreateTranslation(Position);

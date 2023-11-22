@@ -1,7 +1,7 @@
 #version 460
 
-#include "noise/perlin.glsl"
-#include "noise/voronoi.glsl"
+#include "Noise/perlin.glsl"
+#include "Noise/voronoi.glsl"
 
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
@@ -37,11 +37,13 @@ uint mapColor3(float colorNoise, bool firstTriangle, uint[6] colors) {
 
 float getHeightNoise(vec2 uv)
 {
+    vec2 ignore; // For the voronoi closest centers
+
     const int seed = 167856433;
     uv = uChunkOffset + uv;
     
     float freq1 = 0.5;
-    float noise1 = voronoiNoise(seed, uv * freq1, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_DISTANCE);
+    float noise1 = voronoiNoise(seed, uv * freq1, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_DISTANCE, ignore);
     noise1 = noise1 * 0.5 + 0.5;
     noise1 = pow(noise1, 2);
     float factor1 = 100;
@@ -60,6 +62,8 @@ float getHeightNoise(vec2 uv)
 
 uint getColor(vec2 uv, float hightNoise, bool firstTriangle)
 {
+    vec2 ignore; // For the voronoi closest centers
+
     const int seedHight = 75984732;
     const int seedColor = 89361823;
     uv = uChunkOffset + uv;
@@ -67,10 +71,10 @@ uint getColor(vec2 uv, float hightNoise, bool firstTriangle)
     hightNoise *= 4;
 
     float freqH = 10;
-    hightNoise += voronoiNoise(seedHight, uv * freqH, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_CELL_VALUE) * 0.1;
+    hightNoise += voronoiNoise(seedHight, uv * freqH, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_CELL_VALUE, ignore) * 0.1;
 
     float freqC = 5;
-    float colorNoise = voronoiNoise(seedColor, uv * freqC, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_CELL_VALUE) * 0.5 + 0.5;
+    float colorNoise = voronoiNoise(seedColor, uv * freqC, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_CELL_VALUE, ignore) * 0.5 + 0.5;
 
     if (hightNoise < 0.2) // Grass
     {
