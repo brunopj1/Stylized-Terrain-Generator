@@ -1,6 +1,6 @@
 ﻿using Engine.Graphics;
 
-namespace Engine.Common.ObjMesh;
+namespace Engine.Util.ObjMesh;
 
 public struct ObjVertex : IVertex
 {

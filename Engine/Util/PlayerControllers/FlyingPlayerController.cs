@@ -1,12 +1,14 @@
-﻿using OpenTK.Windowing.Common;
+﻿using Engine.Core;
+using Engine.Core.Services;
+using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace Engine.Core.Controllers;
+namespace Engine.Util.PlayerControllers;
 
 // TODO whem cursor is disabled, the ImGui still detects hovering and clicking
-public class DefaultPlayerController : IPlayerController
+public class FlyingPlayerController : IPlayerController
 {
-    public DefaultPlayerController(AEngineBase engine)
+    public FlyingPlayerController(AEngineBase engine)
     {
         _engine = engine;
         CursorEnabled = false;

@@ -1,7 +1,7 @@
-﻿using Engine.Common.ObjMesh;
-using Engine.Core;
-using Engine.Core.Controllers;
+﻿using Engine.Core;
 using Engine.Graphics;
+using Engine.Util.ObjMesh;
+using Engine.Util.PlayerControllers;
 using OpenTK.Windowing.Common;
 using TerrainGenerator.Vertices;
 
@@ -21,7 +21,7 @@ internal class TestEngine : AEngineBase
         Renderer.Camera.Position = new(0.0f, 0.0f, 50.0f);
 
         // Player Controller
-        PlayerController = new DefaultPlayerController(this);
+        PlayerController = new FlyingPlayerController(this);
 
         // Shaders
         var shader1 = Renderer.CreateRenderShader

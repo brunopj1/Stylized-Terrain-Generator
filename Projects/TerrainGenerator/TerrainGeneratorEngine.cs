@@ -1,6 +1,6 @@
 ﻿using Engine.Core;
-using Engine.Core.Controllers;
 using Engine.Graphics;
+using Engine.Util.PlayerControllers;
 using OpenTK.Windowing.Common;
 using TerrainGenerator.Graphics;
 using TerrainGenerator.Services;
@@ -17,9 +17,9 @@ internal class TerrainGeneratorEngine : AEngineBase
         ClearColor = null;
 
         // Player Controller
-        PlayerController = new DefaultPlayerController(this);
-        ((DefaultPlayerController)PlayerController).MovementSpeed = 150f;
-        ((DefaultPlayerController)PlayerController).RunMultiplier = 5f;
+        PlayerController = new FlyingPlayerController(this);
+        ((FlyingPlayerController)PlayerController).MovementSpeed = 150f;
+        ((FlyingPlayerController)PlayerController).RunMultiplier = 5f;
 
         // Services
         _terrainManager = new(Renderer, ImGuiRenderer);

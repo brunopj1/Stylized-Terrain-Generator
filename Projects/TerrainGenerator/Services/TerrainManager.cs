@@ -2,6 +2,7 @@
 using Engine.Core.Services;
 using Engine.Graphics;
 using Engine.Helpers;
+using Engine.Util.EngineProperties.Properties;
 using ImGuiNET;
 using TerrainGenerator.Entities;
 using TerrainGenerator.Graphics;
@@ -46,8 +47,6 @@ internal class TerrainManager : ICustomUniformManager
     private Chunk[,] _chunkGrid;
     private uint _chunkRadius;
     private Chunk? _currentChunk = null;
-
-    // TODO Settings abstraction (value + window + uniform)
 
     private Vector2i _gridOffset;
     public Vector2i GridOffset

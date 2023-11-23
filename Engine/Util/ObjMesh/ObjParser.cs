@@ -1,7 +1,7 @@
 ﻿using Engine.Core.Services;
 using Engine.Graphics;
 
-namespace Engine.Common.ObjMesh;
+namespace Engine.Util.ObjMesh;
 public static class ObjParser
 {
     public static Mesh Parse(string path, Renderer renderer)

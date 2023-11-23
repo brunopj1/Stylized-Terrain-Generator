@@ -1,4 +1,5 @@
-﻿namespace Engine.Core.Controllers;
+﻿namespace Engine.Core.Services;
+
 public interface IPlayerController
 {
     void Update(float deltaTime);
