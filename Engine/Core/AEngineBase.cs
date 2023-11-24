@@ -38,9 +38,9 @@ public abstract class AEngineBase : GameWindow
     public ulong TriangleCount { get; private set; } = 0;
 
     // Public services
-    public EngineClock Clock { get; private set; }
-    public Renderer Renderer { get; private set; }
-    public ImGuiRenderer ImGuiRenderer { get; private set; }
+    public EngineClock Clock { get; }
+    public Renderer Renderer { get; }
+    public ImGuiRenderer ImGuiRenderer { get; }
 
     // Private services
     private readonly EngineUniformManager _uniformManager;

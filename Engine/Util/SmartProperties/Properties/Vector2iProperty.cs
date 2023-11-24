@@ -1,23 +1,23 @@
 ﻿using Engine.Graphics;
-using Engine.Util.EngineProperties.Settings;
+using Engine.Util.SmartProperties.Settings;
 using ImGuiNET;
 
-namespace Engine.Util.EngineProperties.Properties;
+namespace Engine.Util.SmartProperties.Properties;
 
 public class Vector2iProperty : AProperty<Vector2i>
 {
-    public Vector2iProperty(string name, Vector2i value)
-        : base(name, value)
+    public Vector2iProperty(PropertyGroup group, string name, Vector2i value)
+        : base(group, name, value)
     {
     }
 
-    public IntPropertySettings Settings { get; set; } = new();
+    public IntPropertyRange Range { get; set; } = new();
     public IntPropertyRenderSettings RenderSettings { get; set; } = new();
 
     protected override void ApplyValueSettings()
     {
-        var x = MathHelper.Clamp(_value.X, Settings.Min, Settings.Max);
-        var y = MathHelper.Clamp(_value.Y, Settings.Min, Settings.Max);
+        var x = MathHelper.Clamp(_value.X, Range.Min, Range.Max);
+        var y = MathHelper.Clamp(_value.Y, Range.Min, Range.Max);
         _value = new(x, y);
     }
 
@@ -32,7 +32,7 @@ public class Vector2iProperty : AProperty<Vector2i>
 
         if (RenderSettings.EnableDrag)
         {
-            if (ImGui.DragInt2(_name, ref tempValue.X, RenderSettings.DragStep, Settings.Min, Settings.Max))
+            if (ImGui.DragInt2(_name, ref tempValue.X, RenderSettings.DragStep, Range.Min, Range.Max))
             {
                 Value = tempValue;
             }

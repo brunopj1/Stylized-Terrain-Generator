@@ -1,6 +1,7 @@
 ﻿using Engine.Core;
 using Engine.Graphics;
 using Engine.Util.PlayerControllers;
+using Engine.Util.SmartProperties.Properties;
 using OpenTK.Windowing.Common;
 using TerrainGenerator.Graphics;
 using TerrainGenerator.Services;
@@ -28,9 +29,9 @@ internal class TerrainGeneratorEngine : AEngineBase
         // Camera
         Renderer.Camera.Position = new
         (
-            _terrainManager.ChunkLength * 0.5f,
-            _terrainManager.ChunkHeight * 1.0f,
-            _terrainManager.ChunkLength * 0.5f
+            _terrainManager.ChunkLength.Value * 0.5f,
+            _terrainManager.ChunkHeight.Value * 1.0f,
+            _terrainManager.ChunkLength.Value * 0.5f
         );
     }
 

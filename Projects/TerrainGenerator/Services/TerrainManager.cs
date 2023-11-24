@@ -2,7 +2,8 @@
 using Engine.Core.Services;
 using Engine.Graphics;
 using Engine.Helpers;
-using Engine.Util.EngineProperties.Properties;
+using Engine.Util.SmartProperties;
+using Engine.Util.SmartProperties.Properties;
 using ImGuiNET;
 using TerrainGenerator.Entities;
 using TerrainGenerator.Graphics;
@@ -10,11 +11,14 @@ using TerrainGenerator.Graphics;
 namespace TerrainGenerator.Services;
 
 // TODO connections between LODs
+// TODO fix: modifying the length seems to modify the height as well
 internal class TerrainManager : ICustomUniformManager
 {
     public TerrainManager(Renderer renderer, ImGuiRenderer imGuiRenderer)
     {
         _renderer = renderer;
+
+        // Shaders
 
         _renderShader = renderer.CreateRenderShader
         (
@@ -24,6 +28,8 @@ internal class TerrainManager : ICustomUniformManager
 
         _computeShader = renderer.CreateComputeShader("Assets/Shaders/terrain.comp");
 
+        // Tessellation
+
         _tessellationMap = new();
         _tessellationMap.Add(new(4, 64, this));
         _tessellationMap.Add(new(4, 32, this));
@@ -31,12 +37,53 @@ internal class TerrainManager : ICustomUniformManager
         _tessellationMap.Add(new(4, 8, this));
         _tessellationMap.Add(new(4, 4, this));
 
-        // Fake initialization
-        _chunkGrid = new Chunk[0, 0];
-        _gridOffset = Vector2i.Zero;
+        // Smart Properties
 
-        imGuiRenderer.AddOverlay(RenderTerrainSettingsWindow);
-        imGuiRenderer.AddOverlay(RenderTessellationSettingsWindow);
+        _gridPropertyGroup = new("Grid Settings");
+        imGuiRenderer.AddOverlay(_gridPropertyGroup.RenderWindow);
+
+        DynamicTerrainOffset = new(_gridPropertyGroup, "Dynamic Terrain Offset", true);
+
+        GridOffset = new(_gridPropertyGroup, "Grid Offset", Vector2i.Zero);
+        GridOffset.OnValueModified += (oldValue, newValue) =>
+        {
+            var offset = newValue - oldValue;
+            UpdateChunkOffsets();
+            OffsetChunkTextures(offset);
+        };
+
+        ChunkLength = new(_gridPropertyGroup, "Chunk Length", 500f)
+        {
+            Range = new() { Min = 10, Max = 1000 },
+            RenderSettings = new() { DragStep = 2f }
+        };
+        ChunkLength.OnValueModified += (oldValue, newValue) =>
+        {
+            UpdateChunkTransformsAndBVs();
+            UpdateChunkTextures();
+            UpdateCameraViewDistance();
+        };
+
+        ChunkHeight = new(_gridPropertyGroup, "Chunk Height", 3500f)
+        {
+            Range = new() { Min = 0, Max = 10000 },
+            RenderSettings = new() { DragStep = 10f }
+        };
+        ChunkHeight.OnValueModified += (oldValue, newValue) =>
+        {
+            UpdateChunkTransformsAndBVs();
+            UpdateChunkTextures();
+        };
+
+        ChunkHeightStep = new(_gridPropertyGroup, "Chunk Height Step", 3f)
+        {
+            Range = new() { Min = 0.1f, Max = 100 },
+            RenderSettings = new() { DragStep = 0.1f }
+        };
+        ChunkHeightStep.OnValueModified += (oldValue, newValue) =>
+        {
+            UpdateChunkTextures();
+        };
     }
 
     private readonly Renderer _renderer;
@@ -44,61 +91,17 @@ internal class TerrainManager : ICustomUniformManager
     private readonly RenderShader _renderShader;
     private readonly ComputeShader _computeShader;
 
-    private Chunk[,] _chunkGrid;
-    private uint _chunkRadius;
+    private Chunk[,] _chunkGrid = new Chunk[0, 0];
+    private uint _chunkRadius = 0;
     private Chunk? _currentChunk = null;
 
-    private Vector2i _gridOffset;
-    public Vector2i GridOffset
-    {
-        get => _gridOffset;
-        set
-        {
-            var offset = value - _gridOffset;
-            _gridOffset = value;
-            UpdateChunkOffsets();
-            OffsetChunkTextures(offset);
-        }
-    }
+    private readonly PropertyGroup _gridPropertyGroup;
 
-
-    private float _chunkLength = 500;
-    public float ChunkLength
-    {
-        get => _chunkLength;
-        set
-        {
-            _chunkLength = value;
-            UpdateChunkTransformsAndBVs();
-            UpdateChunkTextures();
-            UpdateCameraViewDistance();
-        }
-    }
-
-    private float _chunkHeight = 3500;
-    public float ChunkHeight
-    {
-        get => _chunkHeight;
-        set
-        {
-            _chunkHeight = value;
-            UpdateChunkTransformsAndBVs();
-            UpdateChunkTextures();
-        }
-    }
-
-    private float _chunkHeightStep = 3f;
-    public float ChunkHeightStep
-    {
-        get => _chunkHeightStep;
-        set
-        {
-            _chunkHeightStep = value;
-            UpdateChunkTextures();
-        }
-    }
-
-    public bool DynamicTerrainOffset { get; set; } = true;
+    public BoolProperty DynamicTerrainOffset { get; }
+    public Vector2iProperty GridOffset { get; }
+    public FloatProperty ChunkLength { get; }
+    public FloatProperty ChunkHeight { get; }
+    public FloatProperty ChunkHeightStep { get; }
 
     private readonly TesselationMap _tessellationMap;
 
@@ -111,15 +114,16 @@ internal class TerrainManager : ICustomUniformManager
     public void Update()
     {
         var cameraPos = _renderer.Camera.Position;
+        var chunkLength = ChunkLength.Value;
 
-        var offsetX = (int)MathF.Floor(cameraPos.X / _chunkLength);
-        var offsetZ = (int)MathF.Floor(cameraPos.Z / _chunkLength);
+        var offsetX = (int)MathF.Floor(cameraPos.X / chunkLength);
+        var offsetZ = (int)MathF.Floor(cameraPos.Z / chunkLength);
 
-        if (DynamicTerrainOffset && (offsetX != 0 || offsetZ != 0))
+        if (DynamicTerrainOffset.Value && (offsetX != 0 || offsetZ != 0))
         {
             Vector2i cameraOffset = new Vector2i(offsetX, offsetZ);
-            _renderer.Camera.Position -= new Vector3(offsetX * _chunkLength, 0, offsetZ * _chunkLength);
-            GridOffset += cameraOffset;
+            _renderer.Camera.Position -= new Vector3(offsetX * chunkLength, 0, offsetZ * chunkLength);
+            GridOffset.Value += cameraOffset;
         }
     }
 
@@ -152,16 +156,18 @@ internal class TerrainManager : ICustomUniformManager
 
     private void UpdateChunkTransformsAndBVs()
     {
+        var chunkLength = ChunkLength.Value;
+
         for (var i = 0; i < _chunkGrid.GetLength(0); i++)
         {
             for (var j = 0; j < _chunkGrid.GetLength(1); j++)
             {
                 var model = _chunkGrid[i, j].Model;
 
-                model.Transform.Position = new((i - _chunkRadius) * _chunkLength, 0, (j - _chunkRadius) * _chunkLength);
-                model.Transform.Scale = new(_chunkLength, 1, _chunkLength);
+                model.Transform.Position = new((i - _chunkRadius) * chunkLength, 0, (j - _chunkRadius) * chunkLength);
+                model.Transform.Scale = new(chunkLength, 1, chunkLength);
 
-                model.BoundingVolume = new AxisAlignedBoundingBox(Vector3.Zero, new Vector3(1, _chunkHeight, 1));
+                model.BoundingVolume = new AxisAlignedBoundingBox(Vector3.Zero, new Vector3(1, ChunkHeight.Value, 1));
             }
         }
     }
@@ -186,6 +192,8 @@ internal class TerrainManager : ICustomUniformManager
 
     private void UpdateChunkOffsets()
     {
+        var gridOffset = GridOffset.Value;
+
         for (var i = 0; i < _chunkGrid.GetLength(0); i++)
         {
             for (var j = 0; j < _chunkGrid.GetLength(1); j++)
@@ -193,7 +201,7 @@ internal class TerrainManager : ICustomUniformManager
                 var chunk = _chunkGrid[i, j];
 
                 var localOffset = new Vector2i(i - (int)_chunkRadius, j - (int)_chunkRadius);
-                chunk.Offset = _gridOffset + localOffset;
+                chunk.Offset = gridOffset + localOffset;
             }
         }
     }
@@ -253,7 +261,7 @@ internal class TerrainManager : ICustomUniformManager
 
     private void UpdateCameraViewDistance()
     {
-        _renderer.Camera.Far = MathF.Max((_chunkRadius + 1) * 1.3f * _chunkLength, 1000);
+        _renderer.Camera.Far = MathF.Max((_chunkRadius + 1) * 1.3f * ChunkLength.Value, 1000);
         _renderer.Camera.Near = _renderer.Camera.Far * 0.001f;
     }
 
@@ -283,35 +291,9 @@ internal class TerrainManager : ICustomUniformManager
 
     public void BindUniforms(AShader shader)
     {
-        shader.BindUniform("uChunkLength", _chunkLength);
-        shader.BindUniform("uChunkHeight", _chunkHeight);
-        shader.BindUniform("uChunkHeightStep", _chunkHeightStep);
+        _gridPropertyGroup.BindUniforms(shader);
+
         shader.BindUniform("uMaxChunkDivisions", _tessellationMap.MaxDivisions);
-    }
-
-    private void RenderTerrainSettingsWindow()
-    {
-        ImGui.Begin("Grid Settings");
-
-        var tempB = DynamicTerrainOffset;
-        if (ImGui.Checkbox("Dynamic terrain offset", ref tempB)) DynamicTerrainOffset = tempB;
-
-        var tempF = _chunkLength;
-        if (ImGuiHelper.DragFloatClamped("Chunk length", ref tempF, 2, 10, 1000)) ChunkLength = tempF;
-
-        tempF = _chunkHeight;
-        if (ImGuiHelper.DragFloatClamped("Chunk height", ref tempF, 8, 0, 10000)) ChunkHeight = tempF;
-
-        tempF = _chunkHeightStep;
-        if (ImGuiHelper.DragFloatClamped("Chunk height step", ref tempF, 0.1f, 0.1f, 100)) ChunkHeightStep = tempF;
-
-        ImGui.Separator();
-        ImGui.Separator();
-
-        Vector2i tempV2 = _gridOffset;
-        if (ImGui.DragInt2("Grid offset", ref tempV2.X, 1f)) GridOffset = new Vector2i(tempV2[0], tempV2[1]);
-
-        ImGui.End();
     }
 
     public void RenderTessellationSettingsWindow()

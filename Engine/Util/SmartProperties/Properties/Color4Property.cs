@@ -2,12 +2,12 @@
 using Engine.Graphics;
 using ImGuiNET;
 
-namespace Engine.Util.EngineProperties.Properties;
+namespace Engine.Util.SmartProperties.Properties;
 
 public class Color4Property : AProperty<Vector4>
 {
-    public Color4Property(string name, Vector4 value)
-        : base(name, value)
+    public Color4Property(PropertyGroup group, string name, Vector4 value)
+        : base(group, name, value)
     {
     }
 

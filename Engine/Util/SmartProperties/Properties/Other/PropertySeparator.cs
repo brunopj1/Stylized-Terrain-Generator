@@ -1,19 +1,21 @@
 ﻿using Engine.Graphics;
 using ImGuiNET;
 
-namespace Engine.Util.EngineProperties.Properties.Other;
+namespace Engine.Util.SmartProperties.Properties.Other;
 
 public class PropertySeparator : IProperty
 {
-    public PropertySeparator(uint count = 1)
+    public PropertySeparator(PropertyGroup group, uint count = 1)
     {
+        group.AddProperty(this);
+
         Count = count;
     }
 
     public uint Count { get; set; }
 
     public bool HasShaderUniform { get => false; set { } }
-    public bool HasInputField { get => false; set { } }
+    public bool HasInputField { get => true; set { } }
 
     public void BindUniform(AShader shader)
     { }

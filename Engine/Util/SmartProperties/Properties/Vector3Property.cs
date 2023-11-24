@@ -1,25 +1,25 @@
 ﻿using Engine.Extensions;
 using Engine.Graphics;
-using Engine.Util.EngineProperties.Settings;
+using Engine.Util.SmartProperties.Settings;
 using ImGuiNET;
 
-namespace Engine.Util.EngineProperties.Properties;
+namespace Engine.Util.SmartProperties.Properties;
 
 public class Vector3Property : AProperty<Vector3>
 {
-    public Vector3Property(string name, Vector3 value)
-        : base(name, value)
+    public Vector3Property(PropertyGroup group, string name, Vector3 value)
+        : base(group, name, value)
     {
     }
 
-    public FloatPropertySettings Settings { get; set; } = new();
+    public FloatPropertyRange Range { get; set; } = new();
     public FloatPropertyRenderSettings RenderSettings { get; set; } = new();
 
     protected override void ApplyValueSettings()
     {
-        var x = MathHelper.Clamp(_value.X, Settings.Min, Settings.Max);
-        var y = MathHelper.Clamp(_value.Y, Settings.Min, Settings.Max);
-        var z = MathHelper.Clamp(_value.Z, Settings.Min, Settings.Max);
+        var x = MathHelper.Clamp(_value.X, Range.Min, Range.Max);
+        var y = MathHelper.Clamp(_value.Y, Range.Min, Range.Max);
+        var z = MathHelper.Clamp(_value.Z, Range.Min, Range.Max);
         _value = new(x, y, z);
     }
 
@@ -34,7 +34,7 @@ public class Vector3Property : AProperty<Vector3>
 
         if (RenderSettings.EnableDrag)
         {
-            if (ImGui.DragFloat3(_name, ref tempValue, RenderSettings.DragStep, Settings.Min, Settings.Max, RenderSettings.Format))
+            if (ImGui.DragFloat3(_name, ref tempValue, RenderSettings.DragStep, Range.Min, Range.Max, RenderSettings.Format))
             {
                 Value = tempValue.ToOpenTK();
             }

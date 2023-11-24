@@ -26,8 +26,8 @@ public struct VertexAttribute
         };
     }
 
-    public VertexAttribPointerType Type { get; private set; }
-    public int Size { get; private set; }
-    public bool Normalized { get; private set; }
-    public int Stride { get; private set; }
+    public VertexAttribPointerType Type { get; }
+    public int Size { get; }
+    public bool Normalized { get; }
+    public int Stride { get; }
 }

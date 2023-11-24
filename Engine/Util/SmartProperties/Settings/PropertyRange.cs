@@ -1,8 +1,8 @@
-﻿namespace Engine.Util.EngineProperties.Settings;
+﻿namespace Engine.Util.SmartProperties.Settings;
 
-public struct IntPropertySettings
+public struct IntPropertyRange
 {
-    public IntPropertySettings()
+    public IntPropertyRange()
     {
     }
 
@@ -10,9 +10,9 @@ public struct IntPropertySettings
     public int Max { get; set; } = int.MaxValue;
 }
 
-public struct FloatPropertySettings
+public struct FloatPropertyRange
 {
-    public FloatPropertySettings()
+    public FloatPropertyRange()
     {
     }
 

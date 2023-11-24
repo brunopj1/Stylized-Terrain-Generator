@@ -1,24 +1,24 @@
 ﻿using Engine.Extensions;
 using Engine.Graphics;
-using Engine.Util.EngineProperties.Settings;
+using Engine.Util.SmartProperties.Settings;
 using ImGuiNET;
 
-namespace Engine.Util.EngineProperties.Properties;
+namespace Engine.Util.SmartProperties.Properties;
 
 public class Vector2Property : AProperty<Vector2>
 {
-    public Vector2Property(string name, Vector2 value)
-        : base(name, value)
+    public Vector2Property(PropertyGroup group, string name, Vector2 value)
+        : base(group, name, value)
     {
     }
 
-    public FloatPropertySettings Settings { get; set; } = new();
+    public FloatPropertyRange Range { get; set; } = new();
     public FloatPropertyRenderSettings RenderSettings { get; set; } = new();
 
     protected override void ApplyValueSettings()
     {
-        var x = MathHelper.Clamp(_value.X, Settings.Min, Settings.Max);
-        var y = MathHelper.Clamp(_value.Y, Settings.Min, Settings.Max);
+        var x = MathHelper.Clamp(_value.X, Range.Min, Range.Max);
+        var y = MathHelper.Clamp(_value.Y, Range.Min, Range.Max);
         _value = new(x, y);
     }
 
@@ -33,7 +33,7 @@ public class Vector2Property : AProperty<Vector2>
 
         if (RenderSettings.EnableDrag)
         {
-            if (ImGui.DragFloat2(_name, ref tempValue, RenderSettings.DragStep, Settings.Min, Settings.Max, RenderSettings.Format))
+            if (ImGui.DragFloat2(_name, ref tempValue, RenderSettings.DragStep, Range.Min, Range.Max, RenderSettings.Format))
             {
                 Value = tempValue.ToOpenTK();
             }

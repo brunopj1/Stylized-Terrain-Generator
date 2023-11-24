@@ -1,4 +1,4 @@
-﻿namespace Engine.Util.EngineProperties.Settings;
+﻿namespace Engine.Util.SmartProperties.Settings;
 
 public struct IntPropertyRenderSettings
 {
@@ -20,7 +20,7 @@ public struct FloatPropertyRenderSettings
 
     public string? Format { get; set; } = null;
     public bool EnableDrag { get; set; } = true;
-    public float DragStep { get; set; } = 0.1f;
-    public float SlowStep { get; set; } = 0.1f;
+    public float DragStep { get; set; } = 0.01f;
+    public float SlowStep { get; set; } = 0.01f;
     public float FastStep { get; set; } = 1f;
 }

@@ -1,24 +1,24 @@
 ﻿using Engine.Graphics;
-using Engine.Util.EngineProperties.Settings;
+using Engine.Util.SmartProperties.Settings;
 using ImGuiNET;
 
-namespace Engine.Util.EngineProperties.Properties;
+namespace Engine.Util.SmartProperties.Properties;
 
 public class Vector3iProperty : AProperty<Vector3i>
 {
-    public Vector3iProperty(string name, Vector3i value)
-        : base(name, value)
+    public Vector3iProperty(PropertyGroup group, string name, Vector3i value)
+        : base(group, name, value)
     {
     }
 
-    public IntPropertySettings Settings { get; set; } = new();
+    public IntPropertyRange Range { get; set; } = new();
     public IntPropertyRenderSettings RenderSettings { get; set; } = new();
 
     protected override void ApplyValueSettings()
     {
-        var x = MathHelper.Clamp(_value.X, Settings.Min, Settings.Max);
-        var y = MathHelper.Clamp(_value.Y, Settings.Min, Settings.Max);
-        var z = MathHelper.Clamp(_value.Z, Settings.Min, Settings.Max);
+        var x = MathHelper.Clamp(_value.X, Range.Min, Range.Max);
+        var y = MathHelper.Clamp(_value.Y, Range.Min, Range.Max);
+        var z = MathHelper.Clamp(_value.Z, Range.Min, Range.Max);
         _value = new(x, y, z);
     }
 
@@ -33,7 +33,7 @@ public class Vector3iProperty : AProperty<Vector3i>
 
         if (RenderSettings.EnableDrag)
         {
-            if (ImGui.DragInt3(_name, ref tempValue.X, RenderSettings.DragStep, Settings.Min, Settings.Max))
+            if (ImGui.DragInt3(_name, ref tempValue.X, RenderSettings.DragStep, Range.Min, Range.Max))
             {
                 Value = tempValue;
             }

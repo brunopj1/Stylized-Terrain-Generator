@@ -1,22 +1,22 @@
 ﻿using Engine.Graphics;
-using Engine.Util.EngineProperties.Settings;
+using Engine.Util.SmartProperties.Settings;
 using ImGuiNET;
 
-namespace Engine.Util.EngineProperties.Properties;
+namespace Engine.Util.SmartProperties.Properties;
 
 public class FloatProperty : AProperty<float>
 {
-    public FloatProperty(string name, float value)
-        : base(name, value)
+    public FloatProperty(PropertyGroup group, string name, float value)
+        : base(group, name, value)
     {
     }
 
-    public FloatPropertySettings Settings { get; set; } = new();
+    public FloatPropertyRange Range { get; set; } = new();
     public FloatPropertyRenderSettings RenderSettings { get; set; } = new();
 
     protected override void ApplyValueSettings()
     {
-        _value = MathHelper.Clamp(_value, Settings.Min, Settings.Max);
+        _value = MathHelper.Clamp(_value, Range.Min, Range.Max);
     }
 
     public override void BindUniform(AShader shader)
@@ -30,7 +30,7 @@ public class FloatProperty : AProperty<float>
 
         if (RenderSettings.EnableDrag)
         {
-            if (ImGui.DragFloat(_name, ref tempValue, RenderSettings.DragStep, Settings.Min, Settings.Max))
+            if (ImGui.DragFloat(_name, ref tempValue, RenderSettings.DragStep, Range.Min, Range.Max))
             {
                 Value = tempValue;
             }

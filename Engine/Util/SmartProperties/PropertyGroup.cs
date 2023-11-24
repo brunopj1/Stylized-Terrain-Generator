@@ -1,7 +1,7 @@
 ﻿using Engine.Graphics;
 using ImGuiNET;
 
-namespace Engine.Util.EngineProperties;
+namespace Engine.Util.SmartProperties;
 
 public class PropertyGroup : ICustomUniformManager
 {
@@ -14,7 +14,7 @@ public class PropertyGroup : ICustomUniformManager
 
     private readonly List<IProperty> _properties = new();
 
-    public void AddProperty(IProperty property)
+    internal void AddProperty(IProperty property)
     {
         _properties.Add(property);
     }

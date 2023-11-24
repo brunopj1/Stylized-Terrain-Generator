@@ -1,6 +1,6 @@
 ﻿using Engine.Graphics;
 
-namespace Engine.Util.EngineProperties;
+namespace Engine.Util.SmartProperties;
 
 public interface IProperty
 {
@@ -13,8 +13,10 @@ public interface IProperty
 
 public abstract class AProperty<T> : IProperty where T : struct
 {
-    public AProperty(string name, T value)
+    public AProperty(PropertyGroup group, string name, T value)
     {
+        group.AddProperty(this);
+
         Name = name;
         Value = value;
     }
@@ -38,17 +40,18 @@ public abstract class AProperty<T> : IProperty where T : struct
         get => _value;
         set
         {
+            var oldValue = _value;
             _value = value;
             ApplyValueSettings();
-            OnValueModified?.Invoke(_value);
+            OnValueModified?.Invoke(oldValue, _value);
         }
     }
 
     public bool HasShaderUniform { get; set; } = true;
     public bool HasInputField { get; set; } = true;
 
-    public delegate void ValueModifiedHandler(T newValue);
-    public event ValueModifiedHandler? OnValueModified;
+    public delegate void ValueModifiedHandler(T oldValue, T newValue);
+    public event ValueModifiedHandler? OnValueModified = null;
 
     protected abstract void ApplyValueSettings();
 
