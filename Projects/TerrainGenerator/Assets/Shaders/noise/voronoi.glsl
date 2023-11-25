@@ -201,4 +201,16 @@ float voronoiNoise(int seed, vec3 p, int distanceFunction, int returnType, out v
     }
 }
 
+float voronoiNoise(int seed, vec2 p, int distanceFunction, int returnType)
+{
+    vec2 closestCenter;
+    return voronoiNoise(seed, p, distanceFunction, returnType, closestCenter);
+}
+
+float voronoiNoise(int seed, vec3 p, int distanceFunction, int returnType)
+{
+    vec3 closestCenter;
+    return voronoiNoise(seed, p, distanceFunction, returnType, closestCenter);
+}
+
 #endif

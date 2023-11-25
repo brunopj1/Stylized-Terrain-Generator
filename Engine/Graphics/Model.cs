@@ -4,14 +4,34 @@ namespace Engine.Graphics;
 
 public class Model
 {
-    internal Model(Mesh mesh, RenderShader shader, BoundingVolume? boundingVolume = null, ICustomUniformManager? customUniformManager = null)
+    internal Model(Mesh mesh, RenderShader shader)
     {
         Mesh = mesh;
         Shader = shader;
         Transform = new();
         Textures = new();
-        BoundingVolume = boundingVolume;
-        CustomUniformManager = customUniformManager;
+        BoundingVolume = null;
+        CustomUniformManagers = null;
+    }
+
+    internal Model(Mesh mesh, RenderShader shader, ICustomUniformManager customUniformManagers)
+    {
+        Mesh = mesh;
+        Shader = shader;
+        Transform = new();
+        Textures = new();
+        BoundingVolume = null;
+        CustomUniformManagers = new() { customUniformManagers };
+    }
+
+    internal Model(Mesh mesh, RenderShader shader, List<ICustomUniformManager> customUniformManagers)
+    {
+        Mesh = mesh;
+        Shader = shader;
+        Transform = new();
+        Textures = new();
+        BoundingVolume = null;
+        CustomUniformManagers = customUniformManagers;
     }
 
     public Mesh Mesh { get; set; }
@@ -19,7 +39,7 @@ public class Model
     public List<TextureUniform> Textures { get; set; }
     public Transform Transform { get; set; }
     public BoundingVolume? BoundingVolume { get; set; }
-    public ICustomUniformManager? CustomUniformManager { get; set; }
+    public List<ICustomUniformManager>? CustomUniformManagers { get; set; }
 
     public bool IsEnabled { get; set; } = true;
 
@@ -45,7 +65,14 @@ public class Model
         }
 
         engineUniformManager.BindUniforms(Shader, ref modelMatrix);
-        CustomUniformManager?.BindUniforms(Shader);
+
+        if (CustomUniformManagers != null)
+        {
+            foreach (var customUniformManager in CustomUniformManagers)
+            {
+                customUniformManager.BindUniforms(Shader);
+            }
+        }
 
         return Mesh.Render();
     }

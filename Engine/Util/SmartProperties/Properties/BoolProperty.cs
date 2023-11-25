@@ -23,13 +23,16 @@ public class BoolProperty : AProperty<bool>
         shader.BindUniform(_uniformName, _value);
     }
 
-    public override void RenderInputField()
+    public override bool RenderInputField()
     {
         var tempValue = _value;
 
         if (ImGui.Checkbox(_name, ref tempValue))
         {
             Value = tempValue;
+            return true;
         }
+
+        return false;
     }
 }

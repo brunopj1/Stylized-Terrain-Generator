@@ -27,7 +27,7 @@ public class Vector3iProperty : AProperty<Vector3i>
         shader.BindUniform(_uniformName, _value);
     }
 
-    public override void RenderInputField()
+    public override bool RenderInputField()
     {
         var tempValue = _value;
 
@@ -36,14 +36,20 @@ public class Vector3iProperty : AProperty<Vector3i>
             if (ImGui.DragInt3(_name, ref tempValue.X, RenderSettings.DragStep, Range.Min, Range.Max))
             {
                 Value = tempValue;
+                return true;
             }
+
+            return false;
         }
         else
         {
             if (ImGui.InputInt3(_name, ref tempValue.X))
             {
                 Value = tempValue;
+                return true;
             }
+
+            return false;
         }
     }
 }

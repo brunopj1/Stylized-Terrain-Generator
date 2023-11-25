@@ -16,6 +16,7 @@ internal class TerrainGeneratorEngine : AEngineBase
         ClientLocation = new(50, 50);
         Title = "Terrain Generator";
         ClearColor = null;
+        VSync = VSyncMode.On;
 
         // Player Controller
         PlayerController = new FlyingPlayerController(this);

@@ -24,7 +24,7 @@ public class IntProperty : AProperty<int>
         shader.BindUniform(_uniformName, _value);
     }
 
-    public override void RenderInputField()
+    public override bool RenderInputField()
     {
         var tempValue = _value;
 
@@ -33,14 +33,20 @@ public class IntProperty : AProperty<int>
             if (ImGui.DragInt(_name, ref tempValue, RenderSettings.DragStep, Range.Min, Range.Max))
             {
                 Value = tempValue;
+                return true;
             }
+
+            return false;
         }
         else
         {
             if (ImGui.InputInt(_name, ref tempValue, RenderSettings.SlowStep, RenderSettings.FastStep))
             {
                 Value = tempValue;
+                return true;
             }
+
+            return false;
         }
     }
 }

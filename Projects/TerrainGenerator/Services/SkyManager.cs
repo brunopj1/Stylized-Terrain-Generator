@@ -46,7 +46,7 @@ internal class SkyManager : ICustomUniformManager
         // Smart Properties
 
         _propertyGroup = new("Sky Settings");
-        imGuiRenderer.AddOverlay(_propertyGroup.RenderWindow);
+        imGuiRenderer.AddOverlay(() => _propertyGroup.RenderWindow());
 
         SkyColor0 = new(_propertyGroup, "Sky Color 0", new(0.23f, 0.43f, 0.71f));
 

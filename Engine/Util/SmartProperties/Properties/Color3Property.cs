@@ -24,13 +24,16 @@ public class Color3Property : AProperty<Vector3>
         shader.BindUniform(_uniformName, _value);
     }
 
-    public override void RenderInputField()
+    public override bool RenderInputField()
     {
         var tempValue = _value.ToNumerics();
 
         if (ImGui.ColorEdit3(_name, ref tempValue))
         {
             Value = tempValue.ToOpenTK();
+            return true;
         }
+
+        return false;
     }
 }

@@ -20,11 +20,13 @@ public class PropertySeparator : IProperty
     public void BindUniform(AShader shader)
     { }
 
-    public void RenderInputField()
+    public bool RenderInputField()
     {
         for (var i = 0; i < Count; i++)
         {
             ImGui.Separator();
         }
+
+        return false;
     }
 }

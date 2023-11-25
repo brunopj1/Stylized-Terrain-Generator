@@ -5,7 +5,7 @@ namespace Engine.Util.SmartProperties;
 public interface IProperty
 {
     void BindUniform(AShader shader);
-    void RenderInputField();
+    bool RenderInputField();
 
     bool HasShaderUniform { get; set; }
     bool HasInputField { get; set; }
@@ -57,5 +57,5 @@ public abstract class AProperty<T> : IProperty where T : struct
 
     public abstract void BindUniform(AShader shader);
 
-    public abstract void RenderInputField();
+    public abstract bool RenderInputField();
 }

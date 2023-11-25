@@ -83,9 +83,23 @@ public class Renderer
         _meshes.Remove(mesh);
     }
 
-    public Model CreateModel(Mesh mesh, RenderShader shader, BoundingVolume? boundingVolume = null, ICustomUniformManager? customUniformManager = null)
+    public Model CreateModel(Mesh mesh, RenderShader shader)
     {
-        var model = new Model(mesh, shader, boundingVolume, customUniformManager);
+        var model = new Model(mesh, shader);
+        _models.Add(model);
+        return model;
+    }
+
+    public Model CreateModel(Mesh mesh, RenderShader shader, ICustomUniformManager customUniformManager)
+    {
+        var model = new Model(mesh, shader, customUniformManager);
+        _models.Add(model);
+        return model;
+    }
+
+    public Model CreateModel(Mesh mesh, RenderShader shader, List<ICustomUniformManager> customUniformManagers)
+    {
+        var model = new Model(mesh, shader, customUniformManagers);
         _models.Add(model);
         return model;
     }

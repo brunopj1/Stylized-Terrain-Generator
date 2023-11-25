@@ -27,7 +27,7 @@ public class Vector2Property : AProperty<Vector2>
         shader.BindUniform(_uniformName, _value);
     }
 
-    public override void RenderInputField()
+    public override bool RenderInputField()
     {
         var tempValue = _value.ToNumerics();
 
@@ -36,14 +36,20 @@ public class Vector2Property : AProperty<Vector2>
             if (ImGui.DragFloat2(_name, ref tempValue, RenderSettings.DragStep, Range.Min, Range.Max, RenderSettings.Format))
             {
                 Value = tempValue.ToOpenTK();
+                return true;
             }
+
+            return false;
         }
         else
         {
             if (ImGui.InputFloat2(_name, ref tempValue, RenderSettings.Format))
             {
                 Value = tempValue.ToOpenTK();
+                return true;
             }
+
+            return false;
         }
     }
 }

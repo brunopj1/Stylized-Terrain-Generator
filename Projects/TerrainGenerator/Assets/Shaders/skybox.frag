@@ -24,14 +24,13 @@ uniform vec3 uCloudDirection;
 out vec4 FragColor;
 
 void main() {
-    vec3 voronoiCenter;
-
     vec2 uv = (gl_FragCoord.xy - 0.5 * uWindowResolution) / uWindowResolution.y;
     vec3 ray = normalize(uCameraFront + uv.x * uCameraRight + uv.y * uCameraUp);
 
-    float skyNoise = voronoiNoise(85312, ray * uSkyNoiseFreq, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_CELL_VALUE, voronoiCenter) * 0.5 + 0.5;
+    float skyNoise = voronoiNoise(85312, ray * uSkyNoiseFreq, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_CELL_VALUE) * 0.5 + 0.5;
     vec3 skyColor = mix(uSkyColor0, uSkyColor1, (ray.y * 0.5 + 0.5 + skyNoise * uSkyNoiseFactor) / (1 + uSkyNoiseFactor));
     
+    vec3 voronoiCenter;
     float cloudVoronoiNoise = voronoiNoise(72301, ray * uCloudVoronoiNoiseFreq, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_CELL_VALUE, voronoiCenter);
 
     vec3 cloudTimeOffset = normalize(uCloudDirection) * uTotalTime * uCloudTimeFactor;

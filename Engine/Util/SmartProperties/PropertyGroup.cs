@@ -30,18 +30,40 @@ public class PropertyGroup : ICustomUniformManager
         }
     }
 
-    public void RenderWindow()
+    public bool RenderWindow()
     {
         ImGui.Begin(Name);
+
+        var updated = RenderProperties();
+
+        ImGui.End();
+
+        return updated;
+    }
+
+    public bool RenderTab()
+    {
+        if (!ImGui.BeginTabItem(Name)) return false;
+
+        var updated = RenderProperties();
+
+        ImGui.EndTabItem();
+
+        return updated;
+    }
+
+    private bool RenderProperties()
+    {
+        var updated = false;
 
         foreach (var property in _properties)
         {
             if (property.HasInputField)
             {
-                property.RenderInputField();
+                updated = property.RenderInputField() || updated;
             }
         }
 
-        ImGui.End();
+        return updated;
     }
 }

@@ -28,7 +28,7 @@ public class Vector3Property : AProperty<Vector3>
         shader.BindUniform(_uniformName, _value);
     }
 
-    public override void RenderInputField()
+    public override bool RenderInputField()
     {
         var tempValue = _value.ToNumerics();
 
@@ -37,14 +37,20 @@ public class Vector3Property : AProperty<Vector3>
             if (ImGui.DragFloat3(_name, ref tempValue, RenderSettings.DragStep, Range.Min, Range.Max, RenderSettings.Format))
             {
                 Value = tempValue.ToOpenTK();
+                return true;
             }
+
+            return false;
         }
         else
         {
             if (ImGui.InputFloat3(_name, ref tempValue, RenderSettings.Format))
             {
                 Value = tempValue.ToOpenTK();
+                return true;
             }
+
+            return false;
         }
     }
 }

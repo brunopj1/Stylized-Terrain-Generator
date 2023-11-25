@@ -37,10 +37,13 @@ internal class TerrainManager : ICustomUniformManager
         _tessellationMap.Add(new(4, 8, this));
         _tessellationMap.Add(new(4, 4, this));
 
+        // Terrain Generator
+
+        _terrainGenerator = new();
+
         // Smart Properties
 
         _gridPropertyGroup = new("Grid Settings");
-        imGuiRenderer.AddOverlay(_gridPropertyGroup.RenderWindow);
 
         DynamicTerrainOffset = new(_gridPropertyGroup, "Dynamic Terrain Offset", true);
 
@@ -84,6 +87,12 @@ internal class TerrainManager : ICustomUniformManager
         {
             UpdateChunkTextures();
         };
+
+        // Overlays
+
+        imGuiRenderer.AddOverlay(() => _gridPropertyGroup.RenderWindow());
+        imGuiRenderer.AddOverlay(RenderTessellationSettingsWindow);
+        imGuiRenderer.AddOverlay(RenderBiomeSettingsWindow);
     }
 
     private readonly Renderer _renderer;
@@ -104,6 +113,8 @@ internal class TerrainManager : ICustomUniformManager
     public FloatProperty ChunkHeightStep { get; }
 
     private readonly TesselationMap _tessellationMap;
+
+    private readonly TerrainGenerator _terrainGenerator;
 
     public void Load()
     {
@@ -142,7 +153,7 @@ internal class TerrainManager : ICustomUniformManager
             {
                 var chunk = new Chunk(this);
                 chunk.Model = _renderer.CreateModel(null, _renderShader);
-                chunk.Model.CustomUniformManager = chunk;
+                chunk.Model.CustomUniformManagers = new() { chunk };
 
                 _chunkGrid[i, j] = chunk;
             }
@@ -371,6 +382,16 @@ internal class TerrainManager : ICustomUniformManager
         ImGui.End();
     }
 
+    private void RenderBiomeSettingsWindow()
+    {
+        bool updated = _terrainGenerator.RenderBiomeSettingsWindow();
+
+        if (updated)
+        {
+            UpdateChunkTextures();
+        }
+    }
+
     public Mesh CreateChunkMesh(uint divisions)
     {
         var capacity = divisions * divisions * 2 * 3;
@@ -428,7 +449,7 @@ internal class TerrainManager : ICustomUniformManager
         _computeShader.Use();
 
         chunk.BindUniforms(_computeShader);
-
+        _terrainGenerator.BindUniforms(_computeShader);
         _computeShader.BindUniform("uChunkTexture", chunk.Texture, 0, TextureAccess.WriteOnly);
 
         var size = new Vector2i((int)chunk.Divisions + 1);

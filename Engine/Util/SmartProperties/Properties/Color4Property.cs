@@ -25,13 +25,16 @@ public class Color4Property : AProperty<Vector4>
         shader.BindUniform(_uniformName, _value);
     }
 
-    public override void RenderInputField()
+    public override bool RenderInputField()
     {
         var tempValue = _value.ToNumerics();
 
         if (ImGui.ColorEdit4(_name, ref tempValue))
         {
             Value = tempValue.ToOpenTK();
+            return true;
         }
+
+        return false;
     }
 }

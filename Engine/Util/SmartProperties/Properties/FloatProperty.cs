@@ -24,7 +24,7 @@ public class FloatProperty : AProperty<float>
         shader.BindUniform(_uniformName, _value);
     }
 
-    public override void RenderInputField()
+    public override bool RenderInputField()
     {
         var tempValue = _value;
 
@@ -33,14 +33,20 @@ public class FloatProperty : AProperty<float>
             if (ImGui.DragFloat(_name, ref tempValue, RenderSettings.DragStep, Range.Min, Range.Max))
             {
                 Value = tempValue;
+                return true;
             }
+
+            return false;
         }
         else
         {
             if (ImGui.InputFloat(_name, ref tempValue, RenderSettings.SlowStep, RenderSettings.FastStep, RenderSettings.Format))
             {
                 Value = tempValue;
+                return true;
             }
+
+            return false;
         }
     }
 }
