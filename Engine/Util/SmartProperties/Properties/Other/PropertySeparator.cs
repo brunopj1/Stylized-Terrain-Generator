@@ -3,24 +3,26 @@ using ImGuiNET;
 
 namespace Engine.Util.SmartProperties.Properties.Other;
 
-public class PropertySeparator : IProperty
+public class PropertySeparator : AProperty
 {
     public PropertySeparator(PropertyGroup group, uint count = 1)
+        : base(group, "")
     {
-        group.AddProperty(this);
-
         Count = count;
     }
 
     public uint Count { get; set; }
 
-    public bool HasShaderUniform { get => false; set { } }
-    public bool HasInputField { get => true; set { } }
+    public override string StringValue { get => ""; set { } }
 
-    public void BindUniform(AShader shader)
-    { }
+    public override bool AllowSerialization { get => false; set { } }
+    public override bool HasShaderUniform { get => false; set { } }
 
-    public bool RenderInputField()
+    internal override void BindUniform(AShader shader)
+    {
+    }
+
+    internal override bool RenderInputField()
     {
         for (var i = 0; i < Count; i++)
         {

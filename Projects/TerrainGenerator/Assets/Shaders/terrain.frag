@@ -18,7 +18,7 @@ void main()
     vec3 lightDirWorld = normalize(vec3(1.0, 1.0, 1.0));
     vec3 lightDir = normalize(uViewMatrix * vec4(lightDirWorld, 0.0)).xyz;
     float brightness = dot(lightDir, faceNormal);
-    brightness = mix(max(brightness, 0), brightness * 0.5 + 0.5, 0.5);
+    brightness = mix(max(brightness, 0), brightness * 0.5 + 0.5, 0.7);
 
     FragColor = vec4(brightness * DataIn.color, 1);
 }

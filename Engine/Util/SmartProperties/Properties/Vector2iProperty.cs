@@ -1,4 +1,5 @@
 ﻿using Engine.Graphics;
+using Engine.Helpers;
 using Engine.Util.SmartProperties.Settings;
 using ImGuiNET;
 
@@ -6,13 +7,19 @@ namespace Engine.Util.SmartProperties.Properties;
 
 public class Vector2iProperty : AProperty<Vector2i>
 {
-    public Vector2iProperty(PropertyGroup group, string name, Vector2i value)
+    public Vector2iProperty(PropertyGroup group, string name, Vector2i? value = null)
         : base(group, name, value)
     {
     }
 
     public IntPropertyRange Range { get; set; } = new();
     public IntPropertyRenderSettings RenderSettings { get; set; } = new();
+
+    public override string StringValue
+    {
+        get => Value.ToString();
+        set => Value = VectorHelper.ParseVector2i(value!);
+    }
 
     protected override void ApplyValueSettings()
     {
@@ -21,18 +28,18 @@ public class Vector2iProperty : AProperty<Vector2i>
         _value = new(x, y);
     }
 
-    public override void BindUniform(AShader shader)
+    internal override void BindUniform(AShader shader)
     {
-        shader.BindUniform(_uniformName, _value);
+        shader.BindUniform(UniformName, _value);
     }
 
-    public override bool RenderInputField()
+    internal override bool RenderInputField()
     {
         var tempValue = _value;
 
         if (RenderSettings.EnableDrag)
         {
-            if (ImGui.DragInt2(_name, ref tempValue.X, RenderSettings.DragStep, Range.Min, Range.Max))
+            if (ImGui.DragInt2(Name, ref tempValue.X, RenderSettings.DragStep, Range.Min, Range.Max))
             {
                 Value = tempValue;
                 return true;
@@ -42,7 +49,7 @@ public class Vector2iProperty : AProperty<Vector2i>
         }
         else
         {
-            if (ImGui.InputInt2(_name, ref tempValue.X))
+            if (ImGui.InputInt2(Name, ref tempValue.X))
             {
                 Value = tempValue;
                 return true;

@@ -1,14 +1,21 @@
 ﻿using Engine.Extensions;
 using Engine.Graphics;
+using Engine.Helpers;
 using ImGuiNET;
 
 namespace Engine.Util.SmartProperties.Properties;
 
 public class Color4Property : AProperty<Vector4>
 {
-    public Color4Property(PropertyGroup group, string name, Vector4 value)
+    public Color4Property(PropertyGroup group, string name, Vector4? value = null)
         : base(group, name, value)
     {
+    }
+
+    public override string StringValue
+    {
+        get => Value.ToString();
+        set => Value = VectorHelper.ParseVector4(value!);
     }
 
     protected override void ApplyValueSettings()
@@ -20,16 +27,16 @@ public class Color4Property : AProperty<Vector4>
         _value = new(x, y, z, w);
     }
 
-    public override void BindUniform(AShader shader)
+    internal override void BindUniform(AShader shader)
     {
-        shader.BindUniform(_uniformName, _value);
+        shader.BindUniform(UniformName, _value);
     }
 
-    public override bool RenderInputField()
+    internal override bool RenderInputField()
     {
         var tempValue = _value.ToNumerics();
 
-        if (ImGui.ColorEdit4(_name, ref tempValue))
+        if (ImGui.ColorEdit4(Name, ref tempValue))
         {
             Value = tempValue.ToOpenTK();
             return true;

@@ -1,4 +1,5 @@
 ﻿using Engine.Graphics;
+using Engine.Helpers;
 using Engine.Util.SmartProperties.Settings;
 using ImGuiNET;
 
@@ -6,13 +7,19 @@ namespace Engine.Util.SmartProperties.Properties;
 
 public class Vector3iProperty : AProperty<Vector3i>
 {
-    public Vector3iProperty(PropertyGroup group, string name, Vector3i value)
+    public Vector3iProperty(PropertyGroup group, string name, Vector3i? value = null)
         : base(group, name, value)
     {
     }
 
     public IntPropertyRange Range { get; set; } = new();
     public IntPropertyRenderSettings RenderSettings { get; set; } = new();
+
+    public override string StringValue
+    {
+        get => Value.ToString();
+        set => Value = VectorHelper.ParseVector3i(value!);
+    }
 
     protected override void ApplyValueSettings()
     {
@@ -22,18 +29,18 @@ public class Vector3iProperty : AProperty<Vector3i>
         _value = new(x, y, z);
     }
 
-    public override void BindUniform(AShader shader)
+    internal override void BindUniform(AShader shader)
     {
-        shader.BindUniform(_uniformName, _value);
+        shader.BindUniform(UniformName, _value);
     }
 
-    public override bool RenderInputField()
+    internal override bool RenderInputField()
     {
         var tempValue = _value;
 
         if (RenderSettings.EnableDrag)
         {
-            if (ImGui.DragInt3(_name, ref tempValue.X, RenderSettings.DragStep, Range.Min, Range.Max))
+            if (ImGui.DragInt3(Name, ref tempValue.X, RenderSettings.DragStep, Range.Min, Range.Max))
             {
                 Value = tempValue;
                 return true;
@@ -43,7 +50,7 @@ public class Vector3iProperty : AProperty<Vector3i>
         }
         else
         {
-            if (ImGui.InputInt3(_name, ref tempValue.X))
+            if (ImGui.InputInt3(Name, ref tempValue.X))
             {
                 Value = tempValue;
                 return true;

@@ -11,22 +11,23 @@ uniform float uChunkHeightStep;
 uniform uint uMaxChunkDivisions;
 uniform ivec2 uChunkOffset;
 
-uniform vec3 uPlainsColorGrass0;
-uniform vec3 uPlainsColorGrass1;
-uniform vec3 uPlainsColorGrass2;
-uniform vec3 uPlainsColorGrass3;
-uniform vec3 uPlainsColorGrass4;
-uniform vec3 uPlainsColorGrass5;
+uniform float uPlainsHeightPatternFreq;
+uniform float uPlainsGroundPatternFreq;
 
-uniform vec3 uPlainsColorDirt0;
-uniform vec3 uPlainsColorDirt1;
-uniform vec3 uPlainsColorDirt2;
-uniform vec3 uPlainsColorDirt3;
-uniform vec3 uPlainsColorDirt4;
-uniform vec3 uPlainsColorDirt5;
+uniform vec3 uPlainsGrassColor0;
+uniform vec3 uPlainsGrassColor1;
+uniform vec3 uPlainsGrassColor2;
+uniform vec3 uPlainsGrassColor3;
 
-uniform vec3 uPlainsColorSnow0;
-uniform vec3 uPlainsColorSnow1;
+uniform vec3 uPlainsDirtColor0;
+uniform vec3 uPlainsDirtColor1;
+uniform vec3 uPlainsDirtColor2;
+uniform vec3 uPlainsDirtColor3;
+uniform vec3 uPlainsDirtColor4;
+uniform vec3 uPlainsDirtColor5;
+
+uniform vec3 uPlainsSnowColor0;
+uniform vec3 uPlainsSnowColor1;
 
 layout(rgba32ui) uniform uimage2D uChunkTexture;
 
@@ -36,19 +37,19 @@ uint colorToUint(vec3 color) {
     return uint(color.r * 255) << 16 | uint(color.g * 255) << 8 | uint(color.b * 255);
 }
 
-vec3 mapColor1(float colorNoise, bool firstTriangle, vec3[2] colors) {
+vec3 mapColor(float colorNoise, bool firstTriangle, vec3[2] colors) {
     int idx = int(floor(colorNoise * 1));
     idx = idx * 2 + int(firstTriangle);
     return colors[idx];
 }
 
-vec3 mapColor2(float colorNoise, bool firstTriangle, vec3[4] colors) {
+vec3 mapColor(float colorNoise, bool firstTriangle, vec3[4] colors) {
     int idx = int(floor(colorNoise * 2));
     idx = idx * 2 + int(firstTriangle);
     return colors[idx];
 }
 
-vec3 mapColor3(float colorNoise, bool firstTriangle, vec3[6] colors) {
+vec3 mapColor(float colorNoise, bool firstTriangle, vec3[6] colors) {
     int idx = int(floor(colorNoise * 3));
     idx = idx * 2 + int(firstTriangle);
     return colors[idx];
@@ -87,26 +88,24 @@ vec3 getColor(vec2 uv, float hightNoise, bool firstTriangle)
 
     hightNoise *= 4;
 
-    float freqH = 10;
-    hightNoise += voronoiNoise(seedHight, uv * freqH, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_CELL_VALUE) * 0.1;
+    hightNoise += voronoiNoise(seedHight, uv * uPlainsHeightPatternFreq, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_CELL_VALUE) * 0.1;
 
-    float freqC = 5;
-    float colorNoise = voronoiNoise(seedColor, uv * freqC, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_CELL_VALUE) * 0.5 + 0.5;
+    float colorNoise = voronoiNoise(seedColor, uv * uPlainsGroundPatternFreq, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_CELL_VALUE) * 0.5 + 0.5;
 
     if (hightNoise < 0.2) // Grass
     {
-        const vec3[] colors = { uPlainsColorGrass0, uPlainsColorGrass1, uPlainsColorGrass2, uPlainsColorGrass3, uPlainsColorGrass4, uPlainsColorGrass5 };
-        return mapColor3(colorNoise, firstTriangle, colors);
+        const vec3[] colors = { uPlainsGrassColor0, uPlainsGrassColor1, uPlainsGrassColor2, uPlainsGrassColor3 };
+        return mapColor(colorNoise, firstTriangle, colors);
     }
     if (hightNoise < 0.8) // Dirt
     {
-        const vec3[] colors = { uPlainsColorDirt0, uPlainsColorDirt1, uPlainsColorDirt2, uPlainsColorDirt3, uPlainsColorDirt4, uPlainsColorDirt5 };
-        return mapColor3(colorNoise, firstTriangle, colors);
+        const vec3[] colors = { uPlainsDirtColor0, uPlainsDirtColor1, uPlainsDirtColor2, uPlainsDirtColor3, uPlainsDirtColor4, uPlainsDirtColor5 };
+        return mapColor(colorNoise, firstTriangle, colors);
     }
     else // Snow
     {
-        const vec3[] colors = { uPlainsColorSnow0, uPlainsColorSnow1 };
-        return mapColor1(colorNoise, firstTriangle, colors);
+        const vec3[] colors = { uPlainsSnowColor0, uPlainsSnowColor1 };
+        return mapColor(colorNoise, firstTriangle, colors);
     }
 }
 

@@ -31,11 +31,11 @@ internal class TerrainManager : ICustomUniformManager
         // Tessellation
 
         _tessellationMap = new();
-        _tessellationMap.Add(new(4, 64, this));
-        _tessellationMap.Add(new(4, 32, this));
-        _tessellationMap.Add(new(4, 16, this));
-        _tessellationMap.Add(new(4, 8, this));
-        _tessellationMap.Add(new(4, 4, this));
+        _tessellationMap.Add(new(5, 16, this));
+        _tessellationMap.Add(new(5, 8, this));
+        _tessellationMap.Add(new(5, 4, this));
+        _tessellationMap.Add(new(5, 2, this));
+        _tessellationMap.Add(new(5, 1, this));
 
         // Terrain Generator
 
@@ -385,11 +385,7 @@ internal class TerrainManager : ICustomUniformManager
     private void RenderBiomeSettingsWindow()
     {
         bool updated = _terrainGenerator.RenderBiomeSettingsWindow();
-
-        if (updated)
-        {
-            UpdateChunkTextures();
-        }
+        if (updated) UpdateChunkTextures();
     }
 
     public Mesh CreateChunkMesh(uint divisions)

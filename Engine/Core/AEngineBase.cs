@@ -31,6 +31,7 @@ public abstract class AEngineBase : GameWindow
     private static bool s_wasAlreadyCreated = false;
 
     // Settings
+    public string SmartPropertiesConfigPath { get; set; } = "SmartProperties.xml";
     public new string Title { get; set; } = "My Game";
     public Vector3? ClearColor { get; set; } = new(0.2f, 0.3f, 0.3f);
 

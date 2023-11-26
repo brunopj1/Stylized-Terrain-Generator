@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SmartProperties>
+	<Group Name="Plains">
+		<Property Name="Plains Ground Pattern Freq" Value="2" />
+		<Property Name="Plains Height Pattern Freq" Value="5" />
+		<Property Name="Plains Grass Color 0" Value="(0.183; 0.539; 0.111)" />
+		<Property Name="Plains Grass Color 1" Value="(0.141; 0.662; 0.036)" />
+		<Property Name="Plains Grass Color 2" Value="(0.18; 0.471; 0.122)" />
+		<Property Name="Plains Grass Color 3" Value="(0.141; 0.662; 0.036)" />
+		<Property Name="Plains Dirt Color 0" Value="(0.3725; 0.2549; 0.2196)" />
+		<Property Name="Plains Dirt Color 1" Value="(0.4392; 0.302; 0.2588)" />
+		<Property Name="Plains Dirt Color 2" Value="(0.3176; 0.2039; 0.1804)" />
+		<Property Name="Plains Dirt Color 3" Value="(0.3725; 0.2549; 0.2196)" />
+		<Property Name="Plains Dirt Color 4" Value="(0.251; 0.1529; 0.1333)" />
+		<Property Name="Plains Dirt Color 5" Value="(0.3176; 0.2039; 0.1804)" />
+		<Property Name="Plains Snow Color 0" Value="(0.9765; 0.9765; 0.9765)" />
+		<Property Name="Plains Snow Color 1" Value="(0.8745; 0.8745; 0.8745)" />
+	</Group>
+	<Group Name="Grid Settings">
+		<Property Name="Dynamic Terrain Offset" Value="True" />
+		<Property Name="Grid Offset" Value="(0; 0)" />
+		<Property Name="Chunk Length" Value="500" />
+		<Property Name="Chunk Height" Value="3500" />
+		<Property Name="Chunk Height Step" Value="3" />
+	</Group>
+	<Group Name="Sky Settings">
+		<Property Name="Sky Color 0" Value="(0.23; 0.43; 0.71)" />
+		<Property Name="Sky Color 1" Value="(0.5; 0.61; 0.85)" />
+		<Property Name="Sky Noise Factor" Value="0.2" />
+		<Property Name="Sky Noise Freq" Value="8" />
+		<Property Name="Cloud Voronoi Noise Freq" Value="16" />
+		<Property Name="Cloud Perlin Noise Freq" Value="0.1" />
+		<Property Name="Cloud Threshold" Value="0.7" />
+		<Property Name="Cloud Exponent" Value="0.9" />
+		<Property Name="Cloud Time Factor" Value="0.05" />
+		<Property Name="Cloud Direction" Value="(0.8; 0.2; 0.1)" />
+	</Group>
+</SmartProperties>

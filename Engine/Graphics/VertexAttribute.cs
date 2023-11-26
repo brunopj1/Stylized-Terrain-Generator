@@ -1,6 +1,6 @@
 ﻿namespace Engine.Graphics;
 
-public struct VertexAttribute
+public readonly struct VertexAttribute
 {
     public VertexAttribute(VertexAttribPointerType type, int size, bool normalized)
     {

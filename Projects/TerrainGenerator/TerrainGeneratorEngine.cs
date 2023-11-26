@@ -1,6 +1,7 @@
 ﻿using Engine.Core;
 using Engine.Graphics;
 using Engine.Util.PlayerControllers;
+using Engine.Util.SmartProperties;
 using Engine.Util.SmartProperties.Properties;
 using OpenTK.Windowing.Common;
 using TerrainGenerator.Graphics;
@@ -44,6 +45,8 @@ internal class TerrainGeneratorEngine : AEngineBase
         base.OnLoad();
 
         GL.ProvokingVertex(ProvokingVertexMode.FirstVertexConvention);
+
+        PropertyGroup.LoadValuesFromFile(SmartPropertiesConfigPath);
 
         _terrainManager.Load();
     }

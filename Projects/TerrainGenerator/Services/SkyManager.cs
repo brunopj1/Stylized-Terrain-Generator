@@ -48,44 +48,24 @@ internal class SkyManager : ICustomUniformManager
         _propertyGroup = new("Sky Settings");
         imGuiRenderer.AddOverlay(() => _propertyGroup.RenderWindow());
 
-        SkyColor0 = new(_propertyGroup, "Sky Color 0", new(0.23f, 0.43f, 0.71f));
+        new Vector3Property(_propertyGroup, "Sky Color 0");
+        new Vector3Property(_propertyGroup, "Sky Color 1");
+        new FloatProperty(_propertyGroup, "Sky Noise Factor");
+        new FloatProperty(_propertyGroup, "Sky Noise Freq");
 
-        SkyColor1 = new(_propertyGroup, "Sky Color 1", new(0.50f, 0.61f, 0.85f));
+        new PropertySeparator(_propertyGroup, 2);
 
-        SkyNoiseFactor = new(_propertyGroup, "Sky Noise Factor", 0.2f);
-
-        SkyNoiseFreq = new(_propertyGroup, "Sky Noise Freq", 8f);
-
-        _ = new PropertySeparator(_propertyGroup, 2);
-
-        CloudVoronoiNoiseFreq = new(_propertyGroup, "Cloud Voronoi Noise Freq", 16f);
-
-        CloudPerlinNoiseFreq = new(_propertyGroup, "Cloud Perlin Noise Freq", 0.1f);
-
-        CloudThreshold = new(_propertyGroup, "Cloud Threshold", 0.7f);
-
-        CloudExponent = new(_propertyGroup, "Cloud Exponent", 0.9f);
-
-        CloudTimeFactor = new(_propertyGroup, "Cloud Time Factor", 0.05f);
-
-        CloudDirection = new(_propertyGroup, "Cloud Direction", new(0.8f, 0.2f, 0.1f));
+        new FloatProperty(_propertyGroup, "Cloud Voronoi Noise Freq");
+        new FloatProperty(_propertyGroup, "Cloud Perlin Noise Freq");
+        new FloatProperty(_propertyGroup, "Cloud Threshold");
+        new FloatProperty(_propertyGroup, "Cloud Exponent");
+        new FloatProperty(_propertyGroup, "Cloud Time Factor");
+        new Vector3Property(_propertyGroup, "Cloud Direction");
     }
 
     private readonly Model _skyModel;
 
     private readonly PropertyGroup _propertyGroup;
-
-    public Color3Property SkyColor0 { get; }
-    public Color3Property SkyColor1 { get; }
-    public FloatProperty SkyNoiseFactor { get; }
-    public FloatProperty SkyNoiseFreq { get; }
-
-    public FloatProperty CloudVoronoiNoiseFreq { get; }
-    public FloatProperty CloudPerlinNoiseFreq { get; }
-    public FloatProperty CloudThreshold { get; }
-    public FloatProperty CloudExponent { get; }
-    public FloatProperty CloudTimeFactor { get; }
-    public Vector3Property CloudDirection { get; }
 
     public void BindUniforms(AShader shader)
     {
