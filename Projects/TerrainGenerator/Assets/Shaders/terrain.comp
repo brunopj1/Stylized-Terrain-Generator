@@ -19,6 +19,11 @@ uniform vec3 uPlainsGrassColor1;
 uniform vec3 uPlainsGrassColor2;
 uniform vec3 uPlainsGrassColor3;
 
+uniform int uPlainsEnableFlowers;
+uniform float uPlainsFlowersPatchSize;
+uniform float uPlainsFlowersThreshold;
+uniform vec3 uPlainsFlowersColor;
+
 uniform vec3 uPlainsDirtColor0;
 uniform vec3 uPlainsDirtColor1;
 uniform vec3 uPlainsDirtColor2;
@@ -94,6 +99,14 @@ vec3 getColor(vec2 uv, float hightNoise, bool firstTriangle)
 
     if (hightNoise < 0.2) // Grass
     {
+        // Flowers
+        if (uPlainsEnableFlowers == 1 && firstTriangle) {
+            float flowersNoise = voronoiNoise(seedColor, uv * uPlainsFlowersPatchSize, VORONOI_DISTANCE_EUCLIDEAN_SQR, VORONOI_RETURN_CELL_VALUE) * 0.5 + 0.5;
+            if (flowersNoise > uPlainsFlowersThreshold) {
+                return uPlainsFlowersColor;
+            }
+        }
+
         const vec3[] colors = { uPlainsGrassColor0, uPlainsGrassColor1, uPlainsGrassColor2, uPlainsGrassColor3 };
         return mapColor(colorNoise, firstTriangle, colors);
     }

@@ -19,28 +19,36 @@ internal class TerrainGenerator
 
         _plainsPropertyGroup = new PropertyGroup("Plains");
 
-        new FloatProperty(_plainsPropertyGroup, "Plains Ground Pattern Freq", 2f);
-        new FloatProperty(_plainsPropertyGroup, "Plains Height Pattern Freq", 5f);
+        new PropertyPushItemWidth(_plainsPropertyGroup, 200);
+
+        new BoolProperty(_plainsPropertyGroup, "Plains Enable Flowers");
+        new FloatProperty(_plainsPropertyGroup, "Plains Flowers Patch Size");
+        new FloatProperty(_plainsPropertyGroup, "Plains Flowers Threshold");
+        new Color3Property(_plainsPropertyGroup, "Plains Flowers Color");
 
         new PropertySeparator(_plainsPropertyGroup);
 
-        new Color3Property(_plainsPropertyGroup, "Plains Grass Color 0", new(0.183f, 0.539f, 0.111f));
-        new Color3Property(_plainsPropertyGroup, "Plains Grass Color 1", new(0.141f, 0.662f, 0.036f));
-        new Color3Property(_plainsPropertyGroup, "Plains Grass Color 2", new(0.180f, 0.471f, 0.122f));
-        new Color3Property(_plainsPropertyGroup, "Plains Grass Color 3", new(0.141f, 0.662f, 0.036f));
+        new FloatProperty(_plainsPropertyGroup, "Plains Ground Pattern Freq");
+        new FloatProperty(_plainsPropertyGroup, "Plains Height Pattern Freq");
+
+        new Color3Property(_plainsPropertyGroup, "Plains Grass Color 0");
+        new Color3Property(_plainsPropertyGroup, "Plains Grass Color 1");
+        new Color3Property(_plainsPropertyGroup, "Plains Grass Color 2");
+        new Color3Property(_plainsPropertyGroup, "Plains Grass Color 3");
 
         new PropertySeparator(_plainsPropertyGroup);
 
-        new Color3Property(_plainsPropertyGroup, "Plains Dirt Color 0", new(0.3725f, 0.2549f, 0.2196f));
-        new Color3Property(_plainsPropertyGroup, "Plains Dirt Color 1", new(0.4392f, 0.3020f, 0.2588f));
-        new Color3Property(_plainsPropertyGroup, "Plains Dirt Color 2", new(0.3176f, 0.2039f, 0.1804f));
-        new Color3Property(_plainsPropertyGroup, "Plains Dirt Color 3", new(0.3725f, 0.2549f, 0.2196f));
-        new Color3Property(_plainsPropertyGroup, "Plains Dirt Color 4", new(0.2510f, 0.1529f, 0.1333f));
-        new Color3Property(_plainsPropertyGroup, "Plains Dirt Color 5", new(0.3176f, 0.2039f, 0.1804f));
+        new Color3Property(_plainsPropertyGroup, "Plains Dirt Color 0");
+        new Color3Property(_plainsPropertyGroup, "Plains Dirt Color 1");
+        new Color3Property(_plainsPropertyGroup, "Plains Dirt Color 2");
+        new Color3Property(_plainsPropertyGroup, "Plains Dirt Color 3");
+        new Color3Property(_plainsPropertyGroup, "Plains Dirt Color 4");
+        new Color3Property(_plainsPropertyGroup, "Plains Dirt Color 5");
 
-        new Color3Property(_plainsPropertyGroup, "Plains Snow Color 0", new(0.9765f, 0.9765f, 0.9765f));
-        new Color3Property(_plainsPropertyGroup, "Plains Snow Color 1", new(0.8745f, 0.8745f, 0.8745f));
+        new Color3Property(_plainsPropertyGroup, "Plains Snow Color 0");
+        new Color3Property(_plainsPropertyGroup, "Plains Snow Color 1");
 
+        new PropertySeparator(_plainsPropertyGroup);
     }
 
     private readonly PropertyGroup _plainsPropertyGroup;

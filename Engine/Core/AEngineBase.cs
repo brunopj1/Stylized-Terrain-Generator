@@ -126,6 +126,8 @@ public abstract class AEngineBase : GameWindow
     {
         base.OnRenderFrame(args);
 
+        _uniformManager.Update();
+
         _imGuiController!.Update(this, (float)args.Time);
 
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -153,6 +155,14 @@ public abstract class AEngineBase : GameWindow
     }
 
     protected virtual void OnRecompileShaders()
+    {
+    }
+
+    protected virtual void OnSaveSmartProperties()
+    {
+    }
+
+    protected virtual void OnLoadSmartProperties()
     {
     }
 

@@ -22,7 +22,7 @@ internal class TerrainGeneratorEngine : AEngineBase
         // Player Controller
         PlayerController = new FlyingPlayerController(this);
         ((FlyingPlayerController)PlayerController).MovementSpeed = 150f;
-        ((FlyingPlayerController)PlayerController).RunMultiplier = 5f;
+        ((FlyingPlayerController)PlayerController).RunMultiplier = 3f;
 
         // Services
         _terrainManager = new(Renderer, ImGuiRenderer);
@@ -59,6 +59,11 @@ internal class TerrainGeneratorEngine : AEngineBase
     }
 
     protected override void OnRecompileShaders()
+    {
+        _terrainManager.UpdateChunkTextures();
+    }
+
+    protected override void OnLoadSmartProperties()
     {
         _terrainManager.UpdateChunkTextures();
     }

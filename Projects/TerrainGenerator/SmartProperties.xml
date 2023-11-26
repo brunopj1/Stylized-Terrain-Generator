@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <SmartProperties>
 	<Group Name="Plains">
+		<Property Name="Plains Enable Flowers" Value="False" />
+		<Property Name="Plains Flowers Patch Size" Value="2.5" />
+		<Property Name="Plains Flowers Threshold" Value="0.99" />
+		<Property Name="Plains Flowers Color" Value="(0.9264706; 0.90750307; 0.2815744)" />
 		<Property Name="Plains Ground Pattern Freq" Value="2" />
 		<Property Name="Plains Height Pattern Freq" Value="5" />
 		<Property Name="Plains Grass Color 0" Value="(0.183; 0.539; 0.111)" />
@@ -14,14 +18,12 @@
 		<Property Name="Plains Dirt Color 4" Value="(0.251; 0.1529; 0.1333)" />
 		<Property Name="Plains Dirt Color 5" Value="(0.3176; 0.2039; 0.1804)" />
 		<Property Name="Plains Snow Color 0" Value="(0.9765; 0.9765; 0.9765)" />
-		<Property Name="Plains Snow Color 1" Value="(0.8745; 0.8745; 0.8745)" />
+		<Property Name="Plains Snow Color 1" Value="(0.7990196; 0.7990196; 0.7990196)" />
 	</Group>
 	<Group Name="Grid Settings">
-		<Property Name="Dynamic Terrain Offset" Value="True" />
-		<Property Name="Grid Offset" Value="(0; 0)" />
-		<Property Name="Chunk Length" Value="500" />
-		<Property Name="Chunk Height" Value="3500" />
-		<Property Name="Chunk Height Step" Value="3" />
+		<Property Name="Chunk Length" Value="150" />
+		<Property Name="Chunk Height" Value="1000" />
+		<Property Name="Chunk Height Step" Value="4" />
 	</Group>
 	<Group Name="Sky Settings">
 		<Property Name="Sky Color 0" Value="(0.23; 0.43; 0.71)" />

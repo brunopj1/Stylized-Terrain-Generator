@@ -46,7 +46,9 @@ internal class SkyManager : ICustomUniformManager
         // Smart Properties
 
         _propertyGroup = new("Sky Settings");
-        imGuiRenderer.AddOverlay(() => _propertyGroup.RenderWindow());
+        imGuiRenderer.AddWindowOverlay(() => _propertyGroup.RenderWindow());
+
+        new PropertyPushItemWidth(_propertyGroup, 200);
 
         new Vector3Property(_propertyGroup, "Sky Color 0");
         new Vector3Property(_propertyGroup, "Sky Color 1");
@@ -61,6 +63,8 @@ internal class SkyManager : ICustomUniformManager
         new FloatProperty(_propertyGroup, "Cloud Exponent");
         new FloatProperty(_propertyGroup, "Cloud Time Factor");
         new Vector3Property(_propertyGroup, "Cloud Direction");
+
+        new PropertyPopItemWidth(_propertyGroup);
     }
 
     private readonly Model _skyModel;

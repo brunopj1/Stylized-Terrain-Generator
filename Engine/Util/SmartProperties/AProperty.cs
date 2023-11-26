@@ -53,3 +53,22 @@ public abstract class AProperty<T> : AProperty where T : struct
     internal override abstract void BindUniform(AShader shader);
     internal override abstract bool RenderInputField();
 }
+
+public abstract class ACustomProperty : AProperty
+{
+    public ACustomProperty(PropertyGroup group)
+        : base(group, "")
+    {
+    }
+
+    public override string StringValue { get => ""; set { } }
+
+    public override bool AllowSerialization { get => false; set { } }
+    public override bool HasShaderUniform { get => false; set { } }
+
+    internal override void BindUniform(AShader shader)
+    {
+    }
+
+    internal override abstract bool RenderInputField();
+}

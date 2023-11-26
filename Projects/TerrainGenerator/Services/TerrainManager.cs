@@ -45,9 +45,15 @@ internal class TerrainManager : ICustomUniformManager
 
         _gridPropertyGroup = new("Grid Settings");
 
-        DynamicTerrainOffset = new(_gridPropertyGroup, "Dynamic Terrain Offset", true);
+        DynamicTerrainOffset = new(_gridPropertyGroup, "Dynamic Terrain Offset", true)
+        {
+            AllowSerialization = false
+        };
 
-        GridOffset = new(_gridPropertyGroup, "Grid Offset", Vector2i.Zero);
+        GridOffset = new(_gridPropertyGroup, "Grid Offset", Vector2i.Zero)
+        {
+            AllowSerialization = false
+        };
         GridOffset.OnValueModified += (oldValue, newValue) =>
         {
             var offset = newValue - oldValue;
@@ -55,10 +61,10 @@ internal class TerrainManager : ICustomUniformManager
             OffsetChunkTextures(offset);
         };
 
-        ChunkLength = new(_gridPropertyGroup, "Chunk Length", 500f)
+        ChunkLength = new(_gridPropertyGroup, "Chunk Length", 100f)
         {
-            Range = new() { Min = 10, Max = 1000 },
-            RenderSettings = new() { DragStep = 2f }
+            Range = new() { Min = 1, Max = 1000 },
+            RenderSettings = new() { DragStep = 1f }
         };
         ChunkLength.OnValueModified += (oldValue, newValue) =>
         {
@@ -67,9 +73,9 @@ internal class TerrainManager : ICustomUniformManager
             UpdateCameraViewDistance();
         };
 
-        ChunkHeight = new(_gridPropertyGroup, "Chunk Height", 3500f)
+        ChunkHeight = new(_gridPropertyGroup, "Chunk Height", 700f)
         {
-            Range = new() { Min = 0, Max = 10000 },
+            Range = new() { Min = 0, Max = 5000 },
             RenderSettings = new() { DragStep = 10f }
         };
         ChunkHeight.OnValueModified += (oldValue, newValue) =>
@@ -78,7 +84,7 @@ internal class TerrainManager : ICustomUniformManager
             UpdateChunkTextures();
         };
 
-        ChunkHeightStep = new(_gridPropertyGroup, "Chunk Height Step", 3f)
+        ChunkHeightStep = new(_gridPropertyGroup, "Chunk Height Step", 2.5f)
         {
             Range = new() { Min = 0.1f, Max = 100 },
             RenderSettings = new() { DragStep = 0.1f }
@@ -90,9 +96,9 @@ internal class TerrainManager : ICustomUniformManager
 
         // Overlays
 
-        imGuiRenderer.AddOverlay(() => _gridPropertyGroup.RenderWindow());
-        imGuiRenderer.AddOverlay(RenderTessellationSettingsWindow);
-        imGuiRenderer.AddOverlay(RenderBiomeSettingsWindow);
+        imGuiRenderer.AddWindowOverlay(() => _gridPropertyGroup.RenderWindow());
+        imGuiRenderer.AddWindowOverlay(RenderTessellationSettingsWindow);
+        imGuiRenderer.AddWindowOverlay(RenderBiomeSettingsWindow);
     }
 
     private readonly Renderer _renderer;
@@ -369,7 +375,6 @@ internal class TerrainManager : ICustomUniformManager
 
             ImGui.PopID();
 
-            ImGui.Separator();
             ImGui.Separator();
         }
 

@@ -16,6 +16,15 @@ internal class EngineUniformManager
     private readonly EngineClock _clock;
     private readonly Renderer _renderer;
 
+    private Vector2i _resolution;
+    private float _aspectRatio;
+
+    internal void Update()
+    {
+        _resolution = _window.Size;
+        _aspectRatio = _resolution.X / (float)_resolution.Y;
+    }
+
     internal void BindUniforms(RenderShader shader, ref Matrix4 modelMatrix)
     {
         // Time
@@ -45,11 +54,9 @@ internal class EngineUniformManager
 
         // Window
 
-        var resolution = _window.Size;
+        shader.BindUniform("uWindowResolution", _resolution);
 
-        shader.BindUniform("uWindowResolution", resolution);
-
-        shader.BindUniform("uWindowAspectRatio", resolution.X / (float)resolution.Y);
+        shader.BindUniform("uWindowAspectRatio", _aspectRatio);
 
         // Camera
 

@@ -168,7 +168,6 @@ public class Camera
         }
 
         ImGui.Separator();
-        ImGui.Separator();
 
         tempV3 = new(Front.X, Front.Y, Front.Z);
         if (ImGui.InputFloat3("Front", ref tempV3, null, ImGuiInputTextFlags.ReadOnly)) Front = new(tempV3.X, tempV3.Y, tempV3.Z);

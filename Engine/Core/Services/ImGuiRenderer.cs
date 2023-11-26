@@ -2,33 +2,33 @@
 
 namespace Engine.Core.Services;
 
-public delegate void ImGuiOverlay();
-
 public class ImGuiRenderer
 {
     internal ImGuiRenderer()
     {
     }
 
-    private readonly List<ImGuiOverlay> _generalOverlays = new();
-    private readonly List<ImGuiOverlay> _mainMenuBarOverlays = new();
+    public delegate void ImGuiOverlayHandler();
 
-    public void AddOverlay(ImGuiOverlay overlay)
+    private readonly List<ImGuiOverlayHandler> _windowOverlays = new();
+    private readonly List<ImGuiOverlayHandler> _mainMenuBarOverlays = new();
+
+    public void AddWindowOverlay(ImGuiOverlayHandler overlay)
     {
-        _generalOverlays.Add(overlay);
+        _windowOverlays.Add(overlay);
     }
 
-    public void RemoveOverlay(ImGuiOverlay overlay)
+    public void RemoveWindowOverlay(ImGuiOverlayHandler overlay)
     {
-        _generalOverlays.Remove(overlay);
+        _windowOverlays.Remove(overlay);
     }
 
-    public void AddMainMenuBarOverlay(ImGuiOverlay overlay)
+    public void AddMainMenuBarOverlay(ImGuiOverlayHandler overlay)
     {
         _mainMenuBarOverlays.Add(overlay);
     }
 
-    public void RemoveMainMenuBarOverlay(ImGuiOverlay overlay)
+    public void RemoveMainMenuBarOverlay(ImGuiOverlayHandler overlay)
     {
         _mainMenuBarOverlays.Remove(overlay);
     }
@@ -49,7 +49,7 @@ public class ImGuiRenderer
         }
 
         // General
-        foreach (var overlay in _generalOverlays)
+        foreach (var overlay in _windowOverlays)
         {
             overlay();
         }
