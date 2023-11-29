@@ -31,8 +31,7 @@ internal class TerrainManager : ICustomUniformManager
         // Tessellation
 
         _tessellationMap = new();
-        _tessellationMap.Add(new(5, 16, this));
-        _tessellationMap.Add(new(5, 8, this));
+        _tessellationMap.Add(new(7, 8, this));
         _tessellationMap.Add(new(5, 4, this));
         _tessellationMap.Add(new(5, 2, this));
         _tessellationMap.Add(new(5, 1, this));
@@ -92,6 +91,12 @@ internal class TerrainManager : ICustomUniformManager
         ChunkHeightStep.OnValueModified += (oldValue, newValue) =>
         {
             UpdateChunkTextures();
+        };
+
+        // TODO move this to somewhere else
+        new FloatProperty(_gridPropertyGroup, "Edge Distance", 0.02f)
+        {
+            Range = new() { Min = 0, Max = 1 }
         };
 
         // Overlays
