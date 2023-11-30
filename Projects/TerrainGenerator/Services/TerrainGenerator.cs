@@ -15,6 +15,25 @@ internal class TerrainGenerator
 {
     public TerrainGenerator()
     {
+        // General
+
+        _generalPropertyGroup = new PropertyGroup("General");
+
+        new PropertyPushItemWidth(_generalPropertyGroup, 200);
+
+        new FloatProperty(_generalPropertyGroup, "Chunk Height Step")
+        {
+            Range = new() { Min = 0.1f, Max = 100 },
+            RenderSettings = new() { DragStep = 0.1f }
+        };
+
+        new FloatProperty(_generalPropertyGroup, "Edge Distance")
+        {
+            Range = new() { Min = 0, Max = 0.34f }
+        };
+
+        new PropertyPopItemWidth(_generalPropertyGroup);
+
         // Plains
 
         _plainsPropertyGroup = new PropertyGroup("Plains");
@@ -48,18 +67,41 @@ internal class TerrainGenerator
         new Color3Property(_plainsPropertyGroup, "Plains Snow Color 0");
         new Color3Property(_plainsPropertyGroup, "Plains Snow Color 1");
 
-        new PropertySeparator(_plainsPropertyGroup);
+        new PropertyPopItemWidth(_plainsPropertyGroup);
     }
+
+    private readonly PropertyGroup _generalPropertyGroup;
 
     private readonly PropertyGroup _plainsPropertyGroup;
 
-    public void BindUniforms(AShader shader)
+    public void BindRenderUniforms(AShader shader)
     {
+        _generalPropertyGroup.BindUniforms(shader);
+    }
+
+    public void BindGenerationUniforms(AShader shader)
+    {
+        _generalPropertyGroup.BindUniforms(shader);
         _plainsPropertyGroup.BindUniforms(shader);
     }
 
     public bool RenderBiomeSettingsWindow()
     {
-        return _plainsPropertyGroup.RenderWindow();
+        bool updated = false;
+
+        ImGui.Begin("Terrain Generation Settings");
+
+        if (ImGui.BeginTabBar("Terrain Generation Settings Tabs"))
+        {
+            _ = _generalPropertyGroup.RenderAsTab(); // Frag only. Doesn't require texture update
+
+            updated = _plainsPropertyGroup.RenderAsTab() || updated;
+
+            ImGui.EndTabBar();
+        }
+
+        ImGui.End();
+
+        return updated;
     }
 }

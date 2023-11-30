@@ -36,7 +36,7 @@ public class PropertyGroup : ICustomUniformManager
         }
     }
 
-    public bool RenderWindow()
+    public bool RenderAsWindow()
     {
         ImGui.Begin(Name);
 
@@ -47,7 +47,7 @@ public class PropertyGroup : ICustomUniformManager
         return updated;
     }
 
-    public bool RenderTab()
+    public bool RenderAsTab()
     {
         if (!ImGui.BeginTabItem(Name)) return false;
 
@@ -58,7 +58,7 @@ public class PropertyGroup : ICustomUniformManager
         return updated;
     }
 
-    private bool RenderProperties()
+    public bool RenderProperties()
     {
         var updated = false;
 

@@ -6,7 +6,9 @@ uniform mat4 uViewMatrix;
 uniform mat4 uNormalMatrix;
 
 uniform float uChunkHeight;
+uniform float uChunkHeightStep;
 uniform uint uChunkDivisions;
+uniform uint uMaxChunkDivisions;
 
 uniform usampler2D uChunkTexture;
 
@@ -32,6 +34,8 @@ void main() {
     uvec4 texValue = texture(uChunkTexture, uv);
 
     float height = (texValue.x / 4294967295.0) * uChunkHeight;
+    float heightStep = uChunkHeightStep / (float(uChunkDivisions) / uMaxChunkDivisions);
+    height = clamp(round(height / heightStep) * heightStep, 0, uChunkHeight);
 
     vec4 pos = vec4(aPosition.x, height, aPosition.y, 1);
     DataOut.viewPos = vec3(uViewMatrix * uModelMatrix * pos);

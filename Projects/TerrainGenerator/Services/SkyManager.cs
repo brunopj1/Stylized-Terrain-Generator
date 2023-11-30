@@ -46,7 +46,7 @@ internal class SkyManager : ICustomUniformManager
         // Smart Properties
 
         _propertyGroup = new("Sky Settings");
-        imGuiRenderer.AddWindowOverlay(() => _propertyGroup.RenderWindow());
+        imGuiRenderer.AddWindowOverlay(() => _propertyGroup.RenderAsWindow());
 
         new PropertyPushItemWidth(_propertyGroup, 200);
 

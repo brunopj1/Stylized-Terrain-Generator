@@ -1,5 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <SmartProperties>
+	<Group Name="General">
+		<Property Name="Chunk Height Step" Value="5.9" />
+		<Property Name="Edge Distance" Value="0.02" />
+	</Group>
 	<Group Name="Plains">
 		<Property Name="Plains Enable Flowers" Value="False" />
 		<Property Name="Plains Flowers Patch Size" Value="2.5" />
@@ -23,8 +27,6 @@
 	<Group Name="Grid Settings">
 		<Property Name="Chunk Length" Value="150" />
 		<Property Name="Chunk Height" Value="1000" />
-		<Property Name="Chunk Height Step" Value="6" />
-		<Property Name="Edge Distance" Value="0.02" />
 	</Group>
 	<Group Name="Sky Settings">
 		<Property Name="Sky Color 0" Value="(0.23; 0.43; 0.71)" />

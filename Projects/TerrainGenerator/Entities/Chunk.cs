@@ -8,13 +8,6 @@ namespace TerrainGenerator.Entities;
 
 internal class Chunk : ICustomUniformManager
 {
-    public Chunk(TerrainManager terrainManager)
-    {
-        _terrainManager = terrainManager;
-    }
-
-    private readonly TerrainManager _terrainManager;
-
     public Vector2i Offset { get; set; }
     public uint Divisions { get; set; }
 
@@ -23,8 +16,6 @@ internal class Chunk : ICustomUniformManager
 
     public void BindUniforms(AShader shader)
     {
-        _terrainManager.BindUniforms(shader);
-
         shader.BindUniform("uChunkOffset", Offset);
         shader.BindUniform("uChunkDivisions", Divisions);
         shader.BindUniform("uChunkTexture", Texture, 0);

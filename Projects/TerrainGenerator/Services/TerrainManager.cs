@@ -83,26 +83,9 @@ internal class TerrainManager : ICustomUniformManager
             UpdateChunkTextures();
         };
 
-        ChunkHeightStep = new(_gridPropertyGroup, "Chunk Height Step", 2.5f)
-        {
-            Range = new() { Min = 0.1f, Max = 100 },
-            RenderSettings = new() { DragStep = 0.1f }
-        };
-        ChunkHeightStep.OnValueModified += (oldValue, newValue) =>
-        {
-            UpdateChunkTextures();
-        };
-
-        // TODO move this to somewhere else
-        new FloatProperty(_gridPropertyGroup, "Edge Distance", 0.02f)
-        {
-            Range = new() { Min = 0, Max = 1 }
-        };
-
         // Overlays
 
-        imGuiRenderer.AddWindowOverlay(() => _gridPropertyGroup.RenderWindow());
-        imGuiRenderer.AddWindowOverlay(RenderTessellationSettingsWindow);
+        imGuiRenderer.AddWindowOverlay(RenderSettingsWindow);
         imGuiRenderer.AddWindowOverlay(RenderBiomeSettingsWindow);
     }
 
@@ -121,7 +104,6 @@ internal class TerrainManager : ICustomUniformManager
     public Vector2iProperty GridOffset { get; }
     public FloatProperty ChunkLength { get; }
     public FloatProperty ChunkHeight { get; }
-    public FloatProperty ChunkHeightStep { get; }
 
     private readonly TesselationMap _tessellationMap;
 
@@ -162,9 +144,9 @@ internal class TerrainManager : ICustomUniformManager
         {
             for (var j = 0; j < gridSize; j++)
             {
-                var chunk = new Chunk(this);
+                var chunk = new Chunk();
                 chunk.Model = _renderer.CreateModel(null, _renderShader);
-                chunk.Model.CustomUniformManagers = new() { chunk };
+                chunk.Model.CustomUniformManagers = new() { this, chunk };
 
                 _chunkGrid[i, j] = chunk;
             }
@@ -316,11 +298,26 @@ internal class TerrainManager : ICustomUniformManager
         _gridPropertyGroup.BindUniforms(shader);
 
         shader.BindUniform("uMaxChunkDivisions", _tessellationMap.MaxDivisions);
+
+        _terrainGenerator.BindRenderUniforms(shader);
     }
 
-    public void RenderTessellationSettingsWindow()
+    public void RenderSettingsWindow()
     {
-        ImGui.Begin("Tessellation Settings");
+        ImGui.Begin("Grid Settings");
+
+        _gridPropertyGroup.RenderProperties();
+
+        RenderTessellationSettingsWindow();
+
+        ImGui.End();
+    }
+
+    private void RenderTessellationSettingsWindow()
+    {
+        ImGui.Dummy(new(0, 5));
+        ImGui.SeparatorText("Tessellation");
+        ImGui.Dummy(new(0, 5));
 
         for (var i = 0; i < _tessellationMap.Count; i++)
         {
@@ -388,8 +385,6 @@ internal class TerrainManager : ICustomUniformManager
             _tessellationMap.Add(new(1, 0, this));
             UpdateChunkGrid();
         }
-
-        ImGui.End();
     }
 
     private void RenderBiomeSettingsWindow()
@@ -455,7 +450,7 @@ internal class TerrainManager : ICustomUniformManager
         _computeShader.Use();
 
         chunk.BindUniforms(_computeShader);
-        _terrainGenerator.BindUniforms(_computeShader);
+        _terrainGenerator.BindGenerationUniforms(_computeShader);
         _computeShader.BindUniform("uChunkTexture", chunk.Texture, 0, TextureAccess.WriteOnly);
 
         var size = new Vector2i((int)chunk.Divisions + 1);
