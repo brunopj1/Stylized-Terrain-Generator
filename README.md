@@ -17,6 +17,7 @@ This project creates low-poly terrains entirely on the GPU, which is generated d
 - **Look**: Use the mouse to look around.
 - **Horizontal Movement**: Use `W`, `A`, `S`, `D` to move horizontally.
 - **Vertical Movement**: Use `Space` to go up and `Left Control` to go down.
+- **Fly Faster**: Use `Left Shift` to increase your flying speed.
 - **Mouse**: Press `F1` to enable the mouse and interact with the settings.
 
 ## Building and Running the Project
